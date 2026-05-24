@@ -1,78 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Settings, Home, X, Check } from 'lucide-react';
+import { Volume2, VolumeX, Settings, Home, X, Check, BookOpen } from 'lucide-react';
 import { audioSynth } from './utils/audioSynth';
 import { mathGenerator } from './utils/mathGenerator';
-import VisualCounters from './components/VisualCounters';
-
-const THEMES = [
-  { id: 'space', icon: '🚀', className: 'theme-space' },
-  { id: 'candy', icon: '🍬', className: 'theme-candy' },
-  { id: 'forest', icon: '🍎', className: 'theme-forest' }
-];
+import { progressManager } from './utils/progressManager';
+import MathManipulatives from './components/MathManipulatives';
 
 export default function App() {
-  const [screen, setScreen] = useState('welcome'); // welcome, guardian, settings, playing
-  const [theme, setTheme] = useState('candy');
+  const [screen, setScreen] = useState('welcome'); // welcome, guardian, settings, playing, review
+  const [gameState, setGameState] = useState(progressManager.getInitialState());
   
-  // Parental Settings
-  const [maxNumber, setMaxNumber] = useState(10);
-  const [allowSub, setAllowSub] = useState(true);
-  
-  // Guardian Gate
+  // Settings sync
+  const [syncCodeInput, setSyncCodeInput] = useState('');
+  const [generatedSyncCode, setGeneratedSyncCode] = useState('');
+
+  // Guardian
   const [guardianQ, setGuardianQ] = useState(null);
   const [guardianA, setGuardianA] = useState('');
 
-  // Game State
+  // Gameplay
   const [currentQ, setCurrentQ] = useState(null);
   const [userAns, setUserAns] = useState('');
-  const [errorCount, setErrorCount] = useState(0); // For gentle guidance
-  const [errorPulse, setErrorPulse] = useState(false);
-  const [stars, setStars] = useState(0);
+  const [errorCount, setErrorCount] = useState(0);
+  const [basketFull, setBasketFull] = useState(false); // Used to unlock keypad in early stages
+  const [showHelp, setShowHelp] = useState(false); // Used in stage 3
 
   useEffect(() => {
-    const savedMax = localStorage.getItem('km_maxNum');
-    const savedSub = localStorage.getItem('km_allowSub');
-    const savedStars = localStorage.getItem('km_stars');
-    const savedTheme = localStorage.getItem('km_theme');
-
-    if (savedMax) setMaxNumber(parseInt(savedMax));
-    if (savedSub) setAllowSub(savedSub === 'true');
-    if (savedStars) setStars(parseInt(savedStars));
-    if (savedTheme) setTheme(savedTheme);
-  }, []);
+    progressManager.saveState(gameState);
+  }, [gameState]);
 
   useEffect(() => {
-    document.body.className = THEMES.find(t => t.id === theme)?.className || 'theme-candy';
-  }, [theme]);
-
-  // Read out the question whenever a new one is generated
-  useEffect(() => {
-    if (screen === 'playing' && currentQ) {
+    if ((screen === 'playing' || screen === 'review') && currentQ) {
       setTimeout(() => {
         audioSynth.speak(currentQ.spokenText);
-      }, 500); // Slight delay for smoother transition
+      }, 500);
     }
   }, [currentQ, screen]);
 
-  // Keyboard support
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (screen !== 'playing') return;
-      if (e.key >= '0' && e.key <= '9') {
-        audioSynth.playClick();
-        if (userAns.length < 3) setUserAns(prev => prev + e.key);
-      } else if (e.key === 'Backspace') {
-        audioSynth.playClick();
-        setUserAns(prev => prev.slice(0, -1));
-      } else if (e.key === 'Enter') {
-        submitAnswer();
-      }
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [screen, userAns, currentQ]);
-
-  // --- GUARDIAN GATE ---
+  // --- GUARDIAN ---
   const openGuardian = () => {
     audioSynth.playClick();
     const a = Math.floor(Math.random() * 20) + 15;
@@ -84,27 +48,65 @@ export default function App() {
 
   const checkGuardian = () => {
     if (parseInt(guardianA) === guardianQ.ans) {
+      setGeneratedSyncCode(progressManager.generateSyncCode());
       setScreen('settings');
     } else {
       setScreen('welcome');
     }
   };
 
-  const saveSettings = () => {
-    localStorage.setItem('km_maxNum', maxNumber.toString());
-    localStorage.setItem('km_allowSub', allowSub.toString());
-    localStorage.setItem('km_theme', theme);
-    setScreen('welcome');
+  // --- SETTINGS ---
+  const importSync = () => {
+    if (progressManager.importSyncCode(syncCodeInput)) {
+      alert("同步成功！");
+      setGameState(progressManager.getInitialState());
+    } else {
+      alert("无效的同步码");
+    }
+  };
+
+  const clearMistakes = () => {
+    if (confirm("确定要清空所有错题记录吗？")) {
+      const newState = { ...gameState, mistakes: [] };
+      setGameState(newState);
+      progressManager.saveState(newState);
+    }
   };
 
   // --- GAMEPLAY ---
   const startGame = () => {
     audioSynth.playClick();
+    startNewQuestion('playing');
+  };
+
+  const startReview = () => {
+    if (gameState.mistakes.length === 0) {
+      alert("太棒啦！目前没有错题记录！");
+      return;
+    }
+    audioSynth.playClick();
+    startNewQuestion('review');
+  };
+
+  const startNewQuestion = (mode) => {
     setUserAns('');
     setErrorCount(0);
-    setErrorPulse(false);
-    setCurrentQ(mathGenerator.generateQuestion(maxNumber, allowSub));
-    setScreen('playing');
+    setBasketFull(false);
+    setShowHelp(false);
+
+    if (mode === 'playing') {
+      setCurrentQ(mathGenerator.generateQuestion(gameState.stage));
+      setScreen('playing');
+    } else if (mode === 'review') {
+      // Pick random mistake
+      const m = gameState.mistakes[Math.floor(Math.random() * gameState.mistakes.length)];
+      setCurrentQ({
+        problemStr: m.problemStr, num1: m.num1, num2: m.num2, symbol: m.symbol, answer: m.answer,
+        spokenText: `${m.num1} ${m.symbol === '+' ? '加' : '减'} ${m.num2} 等于几？`,
+        stage: 2 // Treat reviews as stage 2 (visual help)
+      });
+      setScreen('review');
+    }
   };
 
   const padPress = (val) => {
@@ -120,80 +122,95 @@ export default function App() {
     if (userAns === '' || !currentQ) return;
     
     if (parseInt(userAns) === currentQ.answer) {
-      // Correct!
       audioSynth.playCorrect();
-      const nStars = stars + 1;
-      setStars(nStars);
-      localStorage.setItem('km_stars', nStars.toString());
+      
+      let nextState = { ...gameState };
+      nextState.history.totalSolved += 1;
+      
+      // If it was a review and correct on first try, resolve it
+      if (screen === 'review' && errorCount === 0 && !showHelp) {
+        nextState.mistakes = nextState.mistakes.filter(m => m.problemStr !== currentQ.problemStr);
+      }
+
+      setGameState(nextState);
       
       setUserAns('');
-      setErrorCount(0);
-      setErrorPulse(false);
+      
+      if (screen === 'review' && nextState.mistakes.length === 0) {
+        alert("恭喜！所有错题都被你消灭啦！");
+        setScreen('welcome');
+        return;
+      }
+
       setTimeout(() => {
-        setCurrentQ(mathGenerator.generateQuestion(maxNumber, allowSub));
+        startNewQuestion(screen);
       }, 1000);
     } else {
-      // Wrong - Gentle Guidance
       audioSynth.playIncorrect();
       setUserAns('');
-      
       const newErr = errorCount + 1;
       setErrorCount(newErr);
       
-      // If failed 2 times, highlight the visual counters to guide them
+      // Record mistake
+      progressManager.recordMistake(currentQ.problemStr, currentQ.num1, currentQ.num2, currentQ.symbol, currentQ.answer);
+      setGameState(progressManager.getInitialState());
+
       if (newErr >= 2) {
-        setErrorPulse(true);
-        audioSynth.speak("数一数上面的图形吧！");
-        setTimeout(() => setErrorPulse(false), 2000);
+        audioSynth.speak("再仔细数一数哦。");
       }
     }
   };
 
   const toggleMute = () => {
     audioSynth.setMuteState(!audioSynth.getMuteState());
-    audioSynth.playClick();
-    // Force re-render to update icon
-    setStars(prev => prev); 
+    setGameState(prev => ({...prev})); // force render
+  };
+
+  const isKeypadLocked = () => {
+    // Stage 1 & 2 force child to drag everything to basket before keypad is usable
+    if ((gameState.stage <= 2 || screen === 'review') && !basketFull) return true;
+    return false;
   };
 
   return (
     <div id="app-viewport">
       {/* HEADER */}
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
-        <button className="bouncy-button secondary" style={{ padding: '8px', borderRadius: '50%' }} onClick={toggleMute}>
-          {audioSynth.getMuteState() ? <VolumeX size={24} color="#FF6688" /> : <Volume2 size={24} />}
+        <button className="bouncy-button secondary" onClick={toggleMute}>
+          {audioSynth.getMuteState() ? <VolumeX size={24} color="#E07A5F" /> : <Volume2 size={24} />}
         </button>
-
         {screen !== 'welcome' && screen !== 'guardian' && screen !== 'settings' && (
-          <button className="bouncy-button secondary" style={{ padding: '8px', borderRadius: '50%' }} onClick={() => setScreen('welcome')}>
+          <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}>
             <Home size={24} />
           </button>
         )}
-
         {screen === 'welcome' && (
-          <button className="bouncy-button secondary" style={{ padding: '8px', borderRadius: '50%' }} onClick={openGuardian}>
-            <Settings size={24} />
+          <button className="bouncy-button secondary" onClick={openGuardian}>
+            <Settings size={24} /> 家长
           </button>
         )}
       </div>
 
       {/* --- WELCOME SCREEN --- */}
       {screen === 'welcome' && (
-        <div className="screen-wrapper fade-in" style={{ gap: '30px' }}>
-          <div style={{ fontSize: '6rem' }}>{THEMES.find(t=>t.id===theme).icon}</div>
-          <h1 className="title-glow" style={{ fontSize: '3rem', textAlign: 'center' }}>快乐算术</h1>
+        <div className="screen-wrapper fade-in">
+          <h1 className="title-glow">数字蒙特梭利</h1>
+          <p style={{ opacity: 0.6, marginBottom: '30px' }}>专注于数学思维启蒙</p>
           
-          <div className="stat-pill" style={{ fontSize: '1.5rem', padding: '10px 20px', background: 'rgba(255,255,255,0.2)' }}>
-            ⭐ {stars}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '80%', maxWidth: '300px' }}>
+            <button className="bouncy-button primary" onClick={startGame}>
+              开始学习 (阶段 {gameState.stage})
+            </button>
+            <button className="bouncy-button secondary" onClick={startReview} style={{ position: 'relative' }}>
+              <BookOpen size={20} /> 错题大作战
+              {gameState.mistakes.length > 0 && (
+                <span style={{ position: 'absolute', top: -5, right: -5, background: '#E07A5F', color: 'white', borderRadius: '10px', padding: '2px 8px', fontSize: '0.8rem' }}>
+                  {gameState.mistakes.length}
+                </span>
+              )}
+            </button>
           </div>
-
-          <button 
-            className="bouncy-button primary" 
-            style={{ fontSize: '2.5rem', padding: '20px 60px', borderRadius: '40px', marginTop: '20px' }}
-            onClick={startGame}
-          >
-            开始玩！
-          </button>
+          <p style={{ marginTop: '30px', opacity: 0.5 }}>已累计解题: {gameState.history.totalSolved}</p>
         </div>
       )}
 
@@ -201,131 +218,116 @@ export default function App() {
       {screen === 'guardian' && guardianQ && (
         <div className="screen-wrapper fade-in">
           <div className="card-shadow" style={{ padding: '30px', textAlign: 'center', width: '90%', maxWidth: '400px' }}>
-            <h2 className="title-glow" style={{ color: '#FF3366', marginBottom: '20px' }}>家长解锁</h2>
-            <p style={{ marginBottom: '20px', opacity: 0.8 }}>请回答下列算式以进入设置：</p>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '20px' }}>
-              {guardianQ.str}
-            </div>
+            <h2 className="title-glow" style={{ color: '#E07A5F' }}>家长通道</h2>
+            <div style={{ fontSize: '2rem', margin: '20px 0' }}>{guardianQ.str}</div>
             <input 
               type="number" 
               value={guardianA} 
               onChange={e => setGuardianA(e.target.value)}
-              style={{ fontSize: '2rem', width: '100px', textAlign: 'center', padding: '10px', borderRadius: '10px', border: '2px solid #ccc', marginBottom: '20px' }}
+              style={{ fontSize: '2rem', width: '100px', textAlign: 'center', marginBottom: '20px' }}
             />
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-              <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}><X size={24}/></button>
-              <button className="bouncy-button primary" onClick={checkGuardian}><Check size={24}/></button>
+              <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}><X/></button>
+              <button className="bouncy-button primary" onClick={checkGuardian}><Check/></button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- PARENTAL SETTINGS --- */}
+      {/* --- SETTINGS --- */}
       {screen === 'settings' && (
         <div className="screen-wrapper fade-in">
-          <div className="card-shadow" style={{ padding: '30px', width: '90%', maxWidth: '450px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <h2 className="title-glow" style={{ textAlign: 'center' }}>家长设置台</h2>
+          <div className="card-shadow" style={{ padding: '20px', width: '100%', maxWidth: '500px', overflowY: 'auto', maxHeight: '80vh' }}>
+            <h2 className="title-glow">教案配置室</h2>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <label style={{ fontWeight: 'bold' }}>设定最大数值范围 (当前: {maxNumber})</label>
-              <input 
-                type="range" 
-                min="5" max="100" step="1" 
-                value={maxNumber} 
-                onChange={e => setMaxNumber(parseInt(e.target.value))}
-                style={{ width: '100%', height: '20px' }}
-              />
-              <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>题目生成的所有数字（包括答案）均不会超过此数值。</p>
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              <h3>调整学习阶段</h3>
+              <select 
+                value={gameState.stage} 
+                onChange={(e) => setGameState({...gameState, stage: parseInt(e.target.value)})}
+                style={{ width: '100%', padding: '10px', fontSize: '1.2rem', marginTop: '10px' }}
+              >
+                <option value="1">阶段一：感知与计数 (0-10)</option>
+                <option value="2">阶段二：具象加减法 (运算启蒙)</option>
+                <option value="3">阶段三：半抽象运算 (去教具化过渡)</option>
+                <option value="4">阶段四：十进制引入 (进阶 11-20)</option>
+              </select>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <label style={{ fontWeight: 'bold' }}>启用减法运算</label>
-              <input 
-                type="checkbox" 
-                checked={allowSub} 
-                onChange={e => setAllowSub(e.target.checked)}
-                style={{ width: '24px', height: '24px' }}
-              />
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              <h3>错题本数据</h3>
+              <p>当前记录错题数量：{gameState.mistakes.length}</p>
+              <button className="bouncy-button mistake" onClick={clearMistakes} style={{ marginTop: '10px' }}>
+                清空错题本
+              </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <label style={{ fontWeight: 'bold' }}>更换主题</label>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                {THEMES.map(t => (
-                  <button 
-                    key={t.id} 
-                    className={`bouncy-button ${theme === t.id ? 'primary' : 'secondary'}`}
-                    onClick={() => setTheme(t.id)}
-                    style={{ flex: 1, fontSize: '1.5rem' }}
-                  >
-                    {t.icon}
-                  </button>
-                ))}
+            <div style={{ margin: '20px 0' }}>
+              <h3>进度跨设备同步</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>通过“同步码”可以在iPad和电脑之间互传进度。</p>
+              <p><strong>本机同步码导出：</strong></p>
+              <textarea readOnly value={generatedSyncCode} style={{ width: '100%', height: '60px', fontSize: '0.8rem' }} />
+              
+              <p style={{ marginTop: '10px' }}><strong>从其他设备导入：</strong></p>
+              <div style={{ display: 'flex', gap: '5px' }}>
+                <input type="text" value={syncCodeInput} onChange={e=>setSyncCodeInput(e.target.value)} placeholder="粘贴同步码" style={{ flex: 1 }} />
+                <button className="bouncy-button secondary" onClick={importSync}>导入</button>
               </div>
             </div>
 
-            <button className="bouncy-button primary" onClick={saveSettings} style={{ marginTop: '20px' }}>
-              保存并返回
+            <button className="bouncy-button primary" onClick={() => setScreen('welcome')} style={{ width: '100%' }}>
+              返回
             </button>
           </div>
         </div>
       )}
 
-      {/* --- PLAYING SCREEN (5-YEAR-OLD FOCUS) --- */}
-      {screen === 'playing' && currentQ && (
-        <div className="screen-wrapper" style={{ justifyContent: 'flex-start' }}>
+      {/* --- PLAYING / REVIEW SCREEN --- */}
+      {(screen === 'playing' || screen === 'review') && currentQ && (
+        <div className="screen-wrapper" style={{ justifyContent: 'space-between', paddingBottom: '10px' }}>
           
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-            <div className="stat-pill" style={{ fontSize: '1.5rem' }}>⭐ {stars}</div>
+          <div className="equation-container">
+            {screen === 'review' && <span style={{fontSize:'1.5rem', position:'absolute', top: 60, color:'#E07A5F'}}>⭐ 错题复习</span>}
+            <span>{currentQ.num1}</span>
+            <span className="math-operator">{currentQ.symbol}</span>
+            <span>{currentQ.num2}</span>
+            <span>=</span>
+            <div className="answer-box">
+              {userAns === '' ? '?' : userAns}
+            </div>
           </div>
 
-          <div className="math-question-card card-shadow" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '10px' }}>
-            
-            <div className="equation-container" style={{ fontSize: '4rem', gap: '10px', marginTop: '0' }}>
-              <span className="math-number">{currentQ.num1}</span>
-              <span className="math-operator">{currentQ.symbol}</span>
-              <span className="math-number">{currentQ.num2}</span>
-              <span className="math-operator">=</span>
-              <div className={`answer-box ${userAns === '' ? 'empty' : ''}`} style={{ fontSize: '4.5rem', minWidth: '100px', minHeight: '80px' }}>
-                {userAns === '' ? '?' : userAns}
-              </div>
+          {/* Manipulatives area: Show for stage 1 & 2. For stage 3/4 show if showHelp is true */}
+          {(currentQ.stage <= 2 || showHelp) ? (
+            <MathManipulatives currentQ={currentQ} onBasketFull={setBasketFull} />
+          ) : (
+            <div style={{ minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <button className="bouncy-button secondary" onClick={() => setShowHelp(true)}>
+                 [?] 帮帮我
+               </button>
             </div>
+          )}
 
-            {/* Visual Helpers (Always show if maxNumber is reasonably small <= 20) */}
-            {maxNumber <= 20 && (
-              <VisualCounters
-                num1={currentQ.num1}
-                num2={currentQ.num2}
-                symbol={currentQ.symbol}
-                theme={theme}
-                errorPulse={errorPulse}
-              />
-            )}
-
-            <div style={{ flex: 1 }}></div>
-
-            {/* Giant Toddler Keypad */}
-            <div className="keypad-grid" style={{ maxWidth: '100%', gap: '8px', padding: '10px' }}>
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(val => (
-                <button key={val} className="keypad-btn" onClick={() => padPress(val)} style={{ fontSize: '2.5rem', borderRadius: '24px' }}>
-                  {val}
-                </button>
-              ))}
-              <button className="keypad-btn action-clear" onClick={() => padPress('C')} style={{ fontSize: '2.5rem', borderRadius: '24px' }}>
-                ❌
+          {/* Keypad */}
+          <div className="keypad-grid" style={{ opacity: isKeypadLocked() ? 0.3 : 1, transition: 'opacity 0.3s' }}>
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(val => (
+              <button key={val} className="keypad-btn" onClick={() => !isKeypadLocked() && padPress(val)}>
+                {val}
               </button>
-              <button className="keypad-btn" onClick={() => padPress('0')} style={{ fontSize: '2.5rem', borderRadius: '24px' }}>
-                0
-              </button>
-              <button className="keypad-btn action-submit" onClick={submitAnswer} style={{ fontSize: '2.5rem', borderRadius: '24px', gridColumn: 'span 1' }}>
-                ✅
-              </button>
-            </div>
-
+            ))}
+            <button className="keypad-btn action-clear" onClick={() => !isKeypadLocked() && padPress('C')}>
+              ❌
+            </button>
+            <button className="keypad-btn" onClick={() => !isKeypadLocked() && padPress('0')}>
+              0
+            </button>
+            <button className="keypad-btn action-submit" onClick={() => !isKeypadLocked() && submitAnswer()}>
+              ✅
+            </button>
           </div>
+
         </div>
       )}
-
     </div>
   );
 }
