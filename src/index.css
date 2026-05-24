@@ -82,8 +82,13 @@ body {
 }
 .bouncy-button.secondary {
   background: white; color: var(--text-primary);
-  padding: 10px; border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 12px 20px; border-radius: 25px;
+  box-shadow: 0 6px 0 #ffcbf2;
+  border: 2px solid white;
+}
+.bouncy-button.secondary:active { 
+  transform: translateY(6px); 
+  box-shadow: 0 0 0 transparent; 
 }
 .bouncy-button.mistake {
   background: linear-gradient(to bottom, #f72585, #b5179e); color: white;
