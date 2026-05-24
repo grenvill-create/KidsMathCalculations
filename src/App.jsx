@@ -28,14 +28,6 @@ export default function App() {
     progressManager.saveState(gameState);
   }, [gameState]);
 
-  useEffect(() => {
-    if ((screen === 'playing' || screen === 'review') && currentQ) {
-      setTimeout(() => {
-        audioSynth.speak(currentQ.spokenText);
-      }, 500);
-    }
-  }, [currentQ, screen]);
-
   // --- GUARDIAN ---
   const openGuardian = () => {
     audioSynth.playClick();
