@@ -65,6 +65,16 @@ export default function App() {
     }
   };
 
+  const resetProgress = () => {
+    if (confirm("⚠️ 警告：这将清空所有的错题本、解题数量记录，并将阶段重置为1。确定要继续吗？")) {
+      localStorage.removeItem('km_stage');
+      localStorage.removeItem('km_mistakes');
+      localStorage.removeItem('km_history');
+      setGameState(progressManager.getInitialState());
+      alert("进度已成功重置！");
+    }
+  };
+
   // --- GAMEPLAY ---
   const startGame = () => {
     audioSynth.playClick();
@@ -281,6 +291,14 @@ export default function App() {
                 <input type="text" value={syncCodeInput} onChange={e=>setSyncCodeInput(e.target.value)} placeholder="粘贴同步码" style={{ flex: 1 }} />
                 <button className="bouncy-button secondary" onClick={importSync}>导入</button>
               </div>
+            </div>
+
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              <h3 style={{ color: '#E07A5F' }}>危险区域</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>如果你想让孩子重新开始学习，可以初始化所有进度。</p>
+              <button className="bouncy-button mistake" onClick={resetProgress} style={{ width: '100%' }}>
+                重置所有进度
+              </button>
             </div>
 
             <button className="bouncy-button primary" onClick={() => setScreen('welcome')} style={{ width: '100%' }}>
