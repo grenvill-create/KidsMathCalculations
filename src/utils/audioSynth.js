@@ -64,30 +64,31 @@ export const audioSynth = {
     } catch (e) {}
   },
 
-  // Bright correct chime
+  // Single bright 'Ding' for correct
   playCorrect() {
     if (isMuted) return;
     try {
       const ctx = getAudioContext();
       const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
       
-      [523.25, 659.25, 1046.50].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + i * 0.1);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.setValueAtTime(0.1, now + i * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.4);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.1);
-        osc.stop(now + i * 0.1 + 0.5);
-      });
+      osc.type = 'sine'; // Pure tone for bell
+      osc.frequency.setValueAtTime(1200, now); // High pitch C6ish
+      
+      // Quick attack, long slow decay
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.0);
     } catch (e) {}
   },
 
-  // Gentle boing for incorrect
+  // Distinct buzz/uh-oh for incorrect
   playIncorrect() {
     if (isMuted) return;
     try {
@@ -96,18 +97,18 @@ export const audioSynth = {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(250, now);
-      osc.frequency.linearRampToValueAtTime(150, now + 0.3);
+      osc.type = 'sawtooth'; // Buzzy sound
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.linearRampToValueAtTime(100, now + 0.3);
 
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.35);
+      osc.stop(now + 0.4);
     } catch (e) {}
   },
 

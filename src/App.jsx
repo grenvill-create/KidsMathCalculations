@@ -192,24 +192,41 @@ export default function App() {
 
       {/* --- WELCOME SCREEN --- */}
       {screen === 'welcome' && (
-        <div className="screen-wrapper fade-in">
-          <h1 className="title-glow">数字蒙特梭利</h1>
-          <p style={{ opacity: 0.6, marginBottom: '30px' }}>专注于数学思维启蒙</p>
+        <div className="screen-wrapper fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '80%', maxWidth: '300px' }}>
-            <button className="bouncy-button primary" onClick={startGame}>
-              开始学习 (阶段 {gameState.stage})
+          <div className="hero-animation" style={{ fontSize: '5rem', marginBottom: '-20px', animation: 'float 3s ease-in-out infinite' }}>
+            🌟
+          </div>
+
+          <h1 className="title-glow" style={{ fontSize: '3.5rem', margin: '20px 0', textShadow: '4px 4px 0 white, -2px -2px 0 white' }}>
+            奇妙数学冒险
+          </h1>
+          <p style={{ opacity: 0.8, marginBottom: '40px', fontSize: '1.2rem', fontWeight: 'bold' }}>开始你的奇妙计算之旅吧！</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '90%', maxWidth: '350px' }}>
+            <button className="bouncy-button primary" onClick={startGame} style={{ padding: '20px', fontSize: '1.5rem', borderRadius: '30px' }}>
+              🚀 马上开始 (阶段 {gameState.stage})
             </button>
-            <button className="bouncy-button secondary" onClick={startReview} style={{ position: 'relative' }}>
-              <BookOpen size={20} /> 错题大作战
+            <button className="bouncy-button secondary" onClick={startReview} style={{ position: 'relative', padding: '15px', fontSize: '1.2rem', borderRadius: '30px' }}>
+              <BookOpen size={24} /> 错题大作战
               {gameState.mistakes.length > 0 && (
-                <span style={{ position: 'absolute', top: -5, right: -5, background: '#E07A5F', color: 'white', borderRadius: '10px', padding: '2px 8px', fontSize: '0.8rem' }}>
+                <span style={{ position: 'absolute', top: -10, right: -10, background: '#ffb5a7', color: 'white', borderRadius: '15px', padding: '4px 12px', fontSize: '1rem', border: '3px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
                   {gameState.mistakes.length}
                 </span>
               )}
             </button>
           </div>
-          <p style={{ marginTop: '30px', opacity: 0.5 }}>已累计解题: {gameState.history.totalSolved}</p>
+          
+          <p style={{ marginTop: '40px', opacity: 0.6, fontSize: '0.9rem' }}>已累计解题: {gameState.history.totalSolved}</p>
+          
+          <style>{`
+            @keyframes float {
+              0% { transform: translateY(0px) rotate(0deg); }
+              50% { transform: translateY(-20px) rotate(10deg); }
+              100% { transform: translateY(0px) rotate(0deg); }
+            }
+            .hero-animation { filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+          `}</style>
         </div>
       )}
 
