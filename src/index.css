@@ -1,17 +1,16 @@
-/* CSS Core Design System - Cute & Beautiful Edition */
+/* CSS Core Design System - Pink Jelly Edition */
 
 :root {
   --font-kids: 'Fredoka', system-ui, sans-serif;
   --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --container-max-width: 600px;
   
-  /* Jelly Macaron Colors */
-  --bg-primary: #a1c4fd;
-  --bg-secondary: #c2e9fb;
-  --text-primary: #3d5a80; /* Soft dark blue */
+  /* Pink Macaron Colors */
+  --bg-primary: #ffcbf2;
+  --bg-secondary: #ffe5ec;
+  --text-primary: #9d0208; /* Deep red-pink for readability */
   --color-accent: #ffb5a7; /* Peach pink */
-  --color-success: #9bf6ff; /* Cyan/mint */
-  --color-wood: #ffcbf2; /* Pink cloud */
+  --color-success: #ff9a9e; /* Strawberry pink */
   
   --shadow-jelly: 0 8px 0 rgba(0,0,0,0.1), inset 0 3px 0 rgba(255,255,255,0.5);
   --shadow-jelly-active: 0 2px 0 rgba(0,0,0,0.1), inset 0 3px 0 rgba(255,255,255,0.2);
@@ -42,8 +41,8 @@ body {
 /* Background floating bubbles/clouds (pure CSS) */
 #app-viewport::before, #app-viewport::after {
   content: ''; position: absolute; z-index: -1;
-  background: rgba(255,255,255,0.4); border-radius: 50%;
-  filter: blur(2px);
+  background: rgba(255,255,255,0.5); border-radius: 50%;
+  filter: blur(3px);
 }
 #app-viewport::before {
   width: 150px; height: 150px; top: -20px; left: -20px;
@@ -62,7 +61,7 @@ body {
 }
 
 .title-glow {
-  font-weight: 700; color: #ff9f1c;
+  font-weight: 700; color: #ff5d8f;
   text-align: center; font-size: 2.5rem; margin-bottom: 20px;
   text-shadow: 2px 2px 0px white, -1px -1px 0px white;
   letter-spacing: 2px;
@@ -76,10 +75,10 @@ body {
 .bouncy-button:active { transform: scale(0.95) translateY(6px); box-shadow: var(--shadow-jelly-active); }
 
 .bouncy-button.primary {
-  background: linear-gradient(to bottom, #ffd166, #ff9f1c); color: white;
+  background: linear-gradient(to bottom, #ff9a9e, #fecfef); color: #d00000;
   padding: 15px 30px; font-size: 1.2rem;
   box-shadow: var(--shadow-jelly);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
 }
 .bouncy-button.secondary {
   background: white; color: var(--text-primary);
@@ -87,7 +86,7 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .bouncy-button.mistake {
-  background: linear-gradient(to bottom, #ffcbf2, #f15bb5); color: white;
+  background: linear-gradient(to bottom, #f72585, #b5179e); color: white;
   box-shadow: var(--shadow-jelly);
 }
 
@@ -96,17 +95,17 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: 4rem; gap: 15px;
   color: white; margin-top: 20px;
-  text-shadow: 3px 3px 0 #3d5a80;
+  text-shadow: 3px 3px 0 #d00000;
 }
 
 .answer-box {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.4);
   border: 4px dashed white;
   border-radius: 20px;
   min-width: 80px; min-height: 80px;
   display: flex; align-items: center; justify-content: center;
   box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
-  color: #ff9f1c; text-shadow: 2px 2px 0 white;
+  color: #ff5d8f; text-shadow: 2px 2px 0 white;
 }
 
 /* Manipulatives */
@@ -125,17 +124,17 @@ body {
 .draggable-item:active { cursor: grabbing; transform: scale(1.2) rotate(5deg); }
 .draggable-item.used { opacity: 0.5; filter: grayscale(1); }
 
-/* The "Basket" Dropzone (Now looks like a magical cloud/bubble) */
+/* The "Basket" Dropzone */
 .drop-zone {
   width: 90%; min-height: 100px;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5);
   border: 4px solid white; 
   border-radius: 40px;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;
   transition: all 0.3s;
   box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
 }
-.drop-zone.drag-over { background: rgba(255, 255, 255, 0.8); transform: scale(1.02); }
+.drop-zone.drag-over { background: rgba(255, 255, 255, 0.9); transform: scale(1.02); }
 
 /* Minimalist Keypad (Jelly Beans) */
 .keypad-grid {
@@ -146,7 +145,7 @@ body {
   background: white; border: none;
   border-radius: 20px; font-family: var(--font-kids); font-weight: 700;
   color: var(--text-primary); font-size: 2.2rem; cursor: pointer;
-  box-shadow: 0 6px 0 #d9e2ec;
+  box-shadow: 0 6px 0 #ffcbf2;
   transition: var(--transition-spring);
 }
 .keypad-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
@@ -155,7 +154,7 @@ body {
 }
 .keypad-btn.action-clear:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
 .keypad-btn.action-submit { 
-  background: #9bf6ff; color: #3d5a80; box-shadow: 0 6px 0 #7bd1d9; 
+  background: #ff9a9e; color: white; box-shadow: 0 6px 0 #e58a8e; 
 }
 .keypad-btn.action-submit:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
 
