@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>" />
+    <!-- PWA Manifest & Meta Tags -->
+    <link rel="manifest" href="/KidsMathCalculations/manifest.json" />
+    <meta name="theme-color" content="#FFFAFA" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Viewport lock to prevent zooming when kids tap rapidly -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <title>5岁快乐算术 - 启蒙小天才</title>
+    <meta name="description" content="专为5岁幼童定制的视觉化算术游戏，纯动画引导，支持全平台安装。" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&display=swap" rel="stylesheet">
+    
+    <style>
+      html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        overflow: hidden; user-select: none; -webkit-user-select: none;
+        touch-action: none; /* Prevents browser pull-to-refresh */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register Service Worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/KidsMathCalculations/sw.js')
+            .then(reg => console.log('SW Registered', reg))
+            .catch(err => console.log('SW Failed', err));
+        });
+      }
+    </script>
+  </body>
+</html>

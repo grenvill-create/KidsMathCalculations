@@ -1,0 +1,252 @@
+/* CSS Core Design System - 5-Year-Old Toddler Edition */
+
+:root {
+  --font-kids: 'Fredoka', system-ui, sans-serif;
+  --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --container-max-width: 600px; /* Thinner layout, perfect for tablets/phones */
+}
+
+/* THEME 1: CANDY LAND (Default) */
+.theme-candy {
+  --bg-primary: #FFF0F6;
+  --bg-secondary: #FFE3EC;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --text-primary: #4A1525;
+  --color-accent: #FF66CC;
+  --body-bg-gradient: linear-gradient(135deg, #FFE8F2 0%, #FFF5E6 100%);
+}
+
+/* THEME 2: SPACE ODYSSEY */
+.theme-space {
+  --bg-primary: #0A091A;
+  --bg-secondary: #131131;
+  --bg-card: rgba(22, 20, 56, 0.8);
+  --text-primary: #F0F2FF;
+  --color-accent: #00F0FF;
+  --body-bg-gradient: radial-gradient(circle at 50% 50%, #17143e 0%, #0a091a 100%);
+}
+
+/* THEME 3: MAGIC FOREST */
+.theme-forest {
+  --bg-primary: #1C3525;
+  --bg-secondary: #25442F;
+  --bg-card: rgba(37, 68, 47, 0.85);
+  --text-primary: #EAFCF0;
+  --color-accent: #33FF33;
+  --body-bg-gradient: radial-gradient(circle at 50% 50%, #203f29 0%, #112217 100%);
+}
+
+/* UNIVERSAL */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-kids);
+  background: var(--body-bg-gradient);
+  color: var(--text-primary);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+#app-viewport {
+  width: 100%;
+  height: 100%;
+  max-width: var(--container-max-width);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  position: relative;
+}
+
+/* COMPONENTS */
+.card-shadow {
+  background: var(--bg-card);
+  border-radius: 32px; /* Very soft corners for toddlers */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+}
+
+.title-glow {
+  font-weight: 700;
+  color: var(--color-accent);
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+.bouncy-button {
+  font-family: var(--font-kids);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-spring);
+}
+
+.bouncy-button:active { transform: scale(0.95); }
+
+.bouncy-button.primary {
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+}
+.bouncy-button.primary:active {
+  box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+  transform: translateY(6px);
+}
+
+.bouncy-button.secondary {
+  background: rgba(255,255,255,0.2);
+  color: var(--text-primary);
+}
+
+.stat-pill {
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+  font-weight: 700;
+}
+
+/* GAME UI */
+.screen-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.equation-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.math-operator { color: var(--color-accent); }
+
+.answer-box {
+  border-bottom: 8px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+}
+
+/* GIANT KEYPAD */
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.keypad-btn {
+  aspect-ratio: 1.2 / 1;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  font-family: var(--font-kids);
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.keypad-btn:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 rgba(0,0,0,0.15);
+}
+
+.keypad-btn.action-clear {
+  background: rgba(255,50,50,0.2);
+  color: #FF3333;
+}
+
+.keypad-btn.action-submit {
+  background: #00CC66;
+  color: #fff;
+}
+
+/* VISUAL COUNTERS */
+.visual-counters-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 15px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.counters-flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.counter-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 15px;
+}
+
+.counter-item-wrapper {
+  font-size: 2.5rem; /* Huge emojis! */
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.counter-item-wrapper:active { transform: scale(1.3); }
+.crossed-out { opacity: 0.3; }
+
+.cross-mark {
+  position: absolute;
+  font-size: 1.5rem;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.question-mark-box {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center; justify-content: center;
+  font-size: 1.5rem; font-weight: bold;
+}
+
+/* ANIMATIONS */
+@keyframes bounceIn {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.bounce-in { animation: bounceIn 0.5s ease-out; }
+
+.fade-in { animation: bounceIn 0.3s ease-out; }
+
+@keyframes errorPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(255,50,50,0); background: rgba(255,255,255,0.1); }
+  50% { box-shadow: 0 0 20px rgba(255,50,50,0.5); background: rgba(255,50,50,0.2); }
+}
+.pulse-error-highlight {
+  animation: errorPulse 1s ease-in-out infinite;
+  border: 4px solid #FF3333;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "5岁快乐算术",
+  "short_name": "快乐算术",
+  "description": "专为5岁幼童设计的视觉化算术启蒙游戏",
+  "start_url": "/KidsMathCalculations/",
+  "display": "standalone",
+  "background_color": "#FFFAFA",
+  "theme_color": "#FF66CC",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
