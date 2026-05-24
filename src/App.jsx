@@ -167,8 +167,7 @@ export default function App() {
   };
 
   const isKeypadLocked = () => {
-    // Stage 1 & 2 force child to drag everything to basket before keypad is usable
-    if ((gameState.stage <= 2 || screen === 'review') && !basketFull) return true;
+    // Unlocked completely per user request. Dragging is optional.
     return false;
   };
 

@@ -1,17 +1,20 @@
-/* CSS Core Design System - Montessori Education Edition */
+/* CSS Core Design System - Cute & Beautiful Edition */
 
 :root {
   --font-kids: 'Fredoka', system-ui, sans-serif;
   --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --container-max-width: 600px;
   
-  /* Montessori Colors */
-  --bg-primary: #FDFBF7; /* Paper white */
-  --bg-secondary: #F4EFEB; /* Slightly darker paper */
-  --text-primary: #4A3E3D; /* Soft dark grey/brown for readability */
-  --color-accent: #E07A5F; /* Muted terracotta */
-  --color-success: #81B29A; /* Muted green */
-  --color-wood: #D4A373; /* Wood color */
+  /* Jelly Macaron Colors */
+  --bg-primary: #a1c4fd;
+  --bg-secondary: #c2e9fb;
+  --text-primary: #3d5a80; /* Soft dark blue */
+  --color-accent: #ffb5a7; /* Peach pink */
+  --color-success: #9bf6ff; /* Cyan/mint */
+  --color-wood: #ffcbf2; /* Pink cloud */
+  
+  --shadow-jelly: 0 8px 0 rgba(0,0,0,0.1), inset 0 3px 0 rgba(255,255,255,0.5);
+  --shadow-jelly-active: 0 2px 0 rgba(0,0,0,0.1), inset 0 3px 0 rgba(255,255,255,0.2);
 }
 
 * {
@@ -22,10 +25,8 @@
 
 body {
   font-family: var(--font-kids);
-  background-color: var(--bg-primary);
-  /* Subtle paper texture using radial gradients */
-  background-image: radial-gradient(#E8E0D5 1px, transparent 1px);
-  background-size: 20px 20px;
+  /* Dreamy cloud gradient */
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   color: var(--text-primary);
   height: 100vh; width: 100vw;
   display: flex; justify-content: center; align-items: center;
@@ -35,92 +36,129 @@ body {
 #app-viewport {
   width: 100%; height: 100%; max-width: var(--container-max-width);
   display: flex; flex-direction: column; padding: 16px;
+  position: relative;
+}
+
+/* Background floating bubbles/clouds (pure CSS) */
+#app-viewport::before, #app-viewport::after {
+  content: ''; position: absolute; z-index: -1;
+  background: rgba(255,255,255,0.4); border-radius: 50%;
+  filter: blur(2px);
+}
+#app-viewport::before {
+  width: 150px; height: 150px; top: -20px; left: -20px;
+}
+#app-viewport::after {
+  width: 250px; height: 200px; bottom: 10%; right: -50px; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
 }
 
 /* UI Elements */
 .card-shadow {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  border: 1px solid rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: 2px solid rgba(255,255,255,0.5);
 }
 
 .title-glow {
-  font-weight: 700; color: var(--text-primary);
-  text-align: center; font-size: 2rem; margin-bottom: 20px;
+  font-weight: 700; color: #ff9f1c;
+  text-align: center; font-size: 2.5rem; margin-bottom: 20px;
+  text-shadow: 2px 2px 0px white, -1px -1px 0px white;
+  letter-spacing: 2px;
 }
 
 .bouncy-button {
   font-family: var(--font-kids); font-weight: 700; border: none;
   cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; border-radius: 12px; transition: var(--transition-spring);
+  gap: 8px; border-radius: 20px; transition: var(--transition-spring);
 }
-.bouncy-button:active { transform: scale(0.95); }
+.bouncy-button:active { transform: scale(0.95) translateY(6px); box-shadow: var(--shadow-jelly-active); }
+
 .bouncy-button.primary {
-  background: var(--color-success); color: #fff;
+  background: linear-gradient(to bottom, #ffd166, #ff9f1c); color: white;
   padding: 15px 30px; font-size: 1.2rem;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-jelly);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
 }
 .bouncy-button.secondary {
-  background: var(--bg-secondary); color: var(--text-primary);
-  padding: 10px;
+  background: white; color: var(--text-primary);
+  padding: 10px; border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .bouncy-button.mistake {
-  background: var(--color-accent); color: white;
+  background: linear-gradient(to bottom, #ffcbf2, #f15bb5); color: white;
+  box-shadow: var(--shadow-jelly);
 }
 
 /* Gameplay Grid */
 .equation-container {
   display: flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: 4rem; gap: 15px;
-  color: var(--text-primary); margin-top: 20px;
+  color: white; margin-top: 20px;
+  text-shadow: 3px 3px 0 #3d5a80;
 }
 
 .answer-box {
-  border-bottom: 6px solid var(--text-primary);
+  background: rgba(255,255,255,0.3);
+  border: 4px dashed white;
+  border-radius: 20px;
   min-width: 80px; min-height: 80px;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+  color: #ff9f1c; text-shadow: 2px 2px 0 white;
 }
 
 /* Manipulatives */
 .manipulatives-area {
-  display: flex; flex-direction: column; align-items: center; gap: 20px;
-  margin: 20px 0; min-height: 200px;
+  display: flex; flex-direction: column; align-items: center; gap: 15px;
+  margin: 10px 0; min-height: 180px;
 }
 .items-row {
   display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
 }
 .draggable-item {
   font-size: 3rem; cursor: grab; user-select: none;
-  transition: transform 0.1s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
 }
-.draggable-item:active { cursor: grabbing; transform: scale(1.1); }
-.draggable-item.used { opacity: 0.3; filter: grayscale(1); }
+.draggable-item:active { cursor: grabbing; transform: scale(1.2) rotate(5deg); }
+.draggable-item.used { opacity: 0.5; filter: grayscale(1); }
 
-/* The "Basket" Dropzone */
+/* The "Basket" Dropzone (Now looks like a magical cloud/bubble) */
 .drop-zone {
-  width: 90%; min-height: 120px;
-  border: 4px dashed var(--color-wood); border-radius: 20px;
+  width: 90%; min-height: 100px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 4px solid white; 
+  border-radius: 40px;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;
-  background: rgba(212, 163, 115, 0.1); transition: background 0.3s;
+  transition: all 0.3s;
+  box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
 }
-.drop-zone.drag-over { background: rgba(212, 163, 115, 0.3); }
+.drop-zone.drag-over { background: rgba(255, 255, 255, 0.8); transform: scale(1.02); }
 
-/* Minimalist Keypad */
+/* Minimalist Keypad (Jelly Beans) */
 .keypad-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%;
 }
 .keypad-btn {
   aspect-ratio: 1.5 / 1;
-  background: #FFF; border: 2px solid var(--bg-secondary);
-  border-radius: 15px; font-family: var(--font-kids); font-weight: 700;
-  color: var(--text-primary); font-size: 2rem; cursor: pointer;
-  box-shadow: 0 4px 0 var(--bg-secondary);
+  background: white; border: none;
+  border-radius: 20px; font-family: var(--font-kids); font-weight: 700;
+  color: var(--text-primary); font-size: 2.2rem; cursor: pointer;
+  box-shadow: 0 6px 0 #d9e2ec;
+  transition: var(--transition-spring);
 }
-.keypad-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
-.keypad-btn.action-clear { color: var(--color-accent); }
-.keypad-btn.action-submit { background: var(--color-success); color: white; border-color: var(--color-success); box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+.keypad-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+.keypad-btn.action-clear { 
+  background: #ffb5a7; color: white; box-shadow: 0 6px 0 #e59a8c; 
+}
+.keypad-btn.action-clear:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+.keypad-btn.action-submit { 
+  background: #9bf6ff; color: #3d5a80; box-shadow: 0 6px 0 #7bd1d9; 
+}
+.keypad-btn.action-submit:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
 
 /* Animations */
-.fade-in { animation: fadeIn 0.3s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
