@@ -4,6 +4,9 @@ import { audioSynth } from './utils/audioSynth';
 import { mathGenerator } from './utils/mathGenerator';
 import { progressManager } from './utils/progressManager';
 import MathManipulatives from './components/MathManipulatives';
+import ShapeGame from './components/ShapeGame';
+import CompareGame from './components/CompareGame';
+import ClockGame from './components/ClockGame';
 
 // Preset ranges selectable by parents
 const RANGE_PRESETS = [
@@ -413,6 +416,58 @@ export default function App() {
             <span>道题</span>
           </div>
 
+          {/* Fun Learning Games */}
+          <div style={{
+            background: 'rgba(255,255,255,0.65)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '24px',
+            border: '2.5px solid rgba(255,255,255,0.85)',
+            boxShadow: '0 8px 30px rgba(255,93,158,0.1)',
+            padding: '14px 16px',
+            width: '92%', maxWidth: '360px',
+            display: 'flex', flexDirection: 'column', gap: '10px',
+            flexShrink: 0,
+          }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#c07090', textAlign: 'center' }}>
+              🎮 趣味学习游戏
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+              <button onClick={() => { audioSynth.playClick(); setScreen('shape'); }}
+                style={{
+                  padding: '12px 6px', borderRadius: '18px',
+                  background: 'linear-gradient(135deg, #87ceeb, #5bb8d4)',
+                  color: 'white', border: 'none', fontFamily: 'Fredoka, sans-serif',
+                  fontWeight: '700', fontSize: '0.88rem',
+                  boxShadow: '0 4px 12px rgba(91,184,212,0.35)',
+                  cursor: 'pointer', lineHeight: 1.3,
+                }}>
+                🔷<br />认形状
+              </button>
+              <button onClick={() => { audioSynth.playClick(); setScreen('compare'); }}
+                style={{
+                  padding: '12px 6px', borderRadius: '18px',
+                  background: 'linear-gradient(135deg, #6dd99a, #3dc87a)',
+                  color: 'white', border: 'none', fontFamily: 'Fredoka, sans-serif',
+                  fontWeight: '700', fontSize: '0.88rem',
+                  boxShadow: '0 4px 12px rgba(61,200,122,0.35)',
+                  cursor: 'pointer', lineHeight: 1.3,
+                }}>
+                ⚖️<br />比大小
+              </button>
+              <button onClick={() => { audioSynth.playClick(); setScreen('clock'); }}
+                style={{
+                  padding: '12px 6px', borderRadius: '18px',
+                  background: 'linear-gradient(135deg, #c9a0dc, #a57bc4)',
+                  color: 'white', border: 'none', fontFamily: 'Fredoka, sans-serif',
+                  fontWeight: '700', fontSize: '0.88rem',
+                  boxShadow: '0 4px 12px rgba(165,123,196,0.35)',
+                  cursor: 'pointer', lineHeight: 1.3,
+                }}>
+                🕐<br />时钟练习
+              </button>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -769,6 +824,9 @@ export default function App() {
           )}
         </div>
       )}
+      {screen === 'shape' && <ShapeGame />}
+      {screen === 'compare' && <CompareGame />}
+      {screen === 'clock' && <ClockGame />}
     </div>
   );
 }
