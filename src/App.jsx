@@ -263,17 +263,18 @@ export default function App() {
 
       {/* --- WELCOME SCREEN --- */}
       {screen === 'welcome' && (
-        <div className="screen-wrapper fade-in" style={{ justifyContent: 'center', height: '100%', gap: '18px' }}>
+        <div className="screen-wrapper fade-in"
+          style={{ justifyContent: 'center', height: '100%', gap: '12px', overflowY: 'auto', paddingBottom: '12px' }}>
 
           {/* Hero star with orbiting decos */}
-          <div style={{ position: 'relative', width: '140px', height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span className="star-float">🌟</span>
-            <span className="deco-emoji" style={{ top: 0, right: 0, animationDelay: '0s' }}>✨</span>
-            <span className="deco-emoji" style={{ bottom: 8, left: 0, animationDelay: '-2s', fontSize: '1.4rem' }}>🍭</span>
-            <span className="deco-emoji" style={{ top: 10, left: -10, animationDelay: '-1s', fontSize: '1.3rem' }}>⭐</span>
+          <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span className="star-float" style={{ fontSize: '4rem' }}>🌟</span>
+            <span className="deco-emoji" style={{ top: 0, right: 0, animationDelay: '0s', fontSize: '1.2rem' }}>✨</span>
+            <span className="deco-emoji" style={{ bottom: 4, left: 0, animationDelay: '-2s', fontSize: '1.1rem' }}>🍭</span>
+            <span className="deco-emoji" style={{ top: 8, left: -8, animationDelay: '-1s', fontSize: '1rem' }}>⭐</span>
           </div>
 
-          <h1 className="title-glow" style={{ fontSize: '3rem', margin: '0' }}>
+          <h1 className="title-glow" style={{ fontSize: '2.4rem', margin: '0', lineHeight: 1.1 }}>
             奇妙数学冒险
           </h1>
 
@@ -286,13 +287,13 @@ export default function App() {
           </div>
 
           {/* Main action card */}
-          <div className="welcome-card">
+          <div className="welcome-card" style={{ gap: '10px' }}>
             <button className="bouncy-button primary" onClick={startGame}
-              style={{ width: '100%', padding: '18px', fontSize: '1.45rem', borderRadius: '22px' }}>
+              style={{ width: '100%', padding: '15px', fontSize: '1.3rem', borderRadius: '22px' }}>
               🚀 马上开始
             </button>
             <button className="bouncy-button secondary" onClick={startReview}
-              style={{ position: 'relative', width: '100%', padding: '16px', fontSize: '1.15rem', borderRadius: '22px' }}>
+              style={{ position: 'relative', width: '100%', padding: '13px', fontSize: '1.1rem', borderRadius: '22px' }}>
               <BookOpen size={22} /> 错题大作战
               {gameState.mistakes.length > 0 && (
                 <span style={{

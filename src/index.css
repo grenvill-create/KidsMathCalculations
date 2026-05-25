@@ -151,9 +151,9 @@ body::before {
 }
 
 .star-float {
-  font-size: 5.5rem;
+  font-size: 4.5rem;
   animation: starFloat 4s ease-in-out infinite;
-  filter: drop-shadow(0 8px 20px rgba(255,200,0,0.4));
+  filter: drop-shadow(0 6px 16px rgba(255,200,0,0.4));
   line-height: 1;
 }
 @keyframes starFloat {
@@ -182,9 +182,9 @@ body::before {
   border-radius: 28px;
   border: 2.5px solid rgba(255,255,255,0.85);
   box-shadow: 0 10px 40px rgba(255,93,158,0.12), 0 2px 0 rgba(255,255,255,0.9) inset;
-  padding: 20px 24px;
+  padding: 16px 20px;
   width: 92%; max-width: 360px;
-  display: flex; flex-direction: column; gap: 14px;
+  display: flex; flex-direction: column; gap: 10px;
 }
 
 /* Mode badge */
