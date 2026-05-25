@@ -36,6 +36,12 @@ export default function App() {
   const [basketFull, setBasketFull] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Challenge Mode
+  const [challengeQs, setChallengeQs] = useState([]);
+  const [challengeAns, setChallengeAns] = useState({});
+  const [challengeSubmitted, setChallengeSubmitted] = useState(false);
+  const [challengeScore, setChallengeScore] = useState(0);
+
   useEffect(() => {
     progressManager.saveState(gameState);
   }, [gameState]);
@@ -139,6 +145,20 @@ export default function App() {
     startNewQuestion('review');
   };
 
+  const startChallenge = () => {
+    audioSynth.playClick();
+    const opts = {
+      maxNumber: gameState.maxNumber ?? 10,
+      operations: gameState.operations ?? ['add', 'sub'],
+    };
+    const qs = mathGenerator.generateChallenge(10, gameState.stage, opts);
+    setChallengeQs(qs);
+    setChallengeAns({});
+    setChallengeSubmitted(false);
+    setChallengeScore(0);
+    setScreen('challenge');
+  };
+
   const startNewQuestion = (mode) => {
     setUserAns('');
     setErrorCount(0);
@@ -214,6 +234,32 @@ export default function App() {
         audioSynth.speak('再仔细数一数哦。');
       }
     }
+  };
+
+  const submitChallenge = () => {
+    audioSynth.playClick();
+    let score = 0;
+    let nextState = { ...gameState };
+    
+    challengeQs.forEach((q, index) => {
+      const userA = parseInt(challengeAns[index]);
+      if (userA === q.answer) {
+        score += 10;
+        nextState.history.totalSolved += 1;
+      } else {
+        progressManager.recordMistake(q.problemStr, q.num1, q.num2, q.symbol, q.answer);
+      }
+    });
+    
+    if (score >= 80) {
+      audioSynth.playCorrect();
+    } else {
+      audioSynth.playClick();
+    }
+    
+    setGameState(nextState);
+    setChallengeScore(score);
+    setChallengeSubmitted(true);
   };
 
   const toggleMute = () => {
@@ -292,22 +338,29 @@ export default function App() {
               style={{ width: '100%', padding: '15px', fontSize: '1.3rem', borderRadius: '22px' }}>
               🚀 马上开始
             </button>
-            <button className="bouncy-button secondary" onClick={startReview}
-              style={{ position: 'relative', width: '100%', padding: '13px', fontSize: '1.1rem', borderRadius: '22px' }}>
-              <BookOpen size={22} /> 错题大作战
+            <div style={{ position: 'relative', width: '100%' }}>
+              <button className="bouncy-button secondary" onClick={startReview}
+                style={{ width: '100%', padding: '13px', fontSize: '1.1rem', borderRadius: '22px' }}>
+                <BookOpen size={22} /> 错题大作战
+              </button>
               {gameState.mistakes.length > 0 && (
                 <span style={{
-                  position: 'absolute', top: -10, right: -8,
+                  position: 'absolute', top: -8, right: -4,
                   background: 'linear-gradient(135deg, #ff85b8, #ff5d9e)',
                   color: 'white', borderRadius: '50px',
                   padding: '3px 11px', fontSize: '0.95rem',
                   border: '2.5px solid white',
                   boxShadow: '0 3px 8px rgba(255,93,158,0.35)',
                   fontWeight: '700',
+                  zIndex: 10
                 }}>
                   {gameState.mistakes.length}
                 </span>
               )}
+            </div>
+            <button className="bouncy-button primary" onClick={startChallenge}
+              style={{ width: '100%', padding: '13px', fontSize: '1.05rem', borderRadius: '22px', background: 'linear-gradient(135deg, #fde047, #f59e0b)', borderColor: '#fbbf24' }}>
+              ⚡ 挑战模式 (10题连答)
             </button>
           </div>
 
@@ -584,6 +637,73 @@ export default function App() {
             </button>
           </div>
 
+        </div>
+      )}
+
+      {/* --- CHALLENGE SCREEN --- */}
+      {screen === 'challenge' && (
+        <div className="screen-wrapper fade-in" style={{ alignItems: 'center', padding: '20px 10px', overflowY: 'auto' }}>
+          
+          {challengeSubmitted && (
+            <div className="score-banner">
+              🎯 挑战完成！得分：{challengeScore} / 100
+            </div>
+          )}
+
+          <div className="challenge-list">
+            {challengeQs.map((q, index) => {
+              const userVal = challengeAns[index] || '';
+              const isCorrect = challengeSubmitted ? parseInt(userVal) === q.answer : null;
+              
+              return (
+                <div key={index} className="challenge-item">
+                  <div className="challenge-row">
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '1.2rem', color: '#94a3b8', width: '30px' }}>{index + 1}.</span>
+                      <span>{q.num1}</span>
+                      <span className="math-operator" style={{ margin: '0 5px' }}>{q.symbol}</span>
+                      <span>{q.num2}</span>
+                      <span style={{ opacity: 0.85, margin: '0 5px' }}>=</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input
+                        type="number"
+                        className={`challenge-input ${challengeSubmitted ? (isCorrect ? 'correct' : 'wrong') : ''}`}
+                        value={userVal}
+                        onChange={(e) => {
+                          if (!challengeSubmitted) {
+                            setChallengeAns(prev => ({ ...prev, [index]: e.target.value }));
+                          }
+                        }}
+                        disabled={challengeSubmitted}
+                      />
+                      {challengeSubmitted && isCorrect && <span style={{ fontSize: '1.8rem' }}>🌟</span>}
+                      {challengeSubmitted && !isCorrect && <span style={{ fontSize: '1.8rem' }}>❌</span>}
+                    </div>
+                  </div>
+                  
+                  {challengeSubmitted && !isCorrect && (
+                    <div className="challenge-analysis">
+                      <strong>💡 解析：</strong>正确答案是 {q.answer}。<br />
+                      {mathGenerator.generateExplanation(q)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {!challengeSubmitted ? (
+            <button className="bouncy-button primary" onClick={submitChallenge}
+              style={{ width: '100%', maxWidth: '500px', marginTop: '20px', padding: '16px', fontSize: '1.4rem' }}>
+              ✅ 交 卷
+            </button>
+          ) : (
+            <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}
+              style={{ width: '100%', maxWidth: '500px', marginTop: '20px', padding: '14px', fontSize: '1.2rem' }}>
+              🏠 返回主页
+            </button>
+          )}
         </div>
       )}
     </div>

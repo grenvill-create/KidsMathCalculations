@@ -54,5 +54,47 @@ export const mathGenerator = {
       stage,        // preserve stage for UI logic (manipulatives display)
       maxNumber,
     };
+  },
+
+  /**
+   * Generate an array of unique questions for Challenge Mode.
+   */
+  generateChallenge(count, stage, opts = {}) {
+    const questions = [];
+    const usedStrs = new Set();
+    
+    // Safety break to prevent infinite loops if the pool is too small
+    let attempts = 0;
+    while (questions.length < count && attempts < count * 5) {
+      attempts++;
+      const q = this.generateQuestion(stage, opts);
+      if (!usedStrs.has(q.problemStr)) {
+        usedStrs.add(q.problemStr);
+        questions.push(q);
+      }
+    }
+    return questions;
+  },
+
+  /**
+   * Generate a simple explanation text for a missed problem.
+   */
+  generateExplanation(q) {
+    if (q.symbol === '+') {
+      if (q.num1 + q.num2 <= 10) {
+        return `想想看，${q.num1} 和 ${q.num2} 凑在一起是几呢？你可以伸出手指头数一数！`;
+      } else if (q.num1 + q.num2 <= 20) {
+        // Try to explain "凑十法" if possible
+        const bigger = Math.max(q.num1, q.num2);
+        const smaller = Math.min(q.num1, q.num2);
+        const diffToTen = 10 - bigger;
+        if (diffToTen > 0 && diffToTen < smaller) {
+          return `机器提示：试试凑十法！把 ${smaller} 分成 ${diffToTen} 和 ${smaller - diffToTen}。${bigger} 加上 ${diffToTen} 凑成 10，再加上剩下的 ${smaller - diffToTen} 就是 ${q.answer} 啦。`;
+        }
+      }
+      return `${q.num1} 加上 ${q.num2}，等于 ${q.answer} 哦！`;
+    } else {
+      return `从 ${q.num1} 里面拿走 ${q.num2}，还剩下 ${q.answer}。`;
+    }
   }
 };
