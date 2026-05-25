@@ -18,6 +18,9 @@ export default function App() {
   const [screen, setScreen] = useState('welcome'); // welcome, guardian, settings, playing, review
   const [gameState, setGameState] = useState(progressManager.getInitialState());
 
+  // Settings snapshot — used by Cancel to revert unsaved changes
+  const [settingsSnapshot, setSettingsSnapshot] = useState(null);
+
   // Settings sync
   const [syncCodeInput, setSyncCodeInput] = useState('');
   const [generatedSyncCode, setGeneratedSyncCode] = useState('');
@@ -49,11 +52,28 @@ export default function App() {
 
   const checkGuardian = () => {
     if (parseInt(guardianA) === guardianQ.ans) {
+      // Snapshot current state so Cancel can restore it
+      setSettingsSnapshot(JSON.parse(JSON.stringify(gameState)));
       setGeneratedSyncCode(progressManager.generateSyncCode());
       setScreen('settings');
     } else {
       setScreen('welcome');
     }
+  };
+
+  const cancelSettings = () => {
+    if (settingsSnapshot) {
+      // Restore state from snapshot (discards any unsaved changes)
+      setGameState(settingsSnapshot);
+      progressManager.saveState(settingsSnapshot);
+    }
+    setScreen('welcome');
+  };
+
+  const saveSettings = () => {
+    // gameState already reflects the edits; just persist and go back
+    progressManager.saveState(gameState);
+    setScreen('welcome');
   };
 
   // --- SETTINGS ---
@@ -446,9 +466,49 @@ export default function App() {
               </button>
             </div>
 
-            <button className="bouncy-button primary" onClick={() => setScreen('welcome')} style={{ width: '100%' }}>
-              ✅ 保存并返回
-            </button>
+            {/* ── Save / Cancel ── */}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+              <button
+                onClick={cancelSettings}
+                style={{
+                  flex: 1, padding: '16px',
+                  borderRadius: '30px',
+                  border: '3px solid #f5c0d0',
+                  background: 'white',
+                  color: '#b5558a',
+                  fontWeight: '700', fontSize: '1.1rem',
+                  cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                }}
+                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                ✕ 取消
+              </button>
+              <button
+                onClick={saveSettings}
+                style={{
+                  flex: 1, padding: '16px',
+                  borderRadius: '30px',
+                  border: '3px solid #ff8fab',
+                  background: 'linear-gradient(135deg, #ffb5c8, #ff8fab)',
+                  color: 'white',
+                  fontWeight: '700', fontSize: '1.1rem',
+                  cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
+                  boxShadow: '0 4px 14px rgba(255,100,150,0.4)',
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                }}
+                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                ✓ 保存
+              </button>
+            </div>
           </div>
         </div>
       )}
