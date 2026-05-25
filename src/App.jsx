@@ -35,6 +35,7 @@ export default function App() {
   const [errorCount, setErrorCount] = useState(0);
   const [basketFull, setBasketFull] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [sessionCount, setSessionCount] = useState(0);
 
   // Challenge Mode
   const [challengeQs, setChallengeQs] = useState([]);
@@ -151,6 +152,7 @@ export default function App() {
   // --- GAMEPLAY ---
   const startGame = () => {
     audioSynth.playClick();
+    setSessionCount(1);
     startNewQuestion('playing');
   };
 
@@ -232,6 +234,10 @@ export default function App() {
       setGameState(nextState);
       setUserAns('');
 
+      if (screen === 'playing') {
+        setSessionCount(prev => prev + 1);
+      }
+
       if (screen === 'review' && nextState.mistakes.length === 0) {
         alert('恭喜！所有错题都被你消灭啦！');
         setScreen('welcome');
@@ -309,6 +315,14 @@ export default function App() {
         </button>
         {screen !== 'welcome' && screen !== 'guardian' && screen !== 'settings' && (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {screen === 'playing' && (
+              <span style={{
+                background: 'linear-gradient(135deg, #4ade80, #22c55e)',
+                color: 'white', borderRadius: '50px', padding: '6px 14px',
+                fontSize: '0.9rem', fontWeight: '700',
+                boxShadow: '0 4px 10px rgba(34,197,94,0.3)'
+              }}>📝 第 {sessionCount} 题</span>
+            )}
             {screen === 'review' && (
               <span style={{
                 background: 'linear-gradient(135deg, #ff85b8, #ff5d9e)',
