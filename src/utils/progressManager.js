@@ -8,6 +8,7 @@ export const progressManager = {
       mistakes: JSON.parse(localStorage.getItem('km_mistakes') || '[]'),
       history: JSON.parse(localStorage.getItem('km_history') || '{"totalSolved":0}'),
       // Custom range settings
+      minNumber: parseInt(localStorage.getItem('km_minNumber') || '1'),
       maxNumber: parseInt(localStorage.getItem('km_maxNumber') || '10'),
       operations: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
     };
@@ -17,6 +18,7 @@ export const progressManager = {
     localStorage.setItem('km_stage', state.stage.toString());
     localStorage.setItem('km_mistakes', JSON.stringify(state.mistakes));
     localStorage.setItem('km_history', JSON.stringify(state.history));
+    localStorage.setItem('km_minNumber', String(state.minNumber ?? 1));
     localStorage.setItem('km_maxNumber', String(state.maxNumber ?? 10));
     localStorage.setItem('km_operations', JSON.stringify(state.operations ?? ['add', 'sub']));
   },
@@ -56,6 +58,7 @@ export const progressManager = {
       s: localStorage.getItem('km_stage') || '1',
       m: JSON.parse(localStorage.getItem('km_mistakes') || '[]'),
       h: JSON.parse(localStorage.getItem('km_history') || '{"totalSolved":0}'),
+      min: localStorage.getItem('km_minNumber') || '1',
       mn: localStorage.getItem('km_maxNumber') || '10',
       op: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
     };
@@ -71,6 +74,7 @@ export const progressManager = {
         localStorage.setItem('km_stage', data.s.toString());
         localStorage.setItem('km_mistakes', JSON.stringify(data.m));
         localStorage.setItem('km_history', JSON.stringify(data.h || {"totalSolved":0}));
+        if (data.min) localStorage.setItem('km_minNumber', data.min.toString());
         if (data.mn) localStorage.setItem('km_maxNumber', data.mn.toString());
         if (data.op) localStorage.setItem('km_operations', JSON.stringify(data.op));
         return true;

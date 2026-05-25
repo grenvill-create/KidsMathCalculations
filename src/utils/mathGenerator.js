@@ -8,6 +8,7 @@ export const mathGenerator = {
    * @param {number} stage - legacy stage (still used to control manipulative display)
    */
   generateQuestion(stage, opts = {}) {
+    const minNumber = opts.minNumber ?? 1;
     const maxNumber = opts.maxNumber ?? 10;
     const operations = opts.operations ?? ['add', 'sub'];
 
@@ -26,17 +27,23 @@ export const mathGenerator = {
     let num1, num2, answer, symbol;
 
     if (!isSub) {
-      // Addition: answer in [2, maxNumber], split randomly
-      const minAnswer = Math.max(2, Math.floor(maxNumber * 0.1));
-      answer = Math.floor(Math.random() * (maxNumber - minAnswer + 1)) + minAnswer;
+      // Addition: answer (sum) in [minNumber, maxNumber], split randomly.
+      // Ensure answer is at least 2 so we can split it into two positive integers (e.g. 1 + 1)
+      const minAns = Math.max(2, minNumber);
+      const maxAns = Math.max(minAns, maxNumber);
+      
+      answer = Math.floor(Math.random() * (maxAns - minAns + 1)) + minAns;
       num1 = Math.floor(Math.random() * (answer - 1)) + 1; // at least 1
       num2 = answer - num1;
       symbol = '+';
     } else {
-      // Subtraction: minuend in [2, maxNumber], subtract [1, minuend-1]
-      const minMinuend = Math.max(2, Math.floor(maxNumber * 0.1));
-      num1 = Math.floor(Math.random() * (maxNumber - minMinuend + 1)) + minMinuend;
-      num2 = Math.floor(Math.random() * (num1 - 1)) + 1; // 1 to num1-1
+      // Subtraction: minuend (num1) in [minNumber, maxNumber], subtract [1, minuend-1]
+      // Ensure minuend is at least 2 so we can subtract a positive integer and get a positive result
+      const minMin = Math.max(2, minNumber);
+      const maxMin = Math.max(minMin, maxNumber);
+      
+      num1 = Math.floor(Math.random() * (maxMin - minMin + 1)) + minMin;
+      num2 = Math.floor(Math.random() * (num1 - 1)) + 1; // at least 1
       answer = num1 - num2;
       symbol = '-';
     }
@@ -52,6 +59,7 @@ export const mathGenerator = {
       answer,
       spokenText,
       stage,        // preserve stage for UI logic (manipulatives display)
+      minNumber,
       maxNumber,
     };
   },

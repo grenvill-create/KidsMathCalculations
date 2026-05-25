@@ -77,8 +77,25 @@ export default function App() {
   };
 
   const saveSettings = () => {
-    // gameState already reflects the edits; just persist and go back
-    progressManager.saveState(gameState);
+    // Validate minNumber and maxNumber
+    let min = parseInt(gameState.minNumber) ?? 1;
+    let max = parseInt(gameState.maxNumber) ?? 10;
+    
+    if (isNaN(min) || min < 1) min = 1;
+    if (isNaN(max) || max < 2) max = 2;
+    
+    if (min > max) {
+      const temp = min;
+      min = max;
+      max = temp;
+    }
+    
+    // Ensure max is at least 5 if it's too small
+    if (max < 5) max = 5;
+    
+    const finalState = { ...gameState, minNumber: min, maxNumber: max };
+    setGameState(finalState);
+    progressManager.saveState(finalState);
     setScreen('welcome');
   };
 
@@ -105,6 +122,7 @@ export default function App() {
       localStorage.removeItem('km_stage');
       localStorage.removeItem('km_mistakes');
       localStorage.removeItem('km_history');
+      localStorage.removeItem('km_minNumber');
       localStorage.removeItem('km_maxNumber');
       localStorage.removeItem('km_operations');
       setGameState(progressManager.getInitialState());
@@ -113,8 +131,8 @@ export default function App() {
   };
 
   // --- RANGE SETTINGS ---
-  const setMaxNumber = (val) => {
-    const newState = { ...gameState, maxNumber: val };
+  const setRange = (minVal, maxVal) => {
+    const newState = { ...gameState, minNumber: minVal, maxNumber: maxVal };
     setGameState(newState);
   };
 
@@ -148,6 +166,7 @@ export default function App() {
   const startChallenge = () => {
     audioSynth.playClick();
     const opts = {
+      minNumber: gameState.minNumber ?? 1,
       maxNumber: gameState.maxNumber ?? 10,
       operations: gameState.operations ?? ['add', 'sub'],
     };
@@ -167,6 +186,7 @@ export default function App() {
 
     if (mode === 'playing') {
       const opts = {
+        minNumber: gameState.minNumber ?? 1,
         maxNumber: gameState.maxNumber ?? 10,
         operations: gameState.operations ?? ['add', 'sub'],
       };
@@ -270,7 +290,9 @@ export default function App() {
   const isKeypadLocked = () => false;
 
   // Derive a label for the current range on the welcome screen
-  const currentRangeLabel = `${gameState.maxNumber ?? 10} 以内`;
+  const currentRangeLabel = (gameState.minNumber ?? 1) === 1 
+    ? `${gameState.maxNumber ?? 10} 以内` 
+    : `${gameState.minNumber ?? 1} ~ ${gameState.maxNumber ?? 10}`;
   const opsLabel = (() => {
     const ops = gameState.operations ?? ['add', 'sub'];
     if (ops.includes('add') && ops.includes('sub')) return '加减法';
@@ -409,54 +431,81 @@ export default function App() {
             {/* ── Custom Calculation Range ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
               <h3 style={{ marginBottom: '10px' }}>🎯 自定义计算范围</h3>
-              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '12px' }}>选择小朋友计算的数字范围，数字越大越有挑战性哦！</p>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '12px' }}>选择或自己设置数字范围（例如 10 到 20），让练习更有针对性！</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
-                {RANGE_PRESETS.map(preset => (
-                  <button
-                    key={preset.value}
-                    onClick={() => setMaxNumber(preset.value)}
-                    style={{
-                      padding: '10px 18px',
-                      borderRadius: '25px',
-                      border: '3px solid',
-                      borderColor: (gameState.maxNumber ?? 10) === preset.value ? '#e07a5f' : '#f5c0d0',
-                      background: (gameState.maxNumber ?? 10) === preset.value ? 'linear-gradient(135deg, #ffb5c8, #ff8fab)' : 'white',
-                      color: (gameState.maxNumber ?? 10) === preset.value ? 'white' : '#c06080',
-                      fontWeight: '700',
-                      fontSize: '1rem',
-                      cursor: 'pointer',
-                      fontFamily: 'Fredoka, sans-serif',
-                      boxShadow: (gameState.maxNumber ?? 10) === preset.value ? '0 4px 12px rgba(255,100,150,0.35)' : '0 2px 6px rgba(0,0,0,0.08)',
-                      transition: 'all 0.2s ease',
-                      transform: (gameState.maxNumber ?? 10) === preset.value ? 'scale(1.08)' : 'scale(1)',
-                    }}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
+                {RANGE_PRESETS.map(preset => {
+                  const isActive = (gameState.minNumber ?? 1) === 1 && (gameState.maxNumber ?? 10) === preset.value;
+                  return (
+                    <button
+                      key={preset.value}
+                      onClick={() => setRange(1, preset.value)}
+                      style={{
+                        padding: '10px 18px',
+                        borderRadius: '25px',
+                        border: '3px solid',
+                        borderColor: isActive ? '#e07a5f' : '#f5c0d0',
+                        background: isActive ? 'linear-gradient(135deg, #ffb5c8, #ff8fab)' : 'white',
+                        color: isActive ? 'white' : '#c06080',
+                        fontWeight: '700',
+                        fontSize: '1rem',
+                        cursor: 'pointer',
+                        fontFamily: 'Fredoka, sans-serif',
+                        boxShadow: isActive ? '0 4px 12px rgba(255,100,150,0.35)' : '0 2px 6px rgba(0,0,0,0.08)',
+                        transition: 'all 0.2s ease',
+                        transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                      }}
+                    >
+                      {preset.label}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Custom input */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                <label style={{ fontWeight: '600', color: '#b5558a', fontSize: '0.95rem' }}>自定义数值：</label>
-                <input
-                  type="number"
-                  min={5}
-                  max={9999}
-                  value={gameState.maxNumber ?? 10}
-                  onChange={e => {
-                    const v = parseInt(e.target.value);
-                    if (!isNaN(v) && v >= 5) setMaxNumber(v);
-                  }}
-                  style={{
-                    width: '90px', padding: '8px 12px',
-                    borderRadius: '15px', border: '2px solid #f5c0d0',
-                    fontSize: '1.1rem', textAlign: 'center',
-                    fontFamily: 'Fredoka, sans-serif', color: '#b5558a',
-                    fontWeight: '700',
-                  }}
-                />
-                <span style={{ opacity: 0.6, fontSize: '0.9rem' }}>（最小 5，最大 9999）</span>
+                <label style={{ fontWeight: '600', color: '#b5558a', fontSize: '0.95rem' }}>自定义数值范围：</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="number"
+                    min={1}
+                    max={9999}
+                    value={gameState.minNumber ?? 1}
+                    onChange={e => {
+                      const v = parseInt(e.target.value);
+                      if (!isNaN(v)) {
+                        setGameState({ ...gameState, minNumber: v });
+                      }
+                    }}
+                    style={{
+                      width: '75px', padding: '8px 8px',
+                      borderRadius: '15px', border: '2px solid #f5c0d0',
+                      fontSize: '1.1rem', textAlign: 'center',
+                      fontFamily: 'Fredoka, sans-serif', color: '#b5558a',
+                      fontWeight: '700',
+                    }}
+                  />
+                  <span style={{ fontWeight: '600', color: '#b5558a' }}>到</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={9999}
+                    value={gameState.maxNumber ?? 10}
+                    onChange={e => {
+                      const v = parseInt(e.target.value);
+                      if (!isNaN(v)) {
+                        setGameState({ ...gameState, maxNumber: v });
+                      }
+                    }}
+                    style={{
+                      width: '75px', padding: '8px 8px',
+                      borderRadius: '15px', border: '2px solid #f5c0d0',
+                      fontSize: '1.1rem', textAlign: 'center',
+                      fontFamily: 'Fredoka, sans-serif', color: '#b5558a',
+                      fontWeight: '700',
+                    }}
+                  />
+                </div>
+                <span style={{ opacity: 0.6, fontSize: '0.85rem' }}>（最小值 ≥ 1，最大值 ≤ 9999）</span>
               </div>
             </div>
 
