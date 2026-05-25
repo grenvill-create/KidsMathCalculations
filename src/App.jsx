@@ -235,72 +235,94 @@ export default function App() {
   return (
     <div id="app-viewport">
       {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
-        <button className="bouncy-button secondary" onClick={toggleMute}>
-          {audioSynth.getMuteState() ? <VolumeX size={24} color="#E07A5F" /> : <Volume2 size={24} />}
+      <div className="app-header">
+        <button className="bouncy-button secondary" onClick={toggleMute} style={{ padding: '10px 14px' }}>
+          {audioSynth.getMuteState() ? <VolumeX size={22} color="#e07a9e" /> : <Volume2 size={22} />}
         </button>
         {screen !== 'welcome' && screen !== 'guardian' && screen !== 'settings' && (
-          <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}>
-            <Home size={24} />
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {screen === 'review' && (
+              <span style={{
+                background: 'linear-gradient(135deg, #ff85b8, #ff5d9e)',
+                color: 'white', borderRadius: '50px', padding: '6px 14px',
+                fontSize: '0.9rem', fontWeight: '700',
+                boxShadow: '0 4px 10px rgba(255,93,158,0.3)'
+              }}>⭐ 错题复习</span>
+            )}
+            <button className="bouncy-button secondary" onClick={() => setScreen('welcome')} style={{ padding: '10px 14px' }}>
+              <Home size={22} />
+            </button>
+          </div>
         )}
         {screen === 'welcome' && (
-          <button className="bouncy-button secondary" onClick={openGuardian}>
-            <Settings size={24} /> 家长
+          <button className="bouncy-button secondary" onClick={openGuardian} style={{ padding: '10px 18px', gap: '6px' }}>
+            <Settings size={20} /> 家长
           </button>
         )}
       </div>
 
       {/* --- WELCOME SCREEN --- */}
       {screen === 'welcome' && (
-        <div className="screen-wrapper fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+        <div className="screen-wrapper fade-in" style={{ justifyContent: 'center', height: '100%', gap: '18px' }}>
 
-          <div className="hero-animation" style={{ fontSize: '5rem', marginBottom: '-20px', animation: 'float 3s ease-in-out infinite' }}>
-            🌟
+          {/* Hero star with orbiting decos */}
+          <div style={{ position: 'relative', width: '140px', height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="star-float">🌟</span>
+            <span className="deco-emoji" style={{ top: 0, right: 0, animationDelay: '0s' }}>✨</span>
+            <span className="deco-emoji" style={{ bottom: 8, left: 0, animationDelay: '-2s', fontSize: '1.4rem' }}>🍭</span>
+            <span className="deco-emoji" style={{ top: 10, left: -10, animationDelay: '-1s', fontSize: '1.3rem' }}>⭐</span>
           </div>
 
-          <h1 className="title-glow" style={{ fontSize: '3.5rem', margin: '20px 0', textShadow: '4px 4px 0 white, -2px -2px 0 white' }}>
+          <h1 className="title-glow" style={{ fontSize: '3rem', margin: '0' }}>
             奇妙数学冒险
           </h1>
 
-          {/* Range badge */}
-          <div style={{
-            display: 'flex', gap: '10px', alignItems: 'center',
-            background: 'rgba(255,255,255,0.6)', borderRadius: '20px',
-            padding: '8px 20px', marginBottom: '30px',
-            boxShadow: '0 2px 10px rgba(255,182,193,0.3)',
-            fontSize: '1.05rem', fontWeight: '600', color: '#b5558a'
-          }}>
-            <span>🎯 当前模式：</span>
-            <span style={{ color: '#e07a5f' }}>{currentRangeLabel}</span>
-            <span>·</span>
-            <span style={{ color: '#e07a5f' }}>{opsLabel}</span>
+          {/* Mode badge */}
+          <div className="mode-badge">
+            <span>🎯</span>
+            <span>{currentRangeLabel}</span>
+            <span style={{ opacity: 0.5 }}>·</span>
+            <span>{opsLabel}</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '90%', maxWidth: '350px' }}>
-            <button className="bouncy-button primary" onClick={startGame} style={{ padding: '20px', fontSize: '1.5rem', borderRadius: '30px' }}>
+          {/* Main action card */}
+          <div className="welcome-card">
+            <button className="bouncy-button primary" onClick={startGame}
+              style={{ width: '100%', padding: '18px', fontSize: '1.45rem', borderRadius: '22px' }}>
               🚀 马上开始
             </button>
-            <button className="bouncy-button secondary" onClick={startReview} style={{ position: 'relative', padding: '15px', fontSize: '1.2rem', borderRadius: '30px' }}>
-              <BookOpen size={24} /> 错题大作战
+            <button className="bouncy-button secondary" onClick={startReview}
+              style={{ position: 'relative', width: '100%', padding: '16px', fontSize: '1.15rem', borderRadius: '22px' }}>
+              <BookOpen size={22} /> 错题大作战
               {gameState.mistakes.length > 0 && (
-                <span style={{ position: 'absolute', top: -10, right: -10, background: '#ffb5a7', color: 'white', borderRadius: '15px', padding: '4px 12px', fontSize: '1rem', border: '3px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
+                <span style={{
+                  position: 'absolute', top: -10, right: -8,
+                  background: 'linear-gradient(135deg, #ff85b8, #ff5d9e)',
+                  color: 'white', borderRadius: '50px',
+                  padding: '3px 11px', fontSize: '0.95rem',
+                  border: '2.5px solid white',
+                  boxShadow: '0 3px 8px rgba(255,93,158,0.35)',
+                  fontWeight: '700',
+                }}>
                   {gameState.mistakes.length}
                 </span>
               )}
             </button>
           </div>
 
-          <p style={{ marginTop: '40px', opacity: 0.6, fontSize: '0.9rem' }}>已累计解题: {gameState.history.totalSolved}</p>
+          {/* Stats */}
+          <div className="stats-row">
+            <span>🏅</span>
+            <span>已累计解题</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #ff85b8, #ff5d9e)',
+              color: 'white', borderRadius: '50px',
+              padding: '2px 12px', fontWeight: '700',
+              boxShadow: '0 3px 8px rgba(255,93,158,0.25)',
+            }}>{gameState.history.totalSolved}</span>
+            <span>道题</span>
+          </div>
 
-          <style>{`
-            @keyframes float {
-              0% { transform: translateY(0px) rotate(0deg); }
-              50% { transform: translateY(-20px) rotate(10deg); }
-              100% { transform: translateY(0px) rotate(0deg); }
-            }
-            .hero-animation { filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
-          `}</style>
         </div>
       )}
 
@@ -518,24 +540,18 @@ export default function App() {
         <div className="screen-wrapper" style={{ justifyContent: 'space-between', paddingBottom: '10px' }}>
 
           <div className="equation-container">
-            {screen === 'review' && <span style={{ fontSize: '1.5rem', position: 'absolute', top: 60, color: '#E07A5F' }}>⭐ 错题复习</span>}
             <span>{currentQ.num1}</span>
             <span className="math-operator">{currentQ.symbol}</span>
             <span>{currentQ.num2}</span>
-            <span>=</span>
+            <span style={{ opacity: 0.85 }}>=</span>
             <div className="answer-box">
               {userAns === '' ? '?' : userAns}
             </div>
           </div>
 
           {/* Range hint pill */}
-          <div style={{
-            fontSize: '0.85rem', color: '#b5558a', opacity: 0.7,
-            background: 'rgba(255,255,255,0.5)', borderRadius: '20px',
-            padding: '4px 14px', alignSelf: 'center', marginTop: '-8px',
-            fontWeight: '600',
-          }}>
-            {currentRangeLabel} · {opsLabel}
+          <div className="range-hint">
+            🎯 {currentRangeLabel} · {opsLabel}
           </div>
 
           {/* Manipulatives area */}

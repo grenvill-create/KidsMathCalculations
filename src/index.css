@@ -1,168 +1,379 @@
-/* CSS Core Design System - Pink Jelly Edition */
+/* ============================================================
+   CSS Core Design System — Pink Candy Deluxe Edition ✨
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 
 :root {
   --font-kids: 'Fredoka', system-ui, sans-serif;
-  --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-spring: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --container-max-width: 600px;
-  
-  /* Pink Macaron Colors */
-  --bg-primary: #ffcbf2;
-  --bg-secondary: #ffe5ec;
-  --text-primary: #9d0208; /* Deep red-pink for readability */
-  --color-accent: #ffb5a7; /* Peach pink */
-  --color-success: #ff9a9e; /* Strawberry pink */
-  
-  --shadow-jelly: 0 8px 0 rgba(0,0,0,0.1), inset 0 3px 0 rgba(255,255,255,0.5);
-  --shadow-jelly-active: 0 2px 0 rgba(0,0,0,0.1), inset 0 3px 0 rgba(255,255,255,0.2);
+
+  /* ── Palette ── */
+  --pink-100: #fff0f6;
+  --pink-200: #ffd6e8;
+  --pink-300: #ffadd2;
+  --pink-400: #ff85b8;
+  --pink-500: #ff5d9e;
+  --pink-600: #d6317a;
+  --peach:    #ffb5a7;
+  --lavender: #e8d5f5;
+  --mint:     #d5f5e8;
+  --yellow:   #fff3b0;
+
+  /* ── Shadows ── */
+  --shadow-card:  0 8px 32px rgba(255, 93, 158, 0.12);
+  --shadow-btn:   0 6px 0 rgba(214, 49, 122, 0.3);
+  --shadow-btn-secondary: 0 6px 0 #ffd6e8;
+  --shadow-key:   0 7px 0 #ffc2d9;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0; padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 body {
   font-family: var(--font-kids);
-  /* Dreamy cartoon background */
   background: url('./assets/bg.png') center/cover no-repeat fixed;
-  color: var(--text-primary);
+  color: var(--pink-600);
   height: 100vh; width: 100vw;
   display: flex; justify-content: center; align-items: center;
   overflow: hidden;
 }
 
+/* ── Floating candy deco (pure CSS) ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,182,193,0.18) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(216,191,216,0.15) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+}
+
 #app-viewport {
   width: 100%; height: 100%; max-width: var(--container-max-width);
-  display: flex; flex-direction: column; padding: 16px;
-  position: relative;
+  display: flex; flex-direction: column; padding: 12px 16px;
+  position: relative; z-index: 1;
 }
 
-/* Background floating bubbles/clouds (pure CSS) */
-#app-viewport::before, #app-viewport::after {
-  content: ''; position: absolute; z-index: -1;
-  background: rgba(255,255,255,0.5); border-radius: 50%;
-  filter: blur(3px);
-}
-#app-viewport::before {
-  width: 150px; height: 150px; top: -20px; left: -20px;
-}
-#app-viewport::after {
-  width: 250px; height: 200px; bottom: 10%; right: -50px; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-}
-
-/* UI Elements */
+/* ── Glassmorphism card ── */
 .card-shadow {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  border: 2px solid rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 32px;
+  box-shadow: var(--shadow-card), 0 1px 0 rgba(255,255,255,0.9) inset;
+  border: 2px solid rgba(255, 255, 255, 0.7);
 }
 
+/* ── Screen wrapper ── */
+.screen-wrapper {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; overflow-y: auto; padding-bottom: 8px;
+}
+
+/* ── Title ── */
 .title-glow {
-  font-weight: 700; color: #ff5d8f;
-  text-align: center; font-size: 2.5rem; margin-bottom: 20px;
-  text-shadow: 2px 2px 0px white, -1px -1px 0px white;
-  letter-spacing: 2px;
+  font-weight: 700; color: var(--pink-500);
+  text-align: center; font-size: 2.4rem; margin-bottom: 16px;
+  letter-spacing: 1px;
+  text-shadow: 3px 3px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(255,255,255,0.9),
+               0 0 20px rgba(255, 93, 158, 0.25);
+  animation: titlePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes titlePop {
+  0%   { transform: scale(0.7) rotate(-3deg); opacity: 0; }
+  80%  { transform: scale(1.05) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
+/* ── Bouncy buttons (base) ── */
 .bouncy-button {
   font-family: var(--font-kids); font-weight: 700; border: none;
   cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; border-radius: 20px; transition: var(--transition-spring);
+  gap: 8px; border-radius: 50px; transition: var(--transition-spring);
+  letter-spacing: 0.5px; position: relative; overflow: hidden;
 }
-.bouncy-button:active { transform: scale(0.95) translateY(6px); box-shadow: var(--shadow-jelly-active); }
+.bouncy-button::after {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s;
+}
+.bouncy-button:hover::after { left: 150%; }
+.bouncy-button:active { transform: scale(0.93) translateY(3px); }
 
+/* Primary — strawberry pink */
 .bouncy-button.primary {
-  background: linear-gradient(to bottom, #ff9a9e, #fecfef); color: #d00000;
+  background: linear-gradient(160deg, #ff85b8 0%, #ff5d9e 50%, #e8448c 100%);
+  color: white;
   padding: 15px 30px; font-size: 1.2rem;
-  box-shadow: var(--shadow-jelly);
-  text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
+  box-shadow: var(--shadow-btn), 0 0 0 3px rgba(255,93,158,0.15);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
-.bouncy-button.secondary {
-  background: white; color: var(--text-primary);
-  padding: 12px 20px; border-radius: 25px;
-  box-shadow: 0 6px 0 #ffcbf2;
-  border: 2px solid white;
-}
-.bouncy-button.secondary:active { 
-  transform: translateY(6px); 
-  box-shadow: 0 0 0 transparent; 
-}
-.bouncy-button.mistake {
-  background: linear-gradient(to bottom, #f72585, #b5179e); color: white;
-  box-shadow: var(--shadow-jelly);
+.bouncy-button.primary:active {
+  box-shadow: 0 2px 0 rgba(214,49,122,0.3), 0 0 0 3px rgba(255,93,158,0.15);
 }
 
-/* Gameplay Grid */
+/* Secondary — white cloud */
+.bouncy-button.secondary {
+  background: white;
+  color: var(--pink-600);
+  padding: 12px 20px;
+  box-shadow: var(--shadow-btn-secondary);
+  border: 2.5px solid var(--pink-200);
+}
+.bouncy-button.secondary:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #ffd6e8;
+}
+
+/* Mistake / danger */
+.bouncy-button.mistake {
+  background: linear-gradient(160deg, #ff6b9d, #c0392b);
+  color: white;
+  box-shadow: 0 6px 0 rgba(192,57,43,0.35);
+}
+.bouncy-button.mistake:active { box-shadow: 0 2px 0 rgba(192,57,43,0.35); transform: translateY(4px); }
+
+/* ── Header ── */
+.app-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 0 8px;
+}
+
+/* ── Welcome Screen ── */
+.welcome-hero {
+  position: relative; text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1; gap: 0;
+  padding: 10px 0;
+}
+
+.star-float {
+  font-size: 5.5rem;
+  animation: starFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 8px 20px rgba(255,200,0,0.4));
+  line-height: 1;
+}
+@keyframes starFloat {
+  0%   { transform: translateY(0) rotate(-5deg) scale(1); }
+  30%  { transform: translateY(-18px) rotate(5deg) scale(1.05); }
+  60%  { transform: translateY(-10px) rotate(-3deg) scale(1.02); }
+  100% { transform: translateY(0) rotate(-5deg) scale(1); }
+}
+
+/* Decorative mini emojis around star */
+.deco-emoji {
+  position: absolute;
+  font-size: 1.8rem;
+  animation: decoSpin 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes decoSpin {
+  0%, 100% { transform: rotate(-10deg) scale(0.9); }
+  50%       { transform: rotate(10deg)  scale(1.1); }
+}
+
+/* Welcome card */
+.welcome-card {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 28px;
+  border: 2.5px solid rgba(255,255,255,0.85);
+  box-shadow: 0 10px 40px rgba(255,93,158,0.12), 0 2px 0 rgba(255,255,255,0.9) inset;
+  padding: 20px 24px;
+  width: 92%; max-width: 360px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+/* Mode badge */
+.mode-badge {
+  display: flex; gap: 8px; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(255,213,230,0.7), rgba(255,240,246,0.7));
+  border: 2px solid rgba(255,173,210,0.5);
+  border-radius: 50px;
+  padding: 8px 18px;
+  font-size: 0.98rem; font-weight: 600; color: #c0487a;
+  box-shadow: 0 3px 10px rgba(255,93,158,0.1);
+}
+
+/* Stats row */
+.stats-row {
+  display: flex; justify-content: center; gap: 6px;
+  font-size: 0.9rem; color: #c07090; font-weight: 600; opacity: 0.8;
+}
+
+/* ── Equation (playing screen) ── */
 .equation-container {
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 3rem; gap: 10px;
-  color: white; margin-top: 10px;
-  text-shadow: 3px 3px 0 #d00000;
+  font-weight: 700; font-size: 3rem; gap: 12px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(255,133,184,0.85), rgba(255,93,158,0.85));
+  border-radius: 28px;
+  margin: 6px 0;
+  box-shadow: 0 6px 20px rgba(255,93,158,0.3), 0 1px 0 rgba(255,255,255,0.4) inset;
+  color: white;
+  text-shadow: 2px 2px 0 rgba(200,0,80,0.3);
+  position: relative;
+  animation: eqSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes eqSlideIn {
+  from { transform: scale(0.85) translateY(-10px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.math-operator {
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%; width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .answer-box {
-  background: rgba(255,255,255,0.4);
-  border: 4px dashed white;
-  border-radius: 15px;
-  min-width: 60px; min-height: 60px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 3px solid rgba(255,255,255,0.8);
+  border-radius: 18px;
+  min-width: 70px; min-height: 64px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
-  color: #ff5d8f; text-shadow: 2px 2px 0 white;
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.1), 0 2px 0 rgba(255,255,255,0.6);
+  color: white; font-size: 2.6rem;
+  transition: all 0.25s;
+  animation: answerPulse 2s ease-in-out infinite;
+}
+@keyframes answerPulse {
+  0%, 100% { box-shadow: inset 0 3px 10px rgba(0,0,0,0.1), 0 0 0 0 rgba(255,255,255,0.4); }
+  50%       { box-shadow: inset 0 3px 10px rgba(0,0,0,0.1), 0 0 0 6px rgba(255,255,255,0.2); }
 }
 
-/* Manipulatives */
+/* ── Manipulatives ── */
 .manipulatives-area {
-  display: flex; flex-direction: column; align-items: center; gap: 15px;
-  margin: 10px 0; min-height: 180px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  margin: 6px 0; min-height: 160px;
 }
 .items-row {
-  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
 }
 .draggable-item {
-  font-size: 3rem; cursor: grab; user-select: none;
+  font-size: 2.6rem; cursor: grab; user-select: none;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
 }
-.draggable-item:active { cursor: grabbing; transform: scale(1.2) rotate(5deg); }
-.draggable-item.used { opacity: 0.5; filter: grayscale(1); }
+.draggable-item:active { cursor: grabbing; transform: scale(1.25) rotate(8deg); }
+.draggable-item.used { opacity: 0.35; filter: grayscale(1) blur(1px); }
 
-/* The "Basket" Dropzone */
 .drop-zone {
-  width: 90%; min-height: 100px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 4px solid white; 
-  border-radius: 40px;
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;
+  width: 92%; min-height: 90px;
+  background: rgba(255,255,255,0.55);
+  border: 3px dashed var(--pink-300);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px;
   transition: all 0.3s;
-  box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: inset 0 4px 12px rgba(255,93,158,0.08);
+  position: relative;
 }
-.drop-zone.drag-over { background: rgba(255, 255, 255, 0.9); transform: scale(1.02); }
+.drop-zone::before {
+  content: '🧺';
+  position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  font-size: 1.8rem;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,0.15));
+}
+.drop-zone.drag-over {
+  background: rgba(255,213,230,0.8);
+  border-color: var(--pink-400);
+  transform: scale(1.02);
+  box-shadow: 0 0 0 4px rgba(255,93,158,0.15), inset 0 4px 12px rgba(255,93,158,0.1);
+}
 
-/* Minimalist Keypad (Jelly Beans) */
+/* ── Keypad — Candy Jelly ── */
 .keypad-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px; width: 100%;
+  padding: 4px 0;
 }
-.keypad-btn {
-  aspect-ratio: 1.5 / 1;
-  background: white; border: none;
-  border-radius: 20px; font-family: var(--font-kids); font-weight: 700;
-  color: var(--text-primary); font-size: 2.2rem; cursor: pointer;
-  box-shadow: 0 6px 0 #ffcbf2;
-  transition: var(--transition-spring);
-}
-.keypad-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
-.keypad-btn.action-clear { 
-  background: #ffb5a7; color: white; box-shadow: 0 6px 0 #e59a8c; 
-}
-.keypad-btn.action-clear:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
-.keypad-btn.action-submit { 
-  background: #ff9a9e; color: white; box-shadow: 0 6px 0 #e58a8e; 
-}
-.keypad-btn.action-submit:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
 
-/* Animations */
-.fade-in { animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.keypad-btn {
+  aspect-ratio: 1.4 / 1;
+  font-family: var(--font-kids); font-weight: 700;
+  border: none; border-radius: 20px;
+  font-size: 2rem; cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.15s;
+
+  /* White jelly with pink shadow */
+  background: linear-gradient(180deg, #ffffff 0%, #fff0f6 100%);
+  color: var(--pink-600);
+  box-shadow: var(--shadow-key), inset 0 2px 0 rgba(255,255,255,1);
+}
+/* Shine overlay */
+.keypad-btn::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 45%; border-radius: 20px 20px 50% 50% / 20px 20px 30px 30px;
+  background: rgba(255,255,255,0.55);
+  pointer-events: none;
+}
+.keypad-btn:active {
+  transform: translateY(6px);
+  box-shadow: 0 1px 0 #ffc2d9, inset 0 2px 0 rgba(255,255,255,0.7);
+}
+
+/* Clear key — peach */
+.keypad-btn.action-clear {
+  background: linear-gradient(180deg, #ffcba4 0%, #ffb5a7 100%);
+  color: white;
+  box-shadow: 0 7px 0 #e8957a, inset 0 2px 0 rgba(255,255,255,0.5);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.keypad-btn.action-clear:active {
+  box-shadow: 0 1px 0 #e8957a, inset 0 2px 0 rgba(255,255,255,0.4);
+}
+
+/* Submit key — pink gradient */
+.keypad-btn.action-submit {
+  background: linear-gradient(180deg, #ff85b8 0%, #ff5d9e 100%);
+  color: white;
+  box-shadow: 0 7px 0 #d6317a, inset 0 2px 0 rgba(255,255,255,0.4);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  font-size: 1.8rem;
+}
+.keypad-btn.action-submit:active {
+  box-shadow: 0 1px 0 #d6317a, inset 0 2px 0 rgba(255,255,255,0.3);
+}
+
+/* ── Range hint strip ── */
+.range-hint {
+  font-size: 0.82rem; color: #c07090; opacity: 0.75;
+  background: rgba(255,255,255,0.6);
+  border: 1.5px solid rgba(255,173,210,0.4);
+  border-radius: 50px;
+  padding: 4px 16px; align-self: center;
+  font-weight: 600; letter-spacing: 0.3px;
+}
+
+/* ── Animations ── */
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Correct answer flash */
+.correct-flash {
+  animation: correctFlash 0.5s ease;
+}
+@keyframes correctFlash {
+  0%   { background: rgba(255,255,255,0.35); }
+  40%  { background: rgba(180,255,200,0.7); }
+  100% { background: rgba(255,255,255,0.35); }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--pink-300); border-radius: 10px; }
