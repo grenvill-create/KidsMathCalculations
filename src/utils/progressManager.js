@@ -6,7 +6,10 @@ export const progressManager = {
     return {
       stage: parseInt(localStorage.getItem('km_stage') || '1'),
       mistakes: JSON.parse(localStorage.getItem('km_mistakes') || '[]'),
-      history: JSON.parse(localStorage.getItem('km_history') || '{"totalSolved":0}')
+      history: JSON.parse(localStorage.getItem('km_history') || '{"totalSolved":0}'),
+      // Custom range settings
+      maxNumber: parseInt(localStorage.getItem('km_maxNumber') || '10'),
+      operations: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
     };
   },
 
@@ -14,6 +17,8 @@ export const progressManager = {
     localStorage.setItem('km_stage', state.stage.toString());
     localStorage.setItem('km_mistakes', JSON.stringify(state.mistakes));
     localStorage.setItem('km_history', JSON.stringify(state.history));
+    localStorage.setItem('km_maxNumber', String(state.maxNumber ?? 10));
+    localStorage.setItem('km_operations', JSON.stringify(state.operations ?? ['add', 'sub']));
   },
 
   // Record a mistake. if the problem already exists, increment error count.
@@ -50,20 +55,24 @@ export const progressManager = {
     const data = {
       s: localStorage.getItem('km_stage') || '1',
       m: JSON.parse(localStorage.getItem('km_mistakes') || '[]'),
-      h: JSON.parse(localStorage.getItem('km_history') || '{"totalSolved":0}')
+      h: JSON.parse(localStorage.getItem('km_history') || '{"totalSolved":0}'),
+      mn: localStorage.getItem('km_maxNumber') || '10',
+      op: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
     };
     // Encode to base64
-    return btoa(JSON.stringify(data));
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   },
 
   // Import Sync Code
   importSyncCode(code) {
     try {
-      const data = JSON.parse(atob(code));
+      const data = JSON.parse(decodeURIComponent(escape(atob(code))));
       if (data && data.s && data.m) {
         localStorage.setItem('km_stage', data.s.toString());
         localStorage.setItem('km_mistakes', JSON.stringify(data.m));
         localStorage.setItem('km_history', JSON.stringify(data.h || {"totalSolved":0}));
+        if (data.mn) localStorage.setItem('km_maxNumber', data.mn.toString());
+        if (data.op) localStorage.setItem('km_operations', JSON.stringify(data.op));
         return true;
       }
       return false;

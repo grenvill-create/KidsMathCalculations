@@ -5,10 +5,19 @@ import { mathGenerator } from './utils/mathGenerator';
 import { progressManager } from './utils/progressManager';
 import MathManipulatives from './components/MathManipulatives';
 
+// Preset ranges selectable by parents
+const RANGE_PRESETS = [
+  { label: '10 以内', value: 10 },
+  { label: '20 以内', value: 20 },
+  { label: '30 以内', value: 30 },
+  { label: '50 以内', value: 50 },
+  { label: '100 以内', value: 100 },
+];
+
 export default function App() {
   const [screen, setScreen] = useState('welcome'); // welcome, guardian, settings, playing, review
   const [gameState, setGameState] = useState(progressManager.getInitialState());
-  
+
   // Settings sync
   const [syncCodeInput, setSyncCodeInput] = useState('');
   const [generatedSyncCode, setGeneratedSyncCode] = useState('');
@@ -21,8 +30,8 @@ export default function App() {
   const [currentQ, setCurrentQ] = useState(null);
   const [userAns, setUserAns] = useState('');
   const [errorCount, setErrorCount] = useState(0);
-  const [basketFull, setBasketFull] = useState(false); // Used to unlock keypad in early stages
-  const [showHelp, setShowHelp] = useState(false); // Used in stage 3
+  const [basketFull, setBasketFull] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     progressManager.saveState(gameState);
@@ -50,15 +59,15 @@ export default function App() {
   // --- SETTINGS ---
   const importSync = () => {
     if (progressManager.importSyncCode(syncCodeInput)) {
-      alert("同步成功！");
+      alert('同步成功！');
       setGameState(progressManager.getInitialState());
     } else {
-      alert("无效的同步码");
+      alert('无效的同步码');
     }
   };
 
   const clearMistakes = () => {
-    if (confirm("确定要清空所有错题记录吗？")) {
+    if (confirm('确定要清空所有错题记录吗？')) {
       const newState = { ...gameState, mistakes: [] };
       setGameState(newState);
       progressManager.saveState(newState);
@@ -66,13 +75,33 @@ export default function App() {
   };
 
   const resetProgress = () => {
-    if (confirm("⚠️ 警告：这将清空所有的错题本、解题数量记录，并将阶段重置为1。确定要继续吗？")) {
+    if (confirm('⚠️ 警告：这将清空所有的错题本、解题数量记录，并将阶段重置为1。确定要继续吗？')) {
       localStorage.removeItem('km_stage');
       localStorage.removeItem('km_mistakes');
       localStorage.removeItem('km_history');
+      localStorage.removeItem('km_maxNumber');
+      localStorage.removeItem('km_operations');
       setGameState(progressManager.getInitialState());
-      alert("进度已成功重置！");
+      alert('进度已成功重置！');
     }
+  };
+
+  // --- RANGE SETTINGS ---
+  const setMaxNumber = (val) => {
+    const newState = { ...gameState, maxNumber: val };
+    setGameState(newState);
+  };
+
+  const toggleOperation = (op) => {
+    const ops = gameState.operations ?? ['add', 'sub'];
+    let newOps;
+    if (ops.includes(op)) {
+      if (ops.length === 1) return; // must keep at least one
+      newOps = ops.filter(o => o !== op);
+    } else {
+      newOps = [...ops, op];
+    }
+    setGameState({ ...gameState, operations: newOps });
   };
 
   // --- GAMEPLAY ---
@@ -83,7 +112,7 @@ export default function App() {
 
   const startReview = () => {
     if (gameState.mistakes.length === 0) {
-      alert("太棒啦！目前没有错题记录！");
+      alert('太棒啦！目前没有错题记录！');
       return;
     }
     audioSynth.playClick();
@@ -97,15 +126,22 @@ export default function App() {
     setShowHelp(false);
 
     if (mode === 'playing') {
-      setCurrentQ(mathGenerator.generateQuestion(gameState.stage));
+      const opts = {
+        maxNumber: gameState.maxNumber ?? 10,
+        operations: gameState.operations ?? ['add', 'sub'],
+      };
+      setCurrentQ(mathGenerator.generateQuestion(gameState.stage, opts));
       setScreen('playing');
     } else if (mode === 'review') {
-      // Pick random mistake
       const m = gameState.mistakes[Math.floor(Math.random() * gameState.mistakes.length)];
       setCurrentQ({
-        problemStr: m.problemStr, num1: m.num1, num2: m.num2, symbol: m.symbol, answer: m.answer,
+        problemStr: m.problemStr,
+        num1: m.num1,
+        num2: m.num2,
+        symbol: m.symbol,
+        answer: m.answer,
         spokenText: `${m.num1} ${m.symbol === '+' ? '加' : '减'} ${m.num2} 等于几？`,
-        stage: 2 // Treat reviews as stage 2 (visual help)
+        stage: 2,
       });
       setScreen('review');
     }
@@ -122,24 +158,22 @@ export default function App() {
 
   const submitAnswer = () => {
     if (userAns === '' || !currentQ) return;
-    
+
     if (parseInt(userAns) === currentQ.answer) {
       audioSynth.playCorrect();
-      
+
       let nextState = { ...gameState };
       nextState.history.totalSolved += 1;
-      
-      // If it was a review and correct on first try, resolve it
+
       if (screen === 'review' && errorCount === 0 && !showHelp) {
         nextState.mistakes = nextState.mistakes.filter(m => m.problemStr !== currentQ.problemStr);
       }
 
       setGameState(nextState);
-      
       setUserAns('');
-      
+
       if (screen === 'review' && nextState.mistakes.length === 0) {
-        alert("恭喜！所有错题都被你消灭啦！");
+        alert('恭喜！所有错题都被你消灭啦！');
         setScreen('welcome');
         return;
       }
@@ -152,26 +186,31 @@ export default function App() {
       setUserAns('');
       const newErr = errorCount + 1;
       setErrorCount(newErr);
-      
-      // Record mistake
+
       progressManager.recordMistake(currentQ.problemStr, currentQ.num1, currentQ.num2, currentQ.symbol, currentQ.answer);
       setGameState(progressManager.getInitialState());
 
       if (newErr >= 2) {
-        audioSynth.speak("再仔细数一数哦。");
+        audioSynth.speak('再仔细数一数哦。');
       }
     }
   };
 
   const toggleMute = () => {
     audioSynth.setMuteState(!audioSynth.getMuteState());
-    setGameState(prev => ({...prev})); // force render
+    setGameState(prev => ({ ...prev }));
   };
 
-  const isKeypadLocked = () => {
-    // Unlocked completely per user request. Dragging is optional.
-    return false;
-  };
+  const isKeypadLocked = () => false;
+
+  // Derive a label for the current range on the welcome screen
+  const currentRangeLabel = `${gameState.maxNumber ?? 10} 以内`;
+  const opsLabel = (() => {
+    const ops = gameState.operations ?? ['add', 'sub'];
+    if (ops.includes('add') && ops.includes('sub')) return '加减法';
+    if (ops.includes('add')) return '加法';
+    return '减法';
+  })();
 
   return (
     <div id="app-viewport">
@@ -195,7 +234,7 @@ export default function App() {
       {/* --- WELCOME SCREEN --- */}
       {screen === 'welcome' && (
         <div className="screen-wrapper fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          
+
           <div className="hero-animation" style={{ fontSize: '5rem', marginBottom: '-20px', animation: 'float 3s ease-in-out infinite' }}>
             🌟
           </div>
@@ -203,11 +242,24 @@ export default function App() {
           <h1 className="title-glow" style={{ fontSize: '3.5rem', margin: '20px 0', textShadow: '4px 4px 0 white, -2px -2px 0 white' }}>
             奇妙数学冒险
           </h1>
-          <p style={{ opacity: 0.8, marginBottom: '40px', fontSize: '1.2rem', fontWeight: 'bold' }}>开始你的奇妙计算之旅吧！</p>
-          
+
+          {/* Range badge */}
+          <div style={{
+            display: 'flex', gap: '10px', alignItems: 'center',
+            background: 'rgba(255,255,255,0.6)', borderRadius: '20px',
+            padding: '8px 20px', marginBottom: '30px',
+            boxShadow: '0 2px 10px rgba(255,182,193,0.3)',
+            fontSize: '1.05rem', fontWeight: '600', color: '#b5558a'
+          }}>
+            <span>🎯 当前模式：</span>
+            <span style={{ color: '#e07a5f' }}>{currentRangeLabel}</span>
+            <span>·</span>
+            <span style={{ color: '#e07a5f' }}>{opsLabel}</span>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '90%', maxWidth: '350px' }}>
             <button className="bouncy-button primary" onClick={startGame} style={{ padding: '20px', fontSize: '1.5rem', borderRadius: '30px' }}>
-              🚀 马上开始 (阶段 {gameState.stage})
+              🚀 马上开始
             </button>
             <button className="bouncy-button secondary" onClick={startReview} style={{ position: 'relative', padding: '15px', fontSize: '1.2rem', borderRadius: '30px' }}>
               <BookOpen size={24} /> 错题大作战
@@ -218,9 +270,9 @@ export default function App() {
               )}
             </button>
           </div>
-          
+
           <p style={{ marginTop: '40px', opacity: 0.6, fontSize: '0.9rem' }}>已累计解题: {gameState.history.totalSolved}</p>
-          
+
           <style>{`
             @keyframes float {
               0% { transform: translateY(0px) rotate(0deg); }
@@ -238,15 +290,15 @@ export default function App() {
           <div className="card-shadow" style={{ padding: '30px', textAlign: 'center', width: '90%', maxWidth: '400px' }}>
             <h2 className="title-glow" style={{ color: '#E07A5F' }}>家长通道</h2>
             <div style={{ fontSize: '2rem', margin: '20px 0' }}>{guardianQ.str}</div>
-            <input 
-              type="number" 
-              value={guardianA} 
+            <input
+              type="number"
+              value={guardianA}
               onChange={e => setGuardianA(e.target.value)}
               style={{ fontSize: '2rem', width: '100px', textAlign: 'center', marginBottom: '20px' }}
             />
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-              <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}><X/></button>
-              <button className="bouncy-button primary" onClick={checkGuardian}><Check/></button>
+              <button className="bouncy-button secondary" onClick={() => setScreen('welcome')}><X /></button>
+              <button className="bouncy-button primary" onClick={checkGuardian}><Check /></button>
             </div>
           </div>
         </div>
@@ -255,46 +307,139 @@ export default function App() {
       {/* --- SETTINGS --- */}
       {screen === 'settings' && (
         <div className="screen-wrapper fade-in">
-          <div className="card-shadow" style={{ padding: '20px', width: '100%', maxWidth: '500px', overflowY: 'auto', maxHeight: '80vh' }}>
+          <div className="card-shadow" style={{ padding: '20px', width: '100%', maxWidth: '500px', overflowY: 'auto', maxHeight: '85vh' }}>
             <h2 className="title-glow">教案配置室</h2>
-            
-            <div style={{ margin: '20px 0', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              <h3>调整学习阶段</h3>
-              <select 
-                value={gameState.stage} 
-                onChange={(e) => setGameState({...gameState, stage: parseInt(e.target.value)})}
-                style={{ width: '100%', padding: '10px', fontSize: '1.2rem', marginTop: '10px' }}
+
+            {/* ── Custom Calculation Range ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
+              <h3 style={{ marginBottom: '10px' }}>🎯 自定义计算范围</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '12px' }}>选择小朋友计算的数字范围，数字越大越有挑战性哦！</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+                {RANGE_PRESETS.map(preset => (
+                  <button
+                    key={preset.value}
+                    onClick={() => setMaxNumber(preset.value)}
+                    style={{
+                      padding: '10px 18px',
+                      borderRadius: '25px',
+                      border: '3px solid',
+                      borderColor: (gameState.maxNumber ?? 10) === preset.value ? '#e07a5f' : '#f5c0d0',
+                      background: (gameState.maxNumber ?? 10) === preset.value ? 'linear-gradient(135deg, #ffb5c8, #ff8fab)' : 'white',
+                      color: (gameState.maxNumber ?? 10) === preset.value ? 'white' : '#c06080',
+                      fontWeight: '700',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      fontFamily: 'Fredoka, sans-serif',
+                      boxShadow: (gameState.maxNumber ?? 10) === preset.value ? '0 4px 12px rgba(255,100,150,0.35)' : '0 2px 6px rgba(0,0,0,0.08)',
+                      transition: 'all 0.2s ease',
+                      transform: (gameState.maxNumber ?? 10) === preset.value ? 'scale(1.08)' : 'scale(1)',
+                    }}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom input */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <label style={{ fontWeight: '600', color: '#b5558a', fontSize: '0.95rem' }}>自定义数值：</label>
+                <input
+                  type="number"
+                  min={5}
+                  max={9999}
+                  value={gameState.maxNumber ?? 10}
+                  onChange={e => {
+                    const v = parseInt(e.target.value);
+                    if (!isNaN(v) && v >= 5) setMaxNumber(v);
+                  }}
+                  style={{
+                    width: '90px', padding: '8px 12px',
+                    borderRadius: '15px', border: '2px solid #f5c0d0',
+                    fontSize: '1.1rem', textAlign: 'center',
+                    fontFamily: 'Fredoka, sans-serif', color: '#b5558a',
+                    fontWeight: '700',
+                  }}
+                />
+                <span style={{ opacity: 0.6, fontSize: '0.9rem' }}>（最小 5，最大 9999）</span>
+              </div>
+            </div>
+
+            {/* ── Operation Types ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
+              <h3 style={{ marginBottom: '10px' }}>➕➖ 运算类型</h3>
+              <div style={{ display: 'flex', gap: '14px' }}>
+                {[
+                  { key: 'add', emoji: '➕', label: '加法' },
+                  { key: 'sub', emoji: '➖', label: '减法' },
+                ].map(({ key, emoji, label }) => {
+                  const ops = gameState.operations ?? ['add', 'sub'];
+                  const active = ops.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => toggleOperation(key)}
+                      style={{
+                        flex: 1, padding: '14px',
+                        borderRadius: '20px',
+                        border: '3px solid',
+                        borderColor: active ? '#e07a5f' : '#f5c0d0',
+                        background: active ? 'linear-gradient(135deg, #ffb5c8, #ff8fab)' : 'white',
+                        color: active ? 'white' : '#c06080',
+                        fontWeight: '700', fontSize: '1.1rem',
+                        cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
+                        boxShadow: active ? '0 4px 12px rgba(255,100,150,0.35)' : '0 2px 6px rgba(0,0,0,0.08)',
+                        transition: 'all 0.2s ease',
+                        opacity: active ? 1 : 0.6,
+                      }}
+                    >
+                      {emoji} {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p style={{ opacity: 0.55, fontSize: '0.85rem', marginTop: '8px' }}>※ 至少需要选择一种运算类型</p>
+            </div>
+
+            {/* ── Stage selector ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
+              <h3>🏅 调整学习阶段（控制教具显示）</h3>
+              <select
+                value={gameState.stage}
+                onChange={(e) => setGameState({ ...gameState, stage: parseInt(e.target.value) })}
+                style={{ width: '100%', padding: '10px', fontSize: '1.1rem', marginTop: '10px', borderRadius: '12px', border: '2px solid #f5c0d0', fontFamily: 'Fredoka, sans-serif' }}
               >
-                <option value="1">阶段一：感知与计数 (0-10)</option>
-                <option value="2">阶段二：具象加减法 (运算启蒙)</option>
-                <option value="3">阶段三：半抽象运算 (去教具化过渡)</option>
-                <option value="4">阶段四：十进制引入 (进阶 11-20)</option>
+                <option value="1">阶段一：感知与计数（显示拖拽教具）</option>
+                <option value="2">阶段二：具象加减法（显示拖拽教具）</option>
+                <option value="3">阶段三：半抽象运算（按需显示教具）</option>
+                <option value="4">阶段四：纯计算（无教具，直接答题）</option>
               </select>
             </div>
 
-            <div style={{ margin: '20px 0', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              <h3>错题本数据</h3>
+            {/* ── Mistake book ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
+              <h3>📖 错题本数据</h3>
               <p>当前记录错题数量：{gameState.mistakes.length}</p>
               <button className="bouncy-button mistake" onClick={clearMistakes} style={{ marginTop: '10px' }}>
                 清空错题本
               </button>
             </div>
 
-            <div style={{ margin: '20px 0' }}>
-              <h3>进度跨设备同步</h3>
-              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>通过“同步码”可以在iPad和电脑之间互传进度。</p>
+            {/* ── Sync ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
+              <h3>☁️ 进度跨设备同步</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>通过"同步码"可以在 iPad 和电脑之间互传进度与设置。</p>
               <p><strong>本机同步码导出：</strong></p>
-              <textarea readOnly value={generatedSyncCode} style={{ width: '100%', height: '60px', fontSize: '0.8rem' }} />
-              
+              <textarea readOnly value={generatedSyncCode} style={{ width: '100%', height: '60px', fontSize: '0.8rem', borderRadius: '10px', border: '2px solid #f5c0d0' }} />
               <p style={{ marginTop: '10px' }}><strong>从其他设备导入：</strong></p>
               <div style={{ display: 'flex', gap: '5px' }}>
-                <input type="text" value={syncCodeInput} onChange={e=>setSyncCodeInput(e.target.value)} placeholder="粘贴同步码" style={{ flex: 1 }} />
+                <input type="text" value={syncCodeInput} onChange={e => setSyncCodeInput(e.target.value)} placeholder="粘贴同步码" style={{ flex: 1, borderRadius: '12px', border: '2px solid #f5c0d0', padding: '8px', fontFamily: 'Fredoka, sans-serif' }} />
                 <button className="bouncy-button secondary" onClick={importSync}>导入</button>
               </div>
             </div>
 
-            <div style={{ margin: '20px 0', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              <h3 style={{ color: '#E07A5F' }}>危险区域</h3>
+            {/* ── Danger zone ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
+              <h3 style={{ color: '#E07A5F' }}>⚠️ 危险区域</h3>
               <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>如果你想让孩子重新开始学习，可以初始化所有进度。</p>
               <button className="bouncy-button mistake" onClick={resetProgress} style={{ width: '100%' }}>
                 重置所有进度
@@ -302,7 +447,7 @@ export default function App() {
             </div>
 
             <button className="bouncy-button primary" onClick={() => setScreen('welcome')} style={{ width: '100%' }}>
-              返回
+              ✅ 保存并返回
             </button>
           </div>
         </div>
@@ -311,9 +456,9 @@ export default function App() {
       {/* --- PLAYING / REVIEW SCREEN --- */}
       {(screen === 'playing' || screen === 'review') && currentQ && (
         <div className="screen-wrapper" style={{ justifyContent: 'space-between', paddingBottom: '10px' }}>
-          
+
           <div className="equation-container">
-            {screen === 'review' && <span style={{fontSize:'1.5rem', position:'absolute', top: 60, color:'#E07A5F'}}>⭐ 错题复习</span>}
+            {screen === 'review' && <span style={{ fontSize: '1.5rem', position: 'absolute', top: 60, color: '#E07A5F' }}>⭐ 错题复习</span>}
             <span>{currentQ.num1}</span>
             <span className="math-operator">{currentQ.symbol}</span>
             <span>{currentQ.num2}</span>
@@ -323,14 +468,24 @@ export default function App() {
             </div>
           </div>
 
-          {/* Manipulatives area: Show for stage 1 & 2. For stage 3/4 show if showHelp is true */}
+          {/* Range hint pill */}
+          <div style={{
+            fontSize: '0.85rem', color: '#b5558a', opacity: 0.7,
+            background: 'rgba(255,255,255,0.5)', borderRadius: '20px',
+            padding: '4px 14px', alignSelf: 'center', marginTop: '-8px',
+            fontWeight: '600',
+          }}>
+            {currentRangeLabel} · {opsLabel}
+          </div>
+
+          {/* Manipulatives area */}
           {(currentQ.stage <= 2 || showHelp) ? (
             <MathManipulatives currentQ={currentQ} onBasketFull={setBasketFull} />
           ) : (
             <div style={{ minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               <button className="bouncy-button secondary" onClick={() => setShowHelp(true)}>
-                 [?] 帮帮我
-               </button>
+              <button className="bouncy-button secondary" onClick={() => setShowHelp(true)}>
+                [?] 帮帮我
+              </button>
             </div>
           )}
 

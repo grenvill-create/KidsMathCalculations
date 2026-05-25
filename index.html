@@ -31,13 +31,27 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // Register Service Worker for PWA
+      // Register or Unregister Service Worker for PWA
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/KidsMathCalculations/sw.js')
-            .then(reg => console.log('SW Registered', reg))
-            .catch(err => console.log('SW Failed', err));
-        });
+        if (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1')) {
+          // Unregister any active service workers in local development to prevent caching issues
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+              registration.unregister().then(() => {
+                console.log('Local SW Unregistered');
+                // Force reload if service worker was actively caching
+                window.location.reload();
+              });
+            }
+          });
+        } else {
+          // Register the Service Worker in production (GitHub Pages)
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/KidsMathCalculations/sw.js')
+              .then(reg => console.log('SW Registered', reg))
+              .catch(err => console.log('SW Failed', err));
+          });
+        }
       }
     </script>
   </body>
