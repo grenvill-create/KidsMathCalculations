@@ -469,26 +469,6 @@ export default function App() {
             {/* ── Save / Cancel ── */}
             <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
               <button
-                onClick={cancelSettings}
-                style={{
-                  flex: 1, padding: '16px',
-                  borderRadius: '30px',
-                  border: '3px solid #f5c0d0',
-                  background: 'white',
-                  color: '#b5558a',
-                  fontWeight: '700', fontSize: '1.1rem',
-                  cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
-                  boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
-                  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                }}
-                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
-                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.95)'}
-                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                ✕ 取消
-              </button>
-              <button
                 onClick={saveSettings}
                 style={{
                   flex: 1, padding: '16px',
@@ -507,6 +487,26 @@ export default function App() {
                 onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
               >
                 ✓ 保存
+              </button>
+              <button
+                onClick={cancelSettings}
+                style={{
+                  flex: 1, padding: '16px',
+                  borderRadius: '30px',
+                  border: '3px solid #f5c0d0',
+                  background: 'white',
+                  color: '#b5558a',
+                  fontWeight: '700', fontSize: '1.1rem',
+                  cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                }}
+                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                ✕ 取消
               </button>
             </div>
           </div>
