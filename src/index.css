@@ -207,8 +207,8 @@ body::before {
 /* ── Equation (playing screen) ── */
 .equation-container {
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 3rem; gap: 12px;
-  padding: 16px 24px;
+  font-weight: 700; font-size: 2.6rem; gap: 10px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, rgba(255,133,184,0.85), rgba(255,93,158,0.85));
   border-radius: 28px;
   margin: 6px 0;
@@ -249,14 +249,14 @@ body::before {
 
 /* ── Manipulatives ── */
 .manipulatives-area {
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
-  margin: 6px 0; min-height: 160px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  margin: 4px 0; min-height: 120px;
 }
 .items-row {
-  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
 }
 .draggable-item {
-  font-size: 2.6rem; cursor: grab; user-select: none;
+  font-size: 2.1rem; cursor: grab; user-select: none;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
 }

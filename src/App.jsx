@@ -538,7 +538,7 @@ export default function App() {
 
       {/* --- PLAYING / REVIEW SCREEN --- */}
       {(screen === 'playing' || screen === 'review') && currentQ && (
-        <div className="screen-wrapper" style={{ justifyContent: 'space-between', paddingBottom: '10px' }}>
+        <div className="screen-wrapper fade-in" style={{ justifyContent: 'flex-start', gap: '12px', paddingBottom: '20px', overflowY: 'auto' }}>
 
           <div className="equation-container">
             <span>{currentQ.num1}</span>
