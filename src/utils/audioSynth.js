@@ -27,15 +27,15 @@ export const audioSynth = {
   },
 
   // Speak text using SpeechSynthesis
-  speak(text) {
+  speak(text, lang = 'zh') {
     if (isMuted || !window.speechSynthesis) return;
     
     // Stop any ongoing speech
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = 0.85; // Slightly slower for kids
+    utterance.lang = lang === 'en' ? 'en-US' : 'zh-CN';
+    utterance.rate = lang === 'en' ? 0.9 : 0.85; // Slightly slower for kids
     utterance.pitch = 1.3; // Higher pitch for a friendlier voice
     
     window.speechSynthesis.speak(utterance);

@@ -3,13 +3,97 @@ import { audioSynth } from '../utils/audioSynth';
 
 const EMOJI_SETS = ['🍎', '⭐', '🎈', '🌸', '🍭', '🐱', '🦋', '🍬', '🐧', '🌈'];
 
-function generateProblem() {
-  const num1 = Math.floor(Math.random() * 9) + 1;
-  let num2;
-  do { num2 = Math.floor(Math.random() * 9) + 1; } while (num2 === num1);
+function generateProblem(level) {
   const emoji = EMOJI_SETS[Math.floor(Math.random() * EMOJI_SETS.length)];
-  const answer = num1 > num2 ? 'left' : 'right';
-  return { num1, num2, emoji, answer };
+  
+  if (level === 1) {
+    // Easy: simple comparison of 1-9 with emojis
+    const num1 = Math.floor(Math.random() * 9) + 1;
+    let num2;
+    do { num2 = Math.floor(Math.random() * 9) + 1; } while (num2 === num1);
+    
+    return {
+      leftVal: num1,
+      rightVal: num2,
+      leftExpr: num1.toString(),
+      rightExpr: num2.toString(),
+      emoji,
+      showEmoji: true,
+      answer: num1 > num2 ? 'left' : 'right'
+    };
+  } else if (level === 2) {
+    // Medium: Single number vs Addition/Subtraction within 20
+    const op = Math.random() > 0.5 ? '+' : '-';
+    let a, b, leftVal, rightVal;
+    
+    if (op === '+') {
+      a = Math.floor(Math.random() * 9) + 1;
+      b = Math.floor(Math.random() * 9) + 1;
+      leftVal = a + b;
+    } else {
+      leftVal = Math.floor(Math.random() * 9) + 1; // result
+      b = Math.floor(Math.random() * 8) + 1;
+      a = leftVal + b; // start number
+    }
+    
+    do {
+      rightVal = Math.floor(Math.random() * 15) + 1;
+    } while (rightVal === leftVal);
+    
+    // Randomize which side gets the equation
+    const leftIsExpr = Math.random() > 0.5;
+    
+    return {
+      leftVal,
+      rightVal,
+      leftExpr: leftIsExpr ? `${a} ${op} ${b}` : leftVal.toString(),
+      rightExpr: leftIsExpr ? rightVal.toString() : `${a} ${op} ${b}`,
+      emoji,
+      showEmoji: false,
+      answer: leftVal > rightVal ? 'left' : 'right'
+    };
+  } else {
+    // Hard: Expression vs Expression
+    const ops = ['+', '-'];
+    
+    // Left expr
+    const leftOp = ops[Math.floor(Math.random() * 2)];
+    let leftVal, leftA, leftB;
+    if (leftOp === '+') {
+      leftA = Math.floor(Math.random() * 9) + 1;
+      leftB = Math.floor(Math.random() * 9) + 1;
+      leftVal = leftA + leftB;
+    } else {
+      leftVal = Math.floor(Math.random() * 9) + 1;
+      leftB = Math.floor(Math.random() * 8) + 1;
+      leftA = leftVal + leftB;
+    }
+    
+    // Right expr
+    const rightOp = ops[Math.floor(Math.random() * 2)];
+    let rightVal, rightA, rightB;
+    do {
+      if (rightOp === '+') {
+        rightA = Math.floor(Math.random() * 9) + 1;
+        rightB = Math.floor(Math.random() * 9) + 1;
+        rightVal = rightA + rightB;
+      } else {
+        rightVal = Math.floor(Math.random() * 9) + 1;
+        rightB = Math.floor(Math.random() * 8) + 1;
+        rightA = rightVal + rightB;
+      }
+    } while (rightVal === leftVal);
+    
+    return {
+      leftVal,
+      rightVal,
+      leftExpr: `${leftA} ${leftOp} ${leftB}`,
+      rightExpr: `${rightA} ${rightOp} ${rightB}`,
+      emoji,
+      showEmoji: false,
+      answer: leftVal > rightVal ? 'left' : 'right'
+    };
+  }
 }
 
 function EmojiGrid({ count, emoji }) {
@@ -25,18 +109,25 @@ function EmojiGrid({ count, emoji }) {
   );
 }
 
-export default function CompareGame({ autoAdvance }) {
+export default function CompareGame({ autoAdvance, lang = 'zh', difficultyMode = 'adaptive' }) {
+  const [adaptiveLevel, setAdaptiveLevel] = useState(1);
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+  
+  const level = difficultyMode === 'easy' ? 1 : 
+                difficultyMode === 'medium' ? 2 : 
+                difficultyMode === 'hard' ? 3 : adaptiveLevel;
+                
   const [problem, setProblem] = useState(null);
   const [selected, setSelected] = useState(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
 
   const next = useCallback(() => {
-    setProblem(generateProblem());
+    setProblem(generateProblem(level));
     setSelected(null);
-  }, []);
+  }, [level]);
 
-  useEffect(() => { next(); }, []);
+  useEffect(() => { next(); }, [next]);
 
   const handleChoice = (side) => {
     if (selected !== null) return;
@@ -45,11 +136,25 @@ export default function CompareGame({ autoAdvance }) {
     if (side === problem.answer) {
       audioSynth.playCorrect();
       setCorrectCount(p => p + 1);
+      if (difficultyMode === 'adaptive') {
+        const newConsecutive = consecutiveCorrect + 1;
+        setConsecutiveCorrect(newConsecutive);
+        if (newConsecutive >= 2 && adaptiveLevel < 3) {
+          setAdaptiveLevel(l => l + 1);
+          setConsecutiveCorrect(0);
+        }
+      }
       if (autoAdvance) {
         setTimeout(next, 1200);
       }
     } else {
       audioSynth.playIncorrect();
+      if (difficultyMode === 'adaptive') {
+        setConsecutiveCorrect(0);
+        if (adaptiveLevel > 1) {
+          setAdaptiveLevel(l => l - 1);
+        }
+      }
       if (autoAdvance) {
         setTimeout(next, 1800);
       }
@@ -73,46 +178,55 @@ export default function CompareGame({ autoAdvance }) {
     };
   };
 
-  const bigger = Math.max(problem.num1, problem.num2);
-  const smaller = Math.min(problem.num1, problem.num2);
+  const bigger = Math.max(problem.leftVal, problem.rightVal);
+  const smaller = Math.min(problem.leftVal, problem.rightVal);
+  const isEn = lang === 'en';
 
   return (
     <div className="screen-wrapper fade-in" style={{ justifyContent: 'flex-start', gap: '18px', paddingBottom: '20px', overflowY: 'auto' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '1.3rem', fontWeight: '700', color: '#c0487a', marginBottom: '4px' }}>
-          ⚖️ 哪边更多？点一点！
+        <div style={{ fontSize: '1.3rem', fontWeight: '600', color: '#c0487a', marginBottom: '4px' }}>
+          {isEn ? '⚖️ Which side has more? Tap it!' : '⚖️ 哪边更多？点一点！'}
         </div>
         <div style={{ fontSize: '0.9rem', color: '#d4879e', fontWeight: '600' }}>
-          📝 本次 {sessionCount} 题 · ✅ 答对 {correctCount} 题
+          {isEn
+            ? `📝 Total: ${sessionCount} · ✅ Correct: ${correctCount}`
+            : `📝 本次 ${sessionCount} 题 · ✅ 答对 ${correctCount} 题`}
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: '14px', width: '100%', maxWidth: '400px', alignItems: 'stretch' }}>
         <button onClick={() => handleChoice('left')} style={getBoxStyle('left')}>
-          <EmojiGrid count={problem.num1} emoji={problem.emoji} />
-          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#c06080' }}>{problem.num1}</span>
+          {problem.showEmoji && <EmojiGrid count={problem.leftVal} emoji={problem.emoji} />}
+          <span style={{ fontSize: '1.8rem', fontWeight: '700', color: '#c06080' }}>{problem.leftExpr}</span>
+          {selected !== null && !problem.showEmoji && (
+            <span style={{ fontSize: '1.2rem', color: '#888' }}>({problem.leftVal})</span>
+          )}
         </button>
 
         <div style={{
           display: 'flex', alignItems: 'center', fontSize: '1.6rem',
-          color: '#f5c0d0', fontWeight: '700', flexShrink: 0,
+          color: '#f5c0d0', fontWeight: '600', flexShrink: 0,
         }}>VS</div>
 
         <button onClick={() => handleChoice('right')} style={getBoxStyle('right')}>
-          <EmojiGrid count={problem.num2} emoji={problem.emoji} />
-          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#c06080' }}>{problem.num2}</span>
+          {problem.showEmoji && <EmojiGrid count={problem.rightVal} emoji={problem.emoji} />}
+          <span style={{ fontSize: '1.8rem', fontWeight: '700', color: '#c06080' }}>{problem.rightExpr}</span>
+          {selected !== null && !problem.showEmoji && (
+            <span style={{ fontSize: '1.2rem', color: '#888' }}>({problem.rightVal})</span>
+          )}
         </button>
       </div>
 
       {selected !== null && (
         <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            fontSize: '1.1rem', fontWeight: '700', textAlign: 'center',
+            fontSize: '1.1rem', fontWeight: '600', textAlign: 'center',
             color: selected === problem.answer ? '#16a34a' : '#dc2626',
           }}>
             {selected === problem.answer
-              ? `🌟 对啦！${bigger} 比 ${smaller} 多！`
-              : `💡 ${bigger} 才是更多哦，再加油！`}
+              ? (isEn ? `🌟 Correct! ${bigger} is more than ${smaller}!` : `🌟 对啦！${bigger} 比 ${smaller} 多！`)
+              : (isEn ? `💡 ${bigger} is actually more. Keep trying!` : `💡 ${bigger} 才是更多哦，再加油！`)}
           </div>
           {!autoAdvance && (
             <button
@@ -121,7 +235,7 @@ export default function CompareGame({ autoAdvance }) {
                 marginTop: '6px',
                 padding: '10px 28px',
                 fontSize: '1.1rem',
-                fontWeight: '700',
+                fontWeight: '600',
                 color: 'white',
                 background: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
                 border: 'none',
@@ -135,7 +249,7 @@ export default function CompareGame({ autoAdvance }) {
               onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              下一题 ➔
+              {isEn ? 'Next ➔' : '下一题 ➔'}
             </button>
           )}
         </div>
@@ -143,3 +257,4 @@ export default function CompareGame({ autoAdvance }) {
     </div>
   );
 }
+

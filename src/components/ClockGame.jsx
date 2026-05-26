@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { audioSynth } from '../utils/audioSynth';
 
-const ClockFace = ({ hour, size = 210 }) => {
+const ClockFace = ({ time, size = 210 }) => {
+  const { h, m } = time;
   const cx = size / 2;
   const cy = size / 2;
   const faceR = size / 2 - 6;
 
-  // Hour hand: points toward the given hour (short)
-  const hourAngle = ((hour % 12) / 12) * 2 * Math.PI - Math.PI / 2;
+  // Hour hand: points toward the given hour + minute offset
+  const hourAngle = (((h % 12) + m / 60) / 12) * 2 * Math.PI - Math.PI / 2;
   const hourLen = faceR * 0.52;
   const hourX = cx + Math.cos(hourAngle) * hourLen;
   const hourY = cy + Math.sin(hourAngle) * hourLen;
 
-  // Minute hand: always at 12 (pointing straight up)
-  const minAngle = -Math.PI / 2;
+  // Minute hand
+  const minAngle = (m / 60) * 2 * Math.PI - Math.PI / 2;
   const minLen = faceR * 0.72;
   const minX = cx + Math.cos(minAngle) * minLen;
   const minY = cy + Math.sin(minAngle) * minLen;
@@ -63,7 +64,7 @@ const ClockFace = ({ hour, size = 210 }) => {
       {/* Hour numbers */}
       {numbers.map(({ n, x, y }) => (
         <text key={n} x={x} y={y} textAnchor="middle" dominantBaseline="central"
-          fontSize={size * 0.083} fontWeight="700" fill="#c06080"
+          fontSize={size * 0.083} fontWeight="600" fill="#c06080"
           fontFamily="Fredoka, sans-serif">
           {n}
         </text>
@@ -81,27 +82,60 @@ const ClockFace = ({ hour, size = 210 }) => {
   );
 };
 
-function generateProblem() {
-  const hour = Math.floor(Math.random() * 12) + 1;
-  const wrong = new Set();
-  while (wrong.size < 3) {
-    const w = Math.floor(Math.random() * 12) + 1;
-    if (w !== hour) wrong.add(w);
+function generateProblem(level) {
+  const h = Math.floor(Math.random() * 12) + 1;
+  let m = 0;
+  if (level === 2) m = 30;
+  if (level >= 3) m = Math.random() > 0.5 ? 15 : 45;
+
+  const time = { h, m };
+  const wrong = [];
+  
+  while (wrong.length < 3) {
+    const wH = Math.floor(Math.random() * 12) + 1;
+    let wM = m;
+    if (level === 2) wM = Math.random() > 0.5 ? 0 : 30;
+    if (level >= 3) wM = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+    
+    // Check uniqueness
+    if (wH === h && wM === m) continue;
+    if (wrong.some(w => w.h === wH && w.m === wM)) continue;
+    wrong.push({ h: wH, m: wM });
   }
-  const choices = [hour, ...wrong].sort(() => Math.random() - 0.5);
-  return { hour, choices };
+  
+  const choices = [time, ...wrong].sort(() => Math.random() - 0.5);
+  return { time, choices };
 }
 
-export default function ClockGame({ autoAdvance }) {
+const formatTime = (t, isEn) => {
+  const padM = t.m.toString().padStart(2, '0');
+  if (isEn) {
+    if (t.m === 0) return `${t.h} o'clock`;
+    if (t.m === 15) return `${t.h} fifteen`;
+    if (t.m === 30) return `${t.h} thirty`;
+    if (t.m === 45) return `${t.h} forty-five`;
+    return `${t.h}:${padM}`;
+  }
+  return `${t.h}:${padM}`;
+};
+
+export default function ClockGame({ autoAdvance, lang = 'zh', difficultyMode = 'adaptive' }) {
+  const [adaptiveLevel, setAdaptiveLevel] = useState(1);
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+
+  const level = difficultyMode === 'easy' ? 1 : 
+                difficultyMode === 'medium' ? 2 : 
+                difficultyMode === 'hard' ? 3 : adaptiveLevel;
+
   const [problem, setProblem] = useState(null);
   const [selected, setSelected] = useState(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
 
   const next = useCallback(() => {
-    setProblem(generateProblem());
+    setProblem(generateProblem(level));
     setSelected(null);
-  }, []);
+  }, [level]);
 
   useEffect(() => { next(); }, []);
 
@@ -109,14 +143,28 @@ export default function ClockGame({ autoAdvance }) {
     if (selected !== null) return;
     setSelected(val);
     setSessionCount(p => p + 1);
-    if (val === problem.hour) {
+    if (val.h === problem.time.h && val.m === problem.time.m) {
       audioSynth.playCorrect();
       setCorrectCount(p => p + 1);
+      if (difficultyMode === 'adaptive') {
+        const newConsecutive = consecutiveCorrect + 1;
+        setConsecutiveCorrect(newConsecutive);
+        if (newConsecutive >= 2 && adaptiveLevel < 3) {
+          setAdaptiveLevel(l => l + 1);
+          setConsecutiveCorrect(0);
+        }
+      }
       if (autoAdvance) {
         setTimeout(next, 1200);
       }
     } else {
       audioSynth.playIncorrect();
+      if (difficultyMode === 'adaptive') {
+        setConsecutiveCorrect(0);
+        if (adaptiveLevel > 1) {
+          setAdaptiveLevel(l => l - 1);
+        }
+      }
       if (autoAdvance) {
         setTimeout(next, 1800);
       }
@@ -125,40 +173,44 @@ export default function ClockGame({ autoAdvance }) {
 
   if (!problem) return null;
 
+  const isEn = lang === 'en';
+
   return (
     <div className="screen-wrapper fade-in" style={{ justifyContent: 'flex-start', gap: '16px', paddingBottom: '20px', overflowY: 'auto' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '1.3rem', fontWeight: '700', color: '#c0487a', marginBottom: '4px' }}>
-          🕐 时钟现在显示几点？
+        <div style={{ fontSize: '1.3rem', fontWeight: '600', color: '#c0487a', marginBottom: '4px' }}>
+          {isEn ? '🕐 What time is it?' : '🕐 时钟现在显示几点？'}
         </div>
         <div style={{ fontSize: '0.9rem', color: '#d4879e', fontWeight: '600' }}>
-          📝 本次 {sessionCount} 题 · ✅ 答对 {correctCount} 题
+          {isEn
+            ? `📝 Total: ${sessionCount} · ✅ Correct: ${correctCount}`
+            : `📝 本次 ${sessionCount} 题 · ✅ 答对 ${correctCount} 题`}
         </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <ClockFace hour={problem.hour} size={210} />
+        <ClockFace time={problem.time} size={210} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', width: '100%', maxWidth: '360px' }}>
         {problem.choices.map(val => {
           let bg = 'white', border = '#f5c0d0', color = '#c06080';
           if (selected !== null) {
-            if (val === problem.hour)   { bg = '#f0fdf4'; border = '#4ade80'; color = '#16a34a'; }
-            else if (val === selected)  { bg = '#fef2f2'; border = '#f87171'; color = '#dc2626'; }
+            if (val.h === problem.time.h && val.m === problem.time.m)   { bg = '#f0fdf4'; border = '#4ade80'; color = '#16a34a'; }
+            else if (selected.h === val.h && selected.m === val.m)  { bg = '#fef2f2'; border = '#f87171'; color = '#dc2626'; }
           }
           return (
-            <button key={val} onClick={() => handleChoice(val)}
+            <button key={`${val.h}:${val.m}`} onClick={() => handleChoice(val)}
               style={{
-                padding: '18px 10px', borderRadius: '20px',
+                padding: '18px 8px', borderRadius: '20px',
                 border: `3px solid ${border}`, background: bg, color,
-                fontWeight: '700', fontSize: '1.8rem',
+                fontWeight: '600', fontSize: isEn ? '1.1rem' : '1.6rem',
                 cursor: selected !== null ? 'default' : 'pointer',
                 fontFamily: 'Fredoka, sans-serif',
                 boxShadow: '0 4px 12px rgba(255,93,158,0.1)',
                 transition: 'all 0.2s ease',
               }}>
-              {val}:00
+              {formatTime(val, isEn)}
             </button>
           );
         })}
@@ -167,12 +219,12 @@ export default function ClockGame({ autoAdvance }) {
       {selected !== null && (
         <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            fontSize: '1.1rem', fontWeight: '700', textAlign: 'center',
-            color: selected === problem.hour ? '#16a34a' : '#dc2626',
+            fontSize: '1.1rem', fontWeight: '600', textAlign: 'center',
+            color: (selected.h === problem.time.h && selected.m === problem.time.m) ? '#16a34a' : '#dc2626',
           }}>
-            {selected === problem.hour
-              ? `🌟 答对了！是 ${problem.hour}:00！`
-              : `💡 正确答案是 ${problem.hour}:00 哦！`}
+            {(selected.h === problem.time.h && selected.m === problem.time.m)
+              ? (isEn ? `🌟 Correct! It is ${formatTime(problem.time, true)}!` : `🌟 答对了！是 ${formatTime(problem.time, false)}！`)
+              : (isEn ? `💡 Correct answer is ${formatTime(problem.time, true)}!` : `💡 正确答案是 ${formatTime(problem.time, false)} 哦！`)}
           </div>
           {!autoAdvance && (
             <button
@@ -181,7 +233,7 @@ export default function ClockGame({ autoAdvance }) {
                 marginTop: '6px',
                 padding: '10px 28px',
                 fontSize: '1.1rem',
-                fontWeight: '700',
+                fontWeight: '600',
                 color: 'white',
                 background: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
                 border: 'none',
@@ -195,7 +247,7 @@ export default function ClockGame({ autoAdvance }) {
               onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              下一题 ➔
+              {isEn ? 'Next ➔' : '下一题 ➔'}
             </button>
           )}
         </div>

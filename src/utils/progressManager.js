@@ -12,6 +12,8 @@ export const progressManager = {
       maxNumber: parseInt(localStorage.getItem('km_maxNumber') || '10'),
       operations: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
       autoAdvance: localStorage.getItem('km_autoAdvance') !== 'false',
+      lang: localStorage.getItem('km_lang') || 'zh',
+      difficultyMode: localStorage.getItem('km_difficultyMode') || 'adaptive',
     };
   },
 
@@ -23,6 +25,8 @@ export const progressManager = {
     localStorage.setItem('km_maxNumber', String(state.maxNumber ?? 10));
     localStorage.setItem('km_operations', JSON.stringify(state.operations ?? ['add', 'sub']));
     localStorage.setItem('km_autoAdvance', state.autoAdvance !== false ? 'true' : 'false');
+    localStorage.setItem('km_lang', state.lang || 'zh');
+    localStorage.setItem('km_difficultyMode', state.difficultyMode || 'adaptive');
   },
 
   // Record a mistake. if the problem already exists, increment error count.
@@ -64,6 +68,8 @@ export const progressManager = {
       mn: localStorage.getItem('km_maxNumber') || '10',
       op: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
       aa: localStorage.getItem('km_autoAdvance') !== 'false' ? '1' : '0',
+      lg: localStorage.getItem('km_lang') || 'zh',
+      dm: localStorage.getItem('km_difficultyMode') || 'adaptive',
     };
     // Encode to base64
     return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
@@ -81,6 +87,8 @@ export const progressManager = {
         if (data.mn) localStorage.setItem('km_maxNumber', data.mn.toString());
         if (data.op) localStorage.setItem('km_operations', JSON.stringify(data.op));
         if (data.aa) localStorage.setItem('km_autoAdvance', data.aa === '1' ? 'true' : 'false');
+        if (data.lg) localStorage.setItem('km_lang', data.lg.toString());
+        if (data.dm) localStorage.setItem('km_difficultyMode', data.dm.toString());
         return true;
       }
       return false;

@@ -48,7 +48,10 @@ export const mathGenerator = {
       symbol = '-';
     }
 
-    const spokenText = `${num1} ${symbol === '+' ? '加' : '减'} ${num2} 等于几？`;
+    const lang = opts.lang ?? 'zh';
+    const spokenText = lang === 'en'
+      ? `What is ${num1} ${symbol === '+' ? 'plus' : 'minus'} ${num2}?`
+      : `${num1} ${symbol === '+' ? '加' : '减'} ${num2} 等于几？`;
     const problemStr = `${num1}${symbol}${num2}`;
 
     return {
@@ -87,22 +90,31 @@ export const mathGenerator = {
   /**
    * Generate a simple explanation text for a missed problem.
    */
-  generateExplanation(q) {
+  generateExplanation(q, lang = 'zh') {
+    const isEn = lang === 'en';
     if (q.symbol === '+') {
       if (q.num1 + q.num2 <= 10) {
-        return `想想看，${q.num1} 和 ${q.num2} 凑在一起是几呢？你可以伸出手指头数一数！`;
+        return isEn 
+          ? `Think about it, what do you get when you put ${q.num1} and ${q.num2} together? You can count them using your fingers!`
+          : `想想看，${q.num1} 和 ${q.num2} 凑在一起是几呢？你可以伸出手指头数一数！`;
       } else if (q.num1 + q.num2 <= 20) {
         // Try to explain "凑十法" if possible
         const bigger = Math.max(q.num1, q.num2);
         const smaller = Math.min(q.num1, q.num2);
         const diffToTen = 10 - bigger;
         if (diffToTen > 0 && diffToTen < smaller) {
-          return `机器提示：试试凑十法！把 ${smaller} 分成 ${diffToTen} 和 ${smaller - diffToTen}。${bigger} 加上 ${diffToTen} 凑成 10，再加上剩下的 ${smaller - diffToTen} 就是 ${q.answer} 啦。`;
+          return isEn
+            ? `Tip: Try making ten! Split ${smaller} into ${diffToTen} and ${smaller - diffToTen}. ${bigger} plus ${diffToTen} makes 10, then add the remaining ${smaller - diffToTen} to get ${q.answer}.`
+            : `机器提示：试试凑十法！把 ${smaller} 分成 ${diffToTen} 和 ${smaller - diffToTen}。${bigger} 加上 ${diffToTen} 凑成 10，再加上剩下的 ${smaller - diffToTen} 就是 ${q.answer} 啦。`;
         }
       }
-      return `${q.num1} 加上 ${q.num2}，等于 ${q.answer} 哦！`;
+      return isEn 
+        ? `${q.num1} plus ${q.num2} equals ${q.answer}!` 
+        : `${q.num1} 加上 ${q.num2}，等于 ${q.answer} 哦！`;
     } else {
-      return `从 ${q.num1} 里面拿走 ${q.num2}，还剩下 ${q.answer}。`;
+      return isEn 
+        ? `Taking away ${q.num2} from ${q.num1} leaves ${q.answer}.` 
+        : `从 ${q.num1} 里面拿走 ${q.num2}，还剩下 ${q.answer}。`;
     }
   }
 };

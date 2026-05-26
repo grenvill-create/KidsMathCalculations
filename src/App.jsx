@@ -3,6 +3,7 @@ import { Volume2, VolumeX, Settings, Home, X, Check, BookOpen } from 'lucide-rea
 import { audioSynth } from './utils/audioSynth';
 import { mathGenerator } from './utils/mathGenerator';
 import { progressManager } from './utils/progressManager';
+import { t } from './utils/translations';
 import MathManipulatives from './components/MathManipulatives';
 import ShapeGame from './components/ShapeGame';
 import CompareGame from './components/CompareGame';
@@ -38,7 +39,7 @@ function GameSection({ title, color, buttons, onScreen }) {
             style={{
               padding: '10px 4px', borderRadius: '16px',
               background: bg, color: 'white', border: 'none',
-              fontFamily: 'Fredoka, sans-serif', fontWeight: '700', fontSize: '0.82rem',
+              fontFamily: 'Fredoka, sans-serif', fontWeight: '600', fontSize: '0.82rem',
               boxShadow: `0 4px 10px ${shadow}`, cursor: 'pointer', lineHeight: 1.3,
             }}>
             {emoji}<br />{label}
@@ -91,6 +92,12 @@ export default function App() {
   useEffect(() => {
     progressManager.saveState(gameState);
   }, [gameState]);
+
+  useEffect(() => {
+    if (currentQ && currentQ.spokenText) {
+      audioSynth.speak(currentQ.spokenText, gameState.lang);
+    }
+  }, [currentQ]);
 
   // --- GUARDIAN ---
   const openGuardian = () => {
@@ -237,18 +244,22 @@ export default function App() {
         minNumber: gameState.minNumber ?? 1,
         maxNumber: gameState.maxNumber ?? 10,
         operations: gameState.operations ?? ['add', 'sub'],
+        lang: gameState.lang,
       };
       setCurrentQ(mathGenerator.generateQuestion(gameState.stage, opts));
       setScreen('playing');
     } else if (mode === 'review') {
       const m = gameState.mistakes[Math.floor(Math.random() * gameState.mistakes.length)];
+      const spokenText = gameState.lang === 'en'
+        ? `What is ${m.num1} ${m.symbol === '+' ? 'plus' : 'minus'} ${m.num2}?`
+        : `${m.num1} ${m.symbol === '+' ? '加' : '减'} ${m.num2} 等于几？`;
       setCurrentQ({
         problemStr: m.problemStr,
         num1: m.num1,
         num2: m.num2,
         symbol: m.symbol,
         answer: m.answer,
-        spokenText: `${m.num1} ${m.symbol === '+' ? '加' : '减'} ${m.num2} 等于几？`,
+        spokenText,
         stage: 2,
       });
       setScreen('review');
@@ -308,7 +319,7 @@ export default function App() {
       setGameState(progressManager.getInitialState());
 
       if (newErr >= 2) {
-        audioSynth.speak('再仔细数一数哦。');
+        audioSynth.speak(gameState.lang === 'en' ? 'Count carefully again.' : '再仔细数一数哦。', gameState.lang);
       }
     }
   };
@@ -350,7 +361,8 @@ export default function App() {
       setSessionCount(prev => prev + 1);
     }
     if (screen === 'review' && gameState.mistakes.length === 0) {
-      alert('恭喜！所有错题都被你消灭啦！');
+      const isEn = gameState.lang === 'en';
+      alert(isEn ? 'Congratulations! You solved all the mistakes!' : '恭喜！所有错题都被你消灭啦！');
       setScreen('welcome');
       return;
     }
@@ -361,13 +373,13 @@ export default function App() {
 
   // Derive a label for the current range on the welcome screen
   const currentRangeLabel = (gameState.minNumber ?? 1) === 1 
-    ? `${gameState.maxNumber ?? 10} 以内` 
+    ? (gameState.lang === 'en' ? `Within ${gameState.maxNumber ?? 10}` : `${gameState.maxNumber ?? 10} 以内`)
     : `${gameState.minNumber ?? 1} ~ ${gameState.maxNumber ?? 10}`;
   const opsLabel = (() => {
     const ops = gameState.operations ?? ['add', 'sub'];
-    if (ops.includes('add') && ops.includes('sub')) return '加减法';
-    if (ops.includes('add')) return '加法';
-    return '减法';
+    if (ops.includes('add') && ops.includes('sub')) return gameState.lang === 'en' ? 'Add & Sub' : '加减法';
+    if (ops.includes('add')) return gameState.lang === 'en' ? 'Addition' : '加法';
+    return gameState.lang === 'en' ? 'Subtraction' : '减法';
   })();
 
   return (
@@ -385,7 +397,7 @@ export default function App() {
                 color: 'white', borderRadius: '50px', padding: '6px 14px',
                 fontSize: '0.9rem', fontWeight: '700',
                 boxShadow: '0 4px 10px rgba(34,197,94,0.3)'
-              }}>📝 第 {sessionCount} 题</span>
+              }}>📝 {t('questionNum', gameState.lang).replace('{num}', sessionCount)}</span>
             )}
             {screen === 'review' && (
               <span style={{
@@ -393,7 +405,7 @@ export default function App() {
                 color: 'white', borderRadius: '50px', padding: '6px 14px',
                 fontSize: '0.9rem', fontWeight: '700',
                 boxShadow: '0 4px 10px rgba(255,93,158,0.3)'
-              }}>⭐ 错题复习</span>
+              }}>{t('reviewMistakes', gameState.lang)}</span>
             )}
             <button className="bouncy-button secondary" onClick={() => setScreen('welcome')} style={{ padding: '10px 14px' }}>
               <Home size={22} />
@@ -401,9 +413,31 @@ export default function App() {
           </div>
         )}
         {screen === 'welcome' && (
-          <button className="bouncy-button secondary" onClick={openGuardian} style={{ padding: '10px 18px', gap: '6px' }}>
-            <Settings size={20} /> 家长
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              className="bouncy-button secondary"
+              onClick={() => {
+                audioSynth.playClick();
+                const nextLang = gameState.lang === 'zh' ? 'en' : 'zh';
+                setGameState(prev => ({ ...prev, lang: nextLang }));
+              }}
+              style={{
+                padding: '10px 16px',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                fontFamily: 'Fredoka, sans-serif',
+                background: 'linear-gradient(135deg, #e0f2fe, #bae6fd)',
+                borderColor: '#7dd3fc',
+                color: '#0369a1',
+                boxShadow: '0 4px 10px rgba(125,211,252,0.3)',
+              }}
+            >
+              🌐 {gameState.lang === 'zh' ? 'EN' : '中文'}
+            </button>
+            <button className="bouncy-button secondary" onClick={openGuardian} style={{ padding: '10px 18px', gap: '6px' }}>
+              <Settings size={20} /> {t('parent', gameState.lang)}
+            </button>
+          </div>
         )}
       </div>
 
@@ -421,7 +455,7 @@ export default function App() {
           </div>
 
           <h1 className="title-glow" style={{ fontSize: '2.4rem', margin: '0', lineHeight: 1.1 }}>
-            奇妙数学冒险
+            {t('appTitle', gameState.lang)}
           </h1>
 
           {/* Mode badge */}
@@ -436,12 +470,12 @@ export default function App() {
           <div className="welcome-card" style={{ gap: '10px' }}>
             <button className="bouncy-button primary" onClick={startGame}
               style={{ width: '100%', padding: '15px', fontSize: '1.3rem', borderRadius: '22px' }}>
-              🚀 马上开始
+              {t('startBtn', gameState.lang)}
             </button>
             <div style={{ position: 'relative', width: '100%' }}>
               <button className="bouncy-button secondary" onClick={startReview}
                 style={{ width: '100%', padding: '13px', fontSize: '1.1rem', borderRadius: '22px' }}>
-                <BookOpen size={22} /> 错题大作战
+                <BookOpen size={22} /> {t('mistakesBtn', gameState.lang)}
               </button>
               {gameState.mistakes.length > 0 && (
                 <span style={{
@@ -460,47 +494,40 @@ export default function App() {
             </div>
             <button className="bouncy-button primary" onClick={startChallenge}
               style={{ width: '100%', padding: '13px', fontSize: '1.05rem', borderRadius: '22px', background: 'linear-gradient(135deg, #fde047, #f59e0b)', borderColor: '#fbbf24' }}>
-              ⚡ 挑战模式 (10题连答)
+              {t('challengeBtn', gameState.lang)}
             </button>
           </div>
 
           {/* Stats */}
           <div className="stats-row">
             <span>🏅</span>
-            <span>已累计解题</span>
-            <span style={{
-              background: 'linear-gradient(135deg, #ff85b8, #ff5d9e)',
-              color: 'white', borderRadius: '50px',
-              padding: '2px 12px', fontWeight: '700',
-              boxShadow: '0 3px 8px rgba(255,93,158,0.25)',
-            }}>{gameState.history.totalSolved}</span>
-            <span>道题</span>
+            <span>{t('solvedStats', gameState.lang).replace('{count}', gameState.history.totalSolved)}</span>
           </div>
 
           {/* ── Section: 数感与数字 ── */}
-          <GameSection title="🔢 数感与数字" color="#5bb8d4" buttons={[
-            { label: '比大小',     emoji: '⚖️',  screen: 'compare',    bg: 'linear-gradient(135deg, #6dd99a, #3dc87a)', shadow: 'rgba(61,200,122,0.35)' },
-            { label: '数字排序',   emoji: '🔢',  screen: 'numberSort', bg: 'linear-gradient(135deg, #5bb8d4, #3b9fc4)', shadow: 'rgba(59,159,196,0.35)' },
-            { label: '数列填空',   emoji: '❓',  screen: 'seqFill',    bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
-            { label: '凑十法',     emoji: '🎯',  screen: 'makeTen',    bg: 'linear-gradient(135deg, #ffb347, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
-            { label: '乘法启蒙',   emoji: '✖️',  screen: 'multiIntro', bg: 'linear-gradient(135deg, #a78bfa, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
+          <GameSection title={t('catNumber', gameState.lang)} color="#5bb8d4" buttons={[
+            { label: t('gameCompare', gameState.lang),     emoji: '⚖️',  screen: 'compare',    bg: 'linear-gradient(135deg, #6dd99a, #3dc87a)', shadow: 'rgba(61,200,122,0.35)' },
+            { label: t('gameSort', gameState.lang),   emoji: '🔢',  screen: 'numberSort', bg: 'linear-gradient(135deg, #5bb8d4, #3b9fc4)', shadow: 'rgba(59,159,196,0.35)' },
+            { label: t('gameSeqFill', gameState.lang),   emoji: '❓',  screen: 'seqFill',    bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
+            { label: t('gameMakeTen', gameState.lang),     emoji: '🎯',  screen: 'makeTen',    bg: 'linear-gradient(135deg, #ffb347, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
+            { label: t('gameMultiIntro', gameState.lang),   emoji: '✖️',  screen: 'multiIntro', bg: 'linear-gradient(135deg, #a78bfa, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 图形与空间 ── */}
-          <GameSection title="🔷 图形与空间" color="#a57bc4" buttons={[
-            { label: '认形状',   emoji: '🔷', screen: 'shape',      bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
-            { label: '找规律',   emoji: '🔁', screen: 'pattern',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
-            { label: '数形状',   emoji: '🔍', screen: 'shapeCount', bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
-            { label: '空间方位', emoji: '🧭', screen: 'spatial',    bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
+          <GameSection title={t('catShape', gameState.lang)} color="#a57bc4" buttons={[
+            { label: t('gameShape', gameState.lang),   emoji: '🔷', screen: 'shape',      bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
+            { label: t('gamePattern', gameState.lang),   emoji: '🔁', screen: 'pattern',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
+            { label: t('gameShapeCount', gameState.lang),   emoji: '🔍', screen: 'shapeCount', bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
+            { label: t('gameSpatial', gameState.lang), emoji: '🧭', screen: 'spatial',    bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 综合认知 ── */}
-          <GameSection title="🌈 综合认知" color="#f97316" buttons={[
-            { label: '时钟练习', emoji: '🕐', screen: 'clock',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
-            { label: '认颜色',   emoji: '🎨', screen: 'color',    bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
-            { label: '认星期',   emoji: '📅', screen: 'weekday',  bg: 'linear-gradient(135deg, #fbbf24, #f59e0b)', shadow: 'rgba(251,191,36,0.35)' },
-            { label: '认季节',   emoji: '🌍', screen: 'season',   bg: 'linear-gradient(135deg, #6ee7b7, #10b981)', shadow: 'rgba(16,185,129,0.35)' },
-            { label: '购物启蒙', emoji: '🛒', screen: 'shopping', bg: 'linear-gradient(135deg, #fca5a5, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
+          <GameSection title={t('catCognitive', gameState.lang)} color="#f97316" buttons={[
+            { label: t('gameClock', gameState.lang), emoji: '🕐', screen: 'clock',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
+            { label: t('gameColor', gameState.lang),   emoji: '🎨', screen: 'color',    bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
+            { label: t('gameWeekday', gameState.lang),   emoji: '📅', screen: 'weekday',  bg: 'linear-gradient(135deg, #fbbf24, #f59e0b)', shadow: 'rgba(251,191,36,0.35)' },
+            { label: t('gameSeason', gameState.lang),   emoji: '🌍', screen: 'season',   bg: 'linear-gradient(135deg, #6ee7b7, #10b981)', shadow: 'rgba(16,185,129,0.35)' },
+            { label: t('gameShopping', gameState.lang), emoji: '🛒', screen: 'shopping', bg: 'linear-gradient(135deg, #fca5a5, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
         </div>
@@ -510,8 +537,9 @@ export default function App() {
       {screen === 'guardian' && guardianQ && (
         <div className="screen-wrapper fade-in">
           <div className="card-shadow" style={{ padding: '30px', textAlign: 'center', width: '90%', maxWidth: '400px' }}>
-            <h2 className="title-glow" style={{ color: '#E07A5F' }}>家长通道</h2>
-            <div style={{ fontSize: '2rem', margin: '20px 0' }}>{guardianQ.str}</div>
+            <h2 className="title-glow" style={{ color: '#E07A5F' }}>{t('guardianTitle', gameState.lang)}</h2>
+            <p style={{ opacity: 0.8, fontSize: '0.95rem', marginBottom: '10px' }}>{t('guardianQText', gameState.lang)}</p>
+            <div style={{ fontSize: '2rem', margin: '15px 0' }}>{guardianQ.str}</div>
             <input
               type="number"
               value={guardianA}
@@ -530,15 +558,16 @@ export default function App() {
       {screen === 'settings' && (
         <div className="screen-wrapper fade-in">
           <div className="card-shadow" style={{ padding: '20px', width: '100%', maxWidth: '500px', overflowY: 'auto', maxHeight: '85vh' }}>
-            <h2 className="title-glow">教案配置室</h2>
+            <h2 className="title-glow">{t('settingsTitle', gameState.lang)}</h2>
 
             {/* ── Custom Calculation Range ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
-              <h3 style={{ marginBottom: '10px' }}>🎯 自定义计算范围</h3>
-              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '12px' }}>选择或自己设置数字范围（例如 10 到 20），让练习更有针对性！</p>
+              <h3 style={{ marginBottom: '10px' }}>{t('rangeTitle', gameState.lang)}</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '12px', lineHeight: 1.35 }}>{t('rangeDesc', gameState.lang)}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
                 {RANGE_PRESETS.map(preset => {
                   const isActive = (gameState.minNumber ?? 1) === 1 && (gameState.maxNumber ?? 10) === preset.value;
+                  const label = gameState.lang === 'en' ? `Within ${preset.value}` : `${preset.value} 以内`;
                   return (
                     <button
                       key={preset.value}
@@ -550,7 +579,7 @@ export default function App() {
                         borderColor: isActive ? '#e07a5f' : '#f5c0d0',
                         background: isActive ? 'linear-gradient(135deg, #ffb5c8, #ff8fab)' : 'white',
                         color: isActive ? 'white' : '#c06080',
-                        fontWeight: '700',
+                        fontWeight: '600',
                         fontSize: '1rem',
                         cursor: 'pointer',
                         fontFamily: 'Fredoka, sans-serif',
@@ -559,7 +588,7 @@ export default function App() {
                         transform: isActive ? 'scale(1.08)' : 'scale(1)',
                       }}
                     >
-                      {preset.label}
+                      {label}
                     </button>
                   );
                 })}
@@ -567,7 +596,7 @@ export default function App() {
 
               {/* Custom input */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                <label style={{ fontWeight: '600', color: '#b5558a', fontSize: '0.95rem' }}>自定义数值范围：</label>
+                <label style={{ fontWeight: '600', color: '#b5558a', fontSize: '0.95rem' }}>{t('customRange', gameState.lang)}</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <input
                     type="number"
@@ -588,7 +617,7 @@ export default function App() {
                       fontWeight: '700',
                     }}
                   />
-                  <span style={{ fontWeight: '600', color: '#b5558a' }}>到</span>
+                  <span style={{ fontWeight: '600', color: '#b5558a' }}>{t('to', gameState.lang)}</span>
                   <input
                     type="number"
                     min={1}
@@ -609,17 +638,17 @@ export default function App() {
                     }}
                   />
                 </div>
-                <span style={{ opacity: 0.6, fontSize: '0.85rem' }}>（最小值 ≥ 1，最大值 ≤ 9999）</span>
+                <span style={{ opacity: 0.6, fontSize: '0.85rem' }}>{t('rangeLimits', gameState.lang)}</span>
               </div>
             </div>
 
             {/* ── Operation Types ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
-              <h3 style={{ marginBottom: '10px' }}>➕➖ 运算类型</h3>
+              <h3 style={{ marginBottom: '10px' }}>{t('opsTitle', gameState.lang)}</h3>
               <div style={{ display: 'flex', gap: '14px' }}>
                 {[
-                  { key: 'add', emoji: '➕', label: '加法' },
-                  { key: 'sub', emoji: '➖', label: '减法' },
+                  { key: 'add', emoji: '➕', label: t('add', gameState.lang) },
+                  { key: 'sub', emoji: '➖', label: t('sub', gameState.lang) },
                 ].map(({ key, emoji, label }) => {
                   const ops = gameState.operations ?? ['add', 'sub'];
                   const active = ops.includes(key);
@@ -634,7 +663,7 @@ export default function App() {
                         borderColor: active ? '#e07a5f' : '#f5c0d0',
                         background: active ? 'linear-gradient(135deg, #ffb5c8, #ff8fab)' : 'white',
                         color: active ? 'white' : '#c06080',
-                        fontWeight: '700', fontSize: '1.1rem',
+                        fontWeight: '600', fontSize: '1.1rem',
                         cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
                         boxShadow: active ? '0 4px 12px rgba(255,100,150,0.35)' : '0 2px 6px rgba(0,0,0,0.08)',
                         transition: 'all 0.2s ease',
@@ -646,17 +675,17 @@ export default function App() {
                   );
                 })}
               </div>
-              <p style={{ opacity: 0.55, fontSize: '0.85rem', marginTop: '8px' }}>※ 至少需要选择一种运算类型</p>
+              <p style={{ opacity: 0.55, fontSize: '0.85rem', marginTop: '8px' }}>{t('opsDesc', gameState.lang)}</p>
             </div>
 
             {/* ── Auto-advance Toggle ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
-              <h3 style={{ marginBottom: '10px' }}>⚙️ 答题模式设置</h3>
+              <h3 style={{ marginBottom: '10px' }}>{t('autoAdvanceTitle', gameState.lang)}</h3>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
                 <div style={{ paddingRight: '12px' }}>
-                  <span style={{ fontWeight: '700', color: '#b5558a', fontSize: '1.05rem' }}>答对后自动进入下一题</span>
+                  <span style={{ fontWeight: '700', color: '#b5558a', fontSize: '1.05rem' }}>{t('autoAdvanceLabel', gameState.lang)}</span>
                   <p style={{ opacity: 0.6, fontSize: '0.85rem', margin: '4px 0 0 0', lineHeight: 1.3 }}>
-                    开启时，答对后将自动进入下一题；关闭时，答题后会显示正确顺序与解析，需要手动点击“下一题”确认。
+                    {t('autoAdvanceDesc', gameState.lang)}
                   </p>
                 </div>
                 <button
@@ -693,47 +722,62 @@ export default function App() {
 
             {/* ── Stage selector ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
-              <h3>🏅 调整学习阶段（控制教具显示）</h3>
+              <h3>{t('stageTitle', gameState.lang)}</h3>
               <select
                 value={gameState.stage}
                 onChange={(e) => setGameState({ ...gameState, stage: parseInt(e.target.value) })}
                 style={{ width: '100%', padding: '10px', fontSize: '1.1rem', marginTop: '10px', borderRadius: '12px', border: '2px solid #f5c0d0', fontFamily: 'Fredoka, sans-serif' }}
               >
-                <option value="1">阶段一：感知与计数（显示拖拽教具）</option>
-                <option value="2">阶段二：具象加减法（显示拖拽教具）</option>
-                <option value="3">阶段三：半抽象运算（按需显示教具）</option>
-                <option value="4">阶段四：纯计算（无教具，直接答题）</option>
+                <option value="1">{t('stage1', gameState.lang)}</option>
+                <option value="2">{t('stage2', gameState.lang)}</option>
+                <option value="3">{t('stage3', gameState.lang)}</option>
+                <option value="4">{t('stage4', gameState.lang)}</option>
+              </select>
+            </div>
+
+            {/* ── Difficulty Mode selector ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
+              <h3>{t('difficultyTitle', gameState.lang)}</h3>
+              <select
+                value={gameState.difficultyMode || 'adaptive'}
+                onChange={(e) => setGameState({ ...gameState, difficultyMode: e.target.value })}
+                style={{ width: '100%', padding: '10px', fontSize: '1.1rem', marginTop: '10px', borderRadius: '12px', border: '2px solid #f5c0d0', fontFamily: 'Fredoka, sans-serif', fontWeight: '600', color: '#c0487a' }}
+              >
+                <option value="adaptive">{t('diffAdaptive', gameState.lang)}</option>
+                <option value="easy">{t('diffEasy', gameState.lang)}</option>
+                <option value="medium">{t('diffMedium', gameState.lang)}</option>
+                <option value="hard">{t('diffHard', gameState.lang)}</option>
               </select>
             </div>
 
             {/* ── Mistake book ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
-              <h3>📖 错题本数据</h3>
-              <p>当前记录错题数量：{gameState.mistakes.length}</p>
+              <h3>{t('mistakesTitle', gameState.lang)}</h3>
+              <p>{t('mistakesCount', gameState.lang).replace('{count}', gameState.mistakes.length)}</p>
               <button className="bouncy-button mistake" onClick={clearMistakes} style={{ marginTop: '10px' }}>
-                清空错题本
+                {t('clearMistakesBtn', gameState.lang)}
               </button>
             </div>
 
             {/* ── Sync ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
-              <h3>☁️ 进度跨设备同步</h3>
-              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>通过"同步码"可以在 iPad 和电脑之间互传进度与设置。</p>
-              <p><strong>本机同步码导出：</strong></p>
+              <h3>{t('syncTitle', gameState.lang)}</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px', lineHeight: 1.35 }}>{t('syncDesc', gameState.lang)}</p>
+              <p><strong>{t('syncExport', gameState.lang)}</strong></p>
               <textarea readOnly value={generatedSyncCode} style={{ width: '100%', height: '60px', fontSize: '0.8rem', borderRadius: '10px', border: '2px solid #f5c0d0' }} />
-              <p style={{ marginTop: '10px' }}><strong>从其他设备导入：</strong></p>
+              <p style={{ marginTop: '10px' }}><strong>{t('syncImport', gameState.lang)}</strong></p>
               <div style={{ display: 'flex', gap: '5px' }}>
-                <input type="text" value={syncCodeInput} onChange={e => setSyncCodeInput(e.target.value)} placeholder="粘贴同步码" style={{ flex: 1, borderRadius: '12px', border: '2px solid #f5c0d0', padding: '8px', fontFamily: 'Fredoka, sans-serif' }} />
-                <button className="bouncy-button secondary" onClick={importSync}>导入</button>
+                <input type="text" value={syncCodeInput} onChange={e => setSyncCodeInput(e.target.value)} placeholder={t('syncPlaceholder', gameState.lang)} style={{ flex: 1, borderRadius: '12px', border: '2px solid #f5c0d0', padding: '8px', fontFamily: 'Fredoka, sans-serif' }} />
+                <button className="bouncy-button secondary" onClick={importSync}>{t('syncImportBtn', gameState.lang)}</button>
               </div>
             </div>
 
             {/* ── Danger zone ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
-              <h3 style={{ color: '#E07A5F' }}>⚠️ 危险区域</h3>
-              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px' }}>如果你想让孩子重新开始学习，可以初始化所有进度。</p>
+              <h3 style={{ color: '#E07A5F' }}>{t('dangerTitle', gameState.lang)}</h3>
+              <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '10px', lineHeight: 1.35 }}>{t('dangerDesc', gameState.lang)}</p>
               <button className="bouncy-button mistake" onClick={resetProgress} style={{ width: '100%' }}>
-                重置所有进度
+                {t('resetBtn', gameState.lang)}
               </button>
             </div>
 
@@ -747,7 +791,7 @@ export default function App() {
                   border: '3px solid #ff8fab',
                   background: 'linear-gradient(135deg, #ffb5c8, #ff8fab)',
                   color: 'white',
-                  fontWeight: '700', fontSize: '1.1rem',
+                  fontWeight: '600', fontSize: '1.1rem',
                   cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
                   boxShadow: '0 4px 14px rgba(255,100,150,0.4)',
                   transition: 'transform 0.15s ease, box-shadow 0.15s ease',
@@ -757,7 +801,7 @@ export default function App() {
                 onTouchStart={e => e.currentTarget.style.transform = 'scale(0.95)'}
                 onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
               >
-                ✓ 保存
+                {t('save', gameState.lang)}
               </button>
               <button
                 onClick={cancelSettings}
@@ -767,7 +811,7 @@ export default function App() {
                   border: '3px solid #f5c0d0',
                   background: 'white',
                   color: '#b5558a',
-                  fontWeight: '700', fontSize: '1.1rem',
+                  fontWeight: '600', fontSize: '1.1rem',
                   cursor: 'pointer', fontFamily: 'Fredoka, sans-serif',
                   boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
                   transition: 'transform 0.15s ease, box-shadow 0.15s ease',
@@ -777,7 +821,7 @@ export default function App() {
                 onTouchStart={e => e.currentTarget.style.transform = 'scale(0.95)'}
                 onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
               >
-                ✕ 取消
+                {t('cancel', gameState.lang)}
               </button>
             </div>
           </div>
@@ -809,7 +853,7 @@ export default function App() {
           ) : (
             <div style={{ minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <button className="bouncy-button secondary" onClick={() => setShowHelp(true)}>
-                [?] 帮帮我
+                {t('helpBtn', gameState.lang)}
               </button>
             </div>
           )}
@@ -818,7 +862,7 @@ export default function App() {
           {isSolved ? (
             <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '360px', marginTop: '10px' }}>
               <div style={{ fontSize: '1.4rem', color: '#22c55e', fontWeight: '700', marginBottom: '16px', textShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                🌟 答对啦！真棒！
+                {t('correctCelebration', gameState.lang)}
               </div>
               <button
                 onClick={handleNextQuestion}
@@ -826,7 +870,7 @@ export default function App() {
                   width: '100%',
                   padding: '16px',
                   fontSize: '1.3rem',
-                  fontWeight: '700',
+                  fontWeight: '600',
                   color: 'white',
                   background: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
                   border: 'none',
@@ -840,7 +884,7 @@ export default function App() {
                 onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
-                下一题 ➔
+                {t('nextBtn', gameState.lang)}
               </button>
             </div>
           ) : (
@@ -931,20 +975,20 @@ export default function App() {
           )}
         </div>
       )}
-      {screen === 'shape'      && <ShapeGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'compare'    && <CompareGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'clock'      && <ClockGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'numberSort' && <NumberSortGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'seqFill'    && <SequenceFillGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'makeTen'    && <MakeTenGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'multiIntro' && <MultiplicationIntroGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'pattern'    && <PatternGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'shapeCount' && <ShapeCountGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'spatial'    && <SpatialGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'color'      && <ColorGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'weekday'    && <WeekdayGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'season'     && <SeasonGame autoAdvance={gameState.autoAdvance} />}
-      {screen === 'shopping'   && <ShoppingGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'shape'      && <ShapeGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'compare'    && <CompareGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'clock'      && <ClockGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'numberSort' && <NumberSortGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'seqFill'    && <SequenceFillGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'makeTen'    && <MakeTenGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'multiIntro' && <MultiplicationIntroGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'pattern'    && <PatternGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'shapeCount' && <ShapeCountGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'spatial'    && <SpatialGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'color'      && <ColorGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'weekday'    && <WeekdayGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'season'     && <SeasonGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'shopping'   && <ShoppingGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
     </div>
   );
 }
