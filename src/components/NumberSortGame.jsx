@@ -36,7 +36,6 @@ export default function NumberSortGame() {
         audioSynth.playCorrect();
         setSessionCount(p => p + 1);
         setCorrectCount(p => p + 1);
-        setTimeout(next, 1400);
       }
     } else {
       setWrongIdx(idx);
@@ -106,8 +105,32 @@ export default function NumberSortGame() {
           ))}
         </div>
         {selected.length === nums.length && (
-          <div style={{ marginTop: '16px', fontSize: '1rem', color: '#22c55e', fontWeight: '700', opacity: 0.9 }} className="bounce-in">
-            🎉 太棒了！正确顺序：{sorted.join(' → ')}
+          <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '16px' }}>
+            <div style={{ fontSize: '1.1rem', color: '#22c55e', fontWeight: '700', opacity: 0.9 }}>
+              🎉 太棒了！正确顺序：{sorted.join(' → ')}
+            </div>
+            <button
+              onClick={next}
+              style={{
+                marginTop: '12px',
+                padding: '10px 28px',
+                fontSize: '1.1rem',
+                fontWeight: '700',
+                color: 'white',
+                background: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
+                border: 'none',
+                borderRadius: '20px',
+                boxShadow: '0 6px 15px rgba(255,117,140,0.3)',
+                cursor: 'pointer',
+                fontFamily: 'Fredoka, sans-serif',
+                transition: 'transform 0.1s ease',
+              }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              下一题 ➔
+            </button>
           </div>
         )}
       </div>
