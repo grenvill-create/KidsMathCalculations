@@ -105,9 +105,11 @@ export default function NumberSortGame() {
             </button>
           ))}
         </div>
-        <div style={{ marginTop: '16px', fontSize: '1rem', color: '#c07090', fontWeight: '600', opacity: 0.7 }}>
-          目标顺序：{sorted.join(' → ')}
-        </div>
+        {selected.length === nums.length && (
+          <div style={{ marginTop: '16px', fontSize: '1rem', color: '#22c55e', fontWeight: '700', opacity: 0.9 }} className="bounce-in">
+            🎉 太棒了！正确顺序：{sorted.join(' → ')}
+          </div>
+        )}
       </div>
     </div>
   );
