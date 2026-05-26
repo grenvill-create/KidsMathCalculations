@@ -24,33 +24,12 @@ function generateProblem(level) {
       }
     }
   } else {
-    // Hard: Sort 4 items, 2 simple numbers and 2 equations
-    // Simple numbers
-    while (items.length < 2) {
-      const n = Math.floor(Math.random() * 19) + 1;
+    // Hard: Sort 4 larger numbers within 100
+    while (items.length < 4) {
+      const n = Math.floor(Math.random() * 90) + 10; // 10 to 99
       if (!usedVals.has(n)) {
         usedVals.add(n);
         items.push({ display: n.toString(), val: n });
-      }
-    }
-    // Equations
-    while (items.length < 4) {
-      const isAdd = Math.random() > 0.5;
-      let a, b, val, display;
-      if (isAdd) {
-        a = Math.floor(Math.random() * 9) + 1;
-        b = Math.floor(Math.random() * 9) + 1;
-        val = a + b;
-        display = `${a}+${b}`;
-      } else {
-        val = Math.floor(Math.random() * 9) + 1;
-        b = Math.floor(Math.random() * 8) + 1;
-        a = val + b;
-        display = `${a}-${b}`;
-      }
-      if (!usedVals.has(val)) {
-        usedVals.add(val);
-        items.push({ display, val });
       }
     }
   }
@@ -189,8 +168,8 @@ export default function NumberSortGame({ autoAdvance, lang = 'zh', difficultyMod
           <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '16px' }}>
             <div style={{ fontSize: '1.1rem', color: '#22c55e', fontWeight: '600', opacity: 0.9 }}>
               {isEn 
-                ? `🎉 Excellent! Correct order: ${sorted.map(s => `${s.display}(${s.val})`).join(' → ')}` 
-                : `🎉 太棒了！正确顺序：${sorted.map(s => `${s.display}(${s.val})`).join(' → ')}`}
+                ? `🎉 Excellent! Correct order: ${sorted.map(s => s.display).join(' → ')}` 
+                : `🎉 太棒了！正确顺序：${sorted.map(s => s.display).join(' → ')}`}
             </div>
             {!autoAdvance && (
               <button
