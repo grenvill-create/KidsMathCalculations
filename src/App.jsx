@@ -7,6 +7,47 @@ import MathManipulatives from './components/MathManipulatives';
 import ShapeGame from './components/ShapeGame';
 import CompareGame from './components/CompareGame';
 import ClockGame from './components/ClockGame';
+import NumberSortGame from './components/NumberSortGame';
+import SequenceFillGame from './components/SequenceFillGame';
+import MakeTenGame from './components/MakeTenGame';
+import MultiplicationIntroGame from './components/MultiplicationIntroGame';
+import PatternGame from './components/PatternGame';
+import ShapeCountGame from './components/ShapeCountGame';
+import SpatialGame from './components/SpatialGame';
+import ColorGame from './components/ColorGame';
+import WeekdayGame from './components/WeekdayGame';
+import SeasonGame from './components/SeasonGame';
+import ShoppingGame from './components/ShoppingGame';
+
+// Reusable category card for the welcome screen game sections
+function GameSection({ title, color, buttons, onScreen }) {
+  return (
+    <div style={{
+      background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(12px)',
+      borderRadius: '24px', border: '2.5px solid rgba(255,255,255,0.85)',
+      boxShadow: '0 8px 30px rgba(255,93,158,0.1)', padding: '12px 14px',
+      width: '92%', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: '8px',
+      flexShrink: 0,
+    }}>
+      <div style={{ fontSize: '0.82rem', fontWeight: '700', color, textAlign: 'center', letterSpacing: '0.5px' }}>
+        {title}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(62px, 1fr))', gap: '7px' }}>
+        {buttons.map(({ label, emoji, screen, bg, shadow }) => (
+          <button key={screen} onClick={() => onScreen(screen)}
+            style={{
+              padding: '10px 4px', borderRadius: '16px',
+              background: bg, color: 'white', border: 'none',
+              fontFamily: 'Fredoka, sans-serif', fontWeight: '700', fontSize: '0.82rem',
+              boxShadow: `0 4px 10px ${shadow}`, cursor: 'pointer', lineHeight: 1.3,
+            }}>
+            {emoji}<br />{label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Preset ranges selectable by parents
 const RANGE_PRESETS = [
@@ -416,57 +457,31 @@ export default function App() {
             <span>道题</span>
           </div>
 
-          {/* Fun Learning Games */}
-          <div style={{
-            background: 'rgba(255,255,255,0.65)',
-            backdropFilter: 'blur(12px)',
-            borderRadius: '24px',
-            border: '2.5px solid rgba(255,255,255,0.85)',
-            boxShadow: '0 8px 30px rgba(255,93,158,0.1)',
-            padding: '14px 16px',
-            width: '92%', maxWidth: '360px',
-            display: 'flex', flexDirection: 'column', gap: '10px',
-            flexShrink: 0,
-          }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#c07090', textAlign: 'center' }}>
-              🎮 趣味学习游戏
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-              <button onClick={() => { audioSynth.playClick(); setScreen('shape'); }}
-                style={{
-                  padding: '12px 6px', borderRadius: '18px',
-                  background: 'linear-gradient(135deg, #87ceeb, #5bb8d4)',
-                  color: 'white', border: 'none', fontFamily: 'Fredoka, sans-serif',
-                  fontWeight: '700', fontSize: '0.88rem',
-                  boxShadow: '0 4px 12px rgba(91,184,212,0.35)',
-                  cursor: 'pointer', lineHeight: 1.3,
-                }}>
-                🔷<br />认形状
-              </button>
-              <button onClick={() => { audioSynth.playClick(); setScreen('compare'); }}
-                style={{
-                  padding: '12px 6px', borderRadius: '18px',
-                  background: 'linear-gradient(135deg, #6dd99a, #3dc87a)',
-                  color: 'white', border: 'none', fontFamily: 'Fredoka, sans-serif',
-                  fontWeight: '700', fontSize: '0.88rem',
-                  boxShadow: '0 4px 12px rgba(61,200,122,0.35)',
-                  cursor: 'pointer', lineHeight: 1.3,
-                }}>
-                ⚖️<br />比大小
-              </button>
-              <button onClick={() => { audioSynth.playClick(); setScreen('clock'); }}
-                style={{
-                  padding: '12px 6px', borderRadius: '18px',
-                  background: 'linear-gradient(135deg, #c9a0dc, #a57bc4)',
-                  color: 'white', border: 'none', fontFamily: 'Fredoka, sans-serif',
-                  fontWeight: '700', fontSize: '0.88rem',
-                  boxShadow: '0 4px 12px rgba(165,123,196,0.35)',
-                  cursor: 'pointer', lineHeight: 1.3,
-                }}>
-                🕐<br />时钟练习
-              </button>
-            </div>
-          </div>
+          {/* ── Section: 数感与数字 ── */}
+          <GameSection title="🔢 数感与数字" color="#5bb8d4" buttons={[
+            { label: '比大小',     emoji: '⚖️',  screen: 'compare',    bg: 'linear-gradient(135deg, #6dd99a, #3dc87a)', shadow: 'rgba(61,200,122,0.35)' },
+            { label: '数字排序',   emoji: '🔢',  screen: 'numberSort', bg: 'linear-gradient(135deg, #5bb8d4, #3b9fc4)', shadow: 'rgba(59,159,196,0.35)' },
+            { label: '数列填空',   emoji: '❓',  screen: 'seqFill',    bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
+            { label: '凑十法',     emoji: '🎯',  screen: 'makeTen',    bg: 'linear-gradient(135deg, #ffb347, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
+            { label: '乘法启蒙',   emoji: '✖️',  screen: 'multiIntro', bg: 'linear-gradient(135deg, #a78bfa, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
+          ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
+
+          {/* ── Section: 图形与空间 ── */}
+          <GameSection title="🔷 图形与空间" color="#a57bc4" buttons={[
+            { label: '认形状',   emoji: '🔷', screen: 'shape',      bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
+            { label: '找规律',   emoji: '🔁', screen: 'pattern',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
+            { label: '数形状',   emoji: '🔍', screen: 'shapeCount', bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
+            { label: '空间方位', emoji: '🧭', screen: 'spatial',    bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
+          ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
+
+          {/* ── Section: 综合认知 ── */}
+          <GameSection title="🌈 综合认知" color="#f97316" buttons={[
+            { label: '时钟练习', emoji: '🕐', screen: 'clock',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
+            { label: '认颜色',   emoji: '🎨', screen: 'color',    bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
+            { label: '认星期',   emoji: '📅', screen: 'weekday',  bg: 'linear-gradient(135deg, #fbbf24, #f59e0b)', shadow: 'rgba(251,191,36,0.35)' },
+            { label: '认季节',   emoji: '🌍', screen: 'season',   bg: 'linear-gradient(135deg, #6ee7b7, #10b981)', shadow: 'rgba(16,185,129,0.35)' },
+            { label: '购物启蒙', emoji: '🛒', screen: 'shopping', bg: 'linear-gradient(135deg, #fca5a5, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
+          ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
         </div>
       )}
@@ -824,9 +839,20 @@ export default function App() {
           )}
         </div>
       )}
-      {screen === 'shape' && <ShapeGame />}
-      {screen === 'compare' && <CompareGame />}
-      {screen === 'clock' && <ClockGame />}
+      {screen === 'shape'      && <ShapeGame />}
+      {screen === 'compare'    && <CompareGame />}
+      {screen === 'clock'      && <ClockGame />}
+      {screen === 'numberSort' && <NumberSortGame />}
+      {screen === 'seqFill'    && <SequenceFillGame />}
+      {screen === 'makeTen'    && <MakeTenGame />}
+      {screen === 'multiIntro' && <MultiplicationIntroGame />}
+      {screen === 'pattern'    && <PatternGame />}
+      {screen === 'shapeCount' && <ShapeCountGame />}
+      {screen === 'spatial'    && <SpatialGame />}
+      {screen === 'color'      && <ColorGame />}
+      {screen === 'weekday'    && <WeekdayGame />}
+      {screen === 'season'     && <SeasonGame />}
+      {screen === 'shopping'   && <ShoppingGame />}
     </div>
   );
 }
