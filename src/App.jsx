@@ -61,6 +61,7 @@ const RANGE_PRESETS = [
 export default function App() {
   const [screen, setScreen] = useState('welcome'); // welcome, guardian, settings, playing, review
   const [gameState, setGameState] = useState(progressManager.getInitialState());
+  const [isSolved, setIsSolved] = useState(false);
 
   // Settings snapshot — used by Cancel to revert unsaved changes
   const [settingsSnapshot, setSettingsSnapshot] = useState(null);
@@ -229,6 +230,7 @@ export default function App() {
     setErrorCount(0);
     setBasketFull(false);
     setShowHelp(false);
+    setIsSolved(false);
 
     if (mode === 'playing') {
       const opts = {
@@ -276,21 +278,26 @@ export default function App() {
       }
 
       setGameState(nextState);
-      setUserAns('');
 
-      if (screen === 'playing') {
-        setSessionCount(prev => prev + 1);
+      if (gameState.autoAdvance) {
+        setUserAns('');
+
+        if (screen === 'playing') {
+          setSessionCount(prev => prev + 1);
+        }
+
+        if (screen === 'review' && nextState.mistakes.length === 0) {
+          alert('恭喜！所有错题都被你消灭啦！');
+          setScreen('welcome');
+          return;
+        }
+
+        setTimeout(() => {
+          startNewQuestion(screen);
+        }, 1000);
+      } else {
+        setIsSolved(true);
       }
-
-      if (screen === 'review' && nextState.mistakes.length === 0) {
-        alert('恭喜！所有错题都被你消灭啦！');
-        setScreen('welcome');
-        return;
-      }
-
-      setTimeout(() => {
-        startNewQuestion(screen);
-      }, 1000);
     } else {
       audioSynth.playIncorrect();
       setUserAns('');
@@ -337,7 +344,20 @@ export default function App() {
     setGameState(prev => ({ ...prev }));
   };
 
-  const isKeypadLocked = () => false;
+  const handleNextQuestion = () => {
+    audioSynth.playClick();
+    if (screen === 'playing') {
+      setSessionCount(prev => prev + 1);
+    }
+    if (screen === 'review' && gameState.mistakes.length === 0) {
+      alert('恭喜！所有错题都被你消灭啦！');
+      setScreen('welcome');
+      return;
+    }
+    startNewQuestion(screen);
+  };
+
+  const isKeypadLocked = () => isSolved;
 
   // Derive a label for the current range on the welcome screen
   const currentRangeLabel = (gameState.minNumber ?? 1) === 1 
@@ -629,6 +649,48 @@ export default function App() {
               <p style={{ opacity: 0.55, fontSize: '0.85rem', marginTop: '8px' }}>※ 至少需要选择一种运算类型</p>
             </div>
 
+            {/* ── Auto-advance Toggle ── */}
+            <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '20px' }}>
+              <h3 style={{ marginBottom: '10px' }}>⚙️ 答题模式设置</h3>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
+                <div style={{ paddingRight: '12px' }}>
+                  <span style={{ fontWeight: '700', color: '#b5558a', fontSize: '1.05rem' }}>答对后自动进入下一题</span>
+                  <p style={{ opacity: 0.6, fontSize: '0.85rem', margin: '4px 0 0 0', lineHeight: 1.3 }}>
+                    开启时，答对后将自动进入下一题；关闭时，答题后会显示正确顺序与解析，需要手动点击“下一题”确认。
+                  </p>
+                </div>
+                <button
+                  onClick={() => setGameState({ ...gameState, autoAdvance: !gameState.autoAdvance })}
+                  style={{
+                    width: '64px',
+                    height: '34px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: gameState.autoAdvance ? 'linear-gradient(135deg, #4ade80, #22c55e)' : '#e2e8f0',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'background 0.3s ease',
+                    boxShadow: gameState.autoAdvance ? '0 4px 10px rgba(34,197,94,0.3)' : 'none',
+                    flexShrink: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      background: 'white',
+                      position: 'absolute',
+                      top: '4px',
+                      left: gameState.autoAdvance ? '34px' : '4px',
+                      transition: 'left 0.3s ease',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                    }}
+                  />
+                </button>
+              </div>
+            </div>
+
             {/* ── Stage selector ── */}
             <div style={{ margin: '20px 0', borderBottom: '1px solid #f0c0d0', paddingBottom: '10px' }}>
               <h3>🏅 调整学习阶段（控制教具显示）</h3>
@@ -752,23 +814,53 @@ export default function App() {
             </div>
           )}
 
-          {/* Keypad */}
-          <div className="keypad-grid" style={{ opacity: isKeypadLocked() ? 0.3 : 1, transition: 'opacity 0.3s' }}>
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(val => (
-              <button key={val} className="keypad-btn" onClick={() => !isKeypadLocked() && padPress(val)}>
-                {val}
+          {/* Keypad or Manual Next Button */}
+          {isSolved ? (
+            <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '360px', marginTop: '10px' }}>
+              <div style={{ fontSize: '1.4rem', color: '#22c55e', fontWeight: '700', marginBottom: '16px', textShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                🌟 答对啦！真棒！
+              </div>
+              <button
+                onClick={handleNextQuestion}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  fontSize: '1.3rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  background: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
+                  border: 'none',
+                  borderRadius: '24px',
+                  boxShadow: '0 8px 20px rgba(255,117,140,0.4)',
+                  cursor: 'pointer',
+                  fontFamily: 'Fredoka, sans-serif',
+                  transition: 'transform 0.1s ease',
+                }}
+                onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                下一题 ➔
               </button>
-            ))}
-            <button className="keypad-btn action-clear" onClick={() => !isKeypadLocked() && padPress('C')}>
-              ❌
-            </button>
-            <button className="keypad-btn" onClick={() => !isKeypadLocked() && padPress('0')}>
-              0
-            </button>
-            <button className="keypad-btn action-submit" onClick={() => !isKeypadLocked() && submitAnswer()}>
-              ✅
-            </button>
-          </div>
+            </div>
+          ) : (
+            <div className="keypad-grid" style={{ opacity: isKeypadLocked() ? 0.3 : 1, transition: 'opacity 0.3s' }}>
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(val => (
+                <button key={val} className="keypad-btn" onClick={() => !isKeypadLocked() && padPress(val)}>
+                  {val}
+                </button>
+              ))}
+              <button className="keypad-btn action-clear" onClick={() => !isKeypadLocked() && padPress('C')}>
+                ❌
+              </button>
+              <button className="keypad-btn" onClick={() => !isKeypadLocked() && padPress('0')}>
+                0
+              </button>
+              <button className="keypad-btn action-submit" onClick={() => !isKeypadLocked() && submitAnswer()}>
+                ✅
+              </button>
+            </div>
+          )}
 
         </div>
       )}
@@ -839,20 +931,20 @@ export default function App() {
           )}
         </div>
       )}
-      {screen === 'shape'      && <ShapeGame />}
-      {screen === 'compare'    && <CompareGame />}
-      {screen === 'clock'      && <ClockGame />}
-      {screen === 'numberSort' && <NumberSortGame />}
-      {screen === 'seqFill'    && <SequenceFillGame />}
-      {screen === 'makeTen'    && <MakeTenGame />}
-      {screen === 'multiIntro' && <MultiplicationIntroGame />}
-      {screen === 'pattern'    && <PatternGame />}
-      {screen === 'shapeCount' && <ShapeCountGame />}
-      {screen === 'spatial'    && <SpatialGame />}
-      {screen === 'color'      && <ColorGame />}
-      {screen === 'weekday'    && <WeekdayGame />}
-      {screen === 'season'     && <SeasonGame />}
-      {screen === 'shopping'   && <ShoppingGame />}
+      {screen === 'shape'      && <ShapeGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'compare'    && <CompareGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'clock'      && <ClockGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'numberSort' && <NumberSortGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'seqFill'    && <SequenceFillGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'makeTen'    && <MakeTenGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'multiIntro' && <MultiplicationIntroGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'pattern'    && <PatternGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'shapeCount' && <ShapeCountGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'spatial'    && <SpatialGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'color'      && <ColorGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'weekday'    && <WeekdayGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'season'     && <SeasonGame autoAdvance={gameState.autoAdvance} />}
+      {screen === 'shopping'   && <ShoppingGame autoAdvance={gameState.autoAdvance} />}
     </div>
   );
 }

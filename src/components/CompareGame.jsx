@@ -25,7 +25,7 @@ function EmojiGrid({ count, emoji }) {
   );
 }
 
-export default function CompareGame() {
+export default function CompareGame({ autoAdvance }) {
   const [problem, setProblem] = useState(null);
   const [selected, setSelected] = useState(null);
   const [sessionCount, setSessionCount] = useState(0);
@@ -45,10 +45,14 @@ export default function CompareGame() {
     if (side === problem.answer) {
       audioSynth.playCorrect();
       setCorrectCount(p => p + 1);
-      setTimeout(next, 1200);
+      if (autoAdvance) {
+        setTimeout(next, 1200);
+      }
     } else {
       audioSynth.playIncorrect();
-      setTimeout(next, 1800);
+      if (autoAdvance) {
+        setTimeout(next, 1800);
+      }
     }
   };
 
@@ -101,14 +105,39 @@ export default function CompareGame() {
       </div>
 
       {selected !== null && (
-        <div style={{
-          fontSize: '1.1rem', fontWeight: '700', textAlign: 'center',
-          color: selected === problem.answer ? '#16a34a' : '#dc2626',
-          animation: 'fadeIn 0.3s ease',
-        }}>
-          {selected === problem.answer
-            ? `🌟 对啦！${bigger} 比 ${smaller} 多！`
-            : `💡 ${bigger} 才是更多哦，再加油！`}
+        <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            fontSize: '1.1rem', fontWeight: '700', textAlign: 'center',
+            color: selected === problem.answer ? '#16a34a' : '#dc2626',
+          }}>
+            {selected === problem.answer
+              ? `🌟 对啦！${bigger} 比 ${smaller} 多！`
+              : `💡 ${bigger} 才是更多哦，再加油！`}
+          </div>
+          {!autoAdvance && (
+            <button
+              onClick={next}
+              style={{
+                marginTop: '6px',
+                padding: '10px 28px',
+                fontSize: '1.1rem',
+                fontWeight: '700',
+                color: 'white',
+                background: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
+                border: 'none',
+                borderRadius: '20px',
+                boxShadow: '0 6px 15px rgba(255,117,140,0.3)',
+                cursor: 'pointer',
+                fontFamily: 'Fredoka, sans-serif',
+                transition: 'transform 0.1s ease',
+              }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              下一题 ➔
+            </button>
+          )}
         </div>
       )}
     </div>

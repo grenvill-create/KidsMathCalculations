@@ -11,6 +11,7 @@ export const progressManager = {
       minNumber: parseInt(localStorage.getItem('km_minNumber') || '1'),
       maxNumber: parseInt(localStorage.getItem('km_maxNumber') || '10'),
       operations: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
+      autoAdvance: localStorage.getItem('km_autoAdvance') !== 'false',
     };
   },
 
@@ -21,6 +22,7 @@ export const progressManager = {
     localStorage.setItem('km_minNumber', String(state.minNumber ?? 1));
     localStorage.setItem('km_maxNumber', String(state.maxNumber ?? 10));
     localStorage.setItem('km_operations', JSON.stringify(state.operations ?? ['add', 'sub']));
+    localStorage.setItem('km_autoAdvance', state.autoAdvance !== false ? 'true' : 'false');
   },
 
   // Record a mistake. if the problem already exists, increment error count.
@@ -61,6 +63,7 @@ export const progressManager = {
       min: localStorage.getItem('km_minNumber') || '1',
       mn: localStorage.getItem('km_maxNumber') || '10',
       op: JSON.parse(localStorage.getItem('km_operations') || '["add","sub"]'),
+      aa: localStorage.getItem('km_autoAdvance') !== 'false' ? '1' : '0',
     };
     // Encode to base64
     return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
@@ -77,6 +80,7 @@ export const progressManager = {
         if (data.min) localStorage.setItem('km_minNumber', data.min.toString());
         if (data.mn) localStorage.setItem('km_maxNumber', data.mn.toString());
         if (data.op) localStorage.setItem('km_operations', JSON.stringify(data.op));
+        if (data.aa) localStorage.setItem('km_autoAdvance', data.aa === '1' ? 'true' : 'false');
         return true;
       }
       return false;
