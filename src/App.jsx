@@ -19,6 +19,8 @@ import ColorGame from './components/ColorGame';
 import WeekdayGame from './components/WeekdayGame';
 import SeasonGame from './components/SeasonGame';
 import ShoppingGame from './components/ShoppingGame';
+import BreakingTenGame from './components/BreakingTenGame';
+import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
 function GameSection({ title, color, buttons, onScreen }) {
@@ -62,6 +64,7 @@ const RANGE_PRESETS = [
 export default function App() {
   const [screen, setScreen] = useState('welcome'); // welcome, guardian, settings, playing, review
   const [gameState, setGameState] = useState(progressManager.getInitialState());
+  const [showPhilosophy, setShowPhilosophy] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
 
   // Settings snapshot — used by Cancel to revert unsaved changes
@@ -434,6 +437,28 @@ export default function App() {
             >
               🌐 {gameState.lang === 'zh' ? 'EN' : '中文'}
             </button>
+            <button
+              className="bouncy-button secondary"
+              onClick={() => {
+                audioSynth.playClick();
+                setShowPhilosophy(true);
+              }}
+              style={{
+                padding: '10px 14px',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                fontFamily: 'Fredoka, sans-serif',
+                background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                borderColor: '#fcd34d',
+                color: '#b45309',
+                boxShadow: '0 4px 10px rgba(251,191,36,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              {t('philosophy', gameState.lang)}
+            </button>
             <button className="bouncy-button secondary" onClick={openGuardian} style={{ padding: '10px 18px', gap: '6px' }}>
               <Settings size={20} /> {t('parent', gameState.lang)}
             </button>
@@ -510,6 +535,7 @@ export default function App() {
             { label: t('gameSort', gameState.lang),   emoji: '🔢',  screen: 'numberSort', bg: 'linear-gradient(135deg, #5bb8d4, #3b9fc4)', shadow: 'rgba(59,159,196,0.35)' },
             { label: t('gameSeqFill', gameState.lang),   emoji: '❓',  screen: 'seqFill',    bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
             { label: t('gameMakeTen', gameState.lang),     emoji: '🎯',  screen: 'makeTen',    bg: 'linear-gradient(135deg, #ffb347, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
+            { label: t('gameBreakingTen', gameState.lang), emoji: '🎋',  screen: 'breakingTen',bg: 'linear-gradient(135deg, #ff758c, #ff7eb3)', shadow: 'rgba(255,117,140,0.35)' },
             { label: t('gameMultiIntro', gameState.lang),   emoji: '✖️',  screen: 'multiIntro', bg: 'linear-gradient(135deg, #a78bfa, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
@@ -981,6 +1007,7 @@ export default function App() {
       {screen === 'numberSort' && <NumberSortGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'seqFill'    && <SequenceFillGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'makeTen'    && <MakeTenGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'breakingTen'&& <BreakingTenGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'multiIntro' && <MultiplicationIntroGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'pattern'    && <PatternGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'shapeCount' && <ShapeCountGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
@@ -989,6 +1016,51 @@ export default function App() {
       {screen === 'weekday'    && <WeekdayGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'season'     && <SeasonGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'shopping'   && <ShoppingGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+
+      {/* --- EDUCATION PHILOSOPHY MODAL --- */}
+      {showPhilosophy && (
+        <div className="fade-in" style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          padding: '16px'
+        }}>
+          <div className="card-shadow bounce-in" style={{
+            width: '100%', maxWidth: '460px', maxHeight: '85vh',
+            padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px',
+            overflowY: 'auto', position: 'relative', background: 'white', borderRadius: '32px'
+          }}>
+            {/* Close Button */}
+            <button onClick={() => { audioSynth.playClick(); setShowPhilosophy(false); }}
+              style={{
+                position: 'absolute', top: '16px', right: '16px', border: 'none',
+                background: 'rgba(0,0,0,0.05)', width: '32px', height: '32px',
+                borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: '#db2777', zIndex: 10
+              }}>
+              <X size={20} />
+            </button>
+
+            <h2 className="title-glow" style={{ fontSize: '1.8rem', color: '#c0487a', margin: '10px 0 0 0', textAlign: 'center', flexShrink: 0 }}>
+              {t('philosophyTitle', gameState.lang)}
+            </h2>
+
+            {/* Short introductory text */}
+            <div style={{
+              background: '#fffbeb', border: '1.5px solid #fef3c7', borderRadius: '16px',
+              padding: '12px 14px', fontSize: '0.85rem', color: '#92400e', lineHeight: 1.45,
+              fontWeight: '600', flexShrink: 0
+            }}>
+              {t('philosophyQuote', gameState.lang)}
+            </div>
+
+            {/* Infographic Poster */}
+            <div style={{ borderRadius: '16px', overflow: 'hidden', border: '2px solid #ffd6e8', boxShadow: '0 4px 12px rgba(255,93,158,0.1)', flexShrink: 0 }}>
+              <img src={philosophyImg} alt="Our Philosophy" style={{ width: '100%', height: 'auto', display: 'block' }} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
