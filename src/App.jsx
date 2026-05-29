@@ -469,7 +469,8 @@ export default function App() {
       {/* --- WELCOME SCREEN --- */}
       {screen === 'welcome' && (
         <div className="screen-wrapper fade-in"
-          style={{ justifyContent: 'center', height: '100%', gap: '12px', overflowY: 'auto', paddingBottom: '12px' }}>
+          style={{ justifyContent: 'flex-start', gap: '12px', overflowY: 'auto', paddingBottom: '24px', paddingTop: '10px' }}>
+
 
           {/* Hero star with orbiting decos */}
           <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
