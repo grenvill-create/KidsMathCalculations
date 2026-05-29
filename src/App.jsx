@@ -29,7 +29,7 @@ function GameSection({ title, color, buttons, onScreen }) {
       background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(12px)',
       borderRadius: '24px', border: '2.5px solid rgba(255,255,255,0.85)',
       boxShadow: '0 8px 30px rgba(255,93,158,0.1)', padding: '12px 14px',
-      width: '92%', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: '8px',
+      width: '100%', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: '8px',
       flexShrink: 0,
     }}>
       <div style={{ fontSize: '0.82rem', fontWeight: '700', color, textAlign: 'center', letterSpacing: '0.5px' }}>
@@ -457,7 +457,7 @@ export default function App() {
                 gap: '4px'
               }}
             >
-              {t('philosophy', gameState.lang)}
+              💡 {t('philosophy', gameState.lang)}
             </button>
             <button className="bouncy-button secondary" onClick={openGuardian} style={{ padding: '10px 18px', gap: '6px' }}>
               <Settings size={20} /> {t('parent', gameState.lang)}

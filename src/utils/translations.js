@@ -6,11 +6,11 @@ export const translations = {
     // Header & Global
     questionNum: "第 {num} 题",
     reviewMistakes: "⭐ 错题复习",
-    parent: "⚙️ 家长",
+    parent: "家长",
     home: "首页",
     cancel: "✕ 取消",
     save: "✓ 保存",
-    philosophy: "💡 理念",
+    philosophy: "理念",
     philosophyTitle: "设计初衷与理念",
     philosophyQuote: "💡 聪明的家长，不急着“刷题”，而是帮孩子“开窍”！很多时候卡住孩子的，往往不是“不会算”，而是“读不懂题”。本软件旨在通过图形与趣味教具，把时间投资在“玩和读”等肥沃的土壤上，培养理解力和数感，静待花开！🌻",
     
@@ -108,11 +108,11 @@ export const translations = {
     // Header & Global
     questionNum: "Question {num}",
     reviewMistakes: "⭐ Review Mistakes",
-    parent: "⚙️ Parent",
+    parent: "Parent",
     home: "Home",
     cancel: "✕ Cancel",
     save: "✓ Save",
-    philosophy: "💡 Ideal",
+    philosophy: "Ideal",
     philosophyTitle: "Design Philosophy",
     philosophyQuote: "💡 Smart parents don't rush to drill, but help kids open their minds! Often what stops a child is not arithmetic, but reading comprehension. This app focuses on visual toys to help kids 'play & read', and let thinking bloom! 🌻",
     

@@ -494,3 +494,55 @@ body::before {
   from { transform: scale(0.8) translateY(20px); opacity: 0; }
   to { transform: scale(1) translateY(0); opacity: 1; }
 }
+
+/* ── Responsive Mobile Optimizations ── */
+@media (max-width: 480px) {
+  #app-viewport {
+    padding: 6px 10px !important;
+  }
+  
+  .app-header {
+    padding: 4px 0 6px !important;
+  }
+  
+  .app-header .bouncy-button.secondary {
+    padding: 6px 10px !important;
+    font-size: 0.82rem !important;
+    gap: 4px !important;
+  }
+  
+  .app-header .bouncy-button.secondary svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .title-glow {
+    font-size: 1.9rem !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .welcome-card {
+    width: 100% !important;
+    padding: 12px 14px !important;
+    gap: 8px !important;
+    border-radius: 22px !important;
+  }
+  
+  .welcome-hero {
+    padding: 4px 0 !important;
+  }
+  
+  .star-float {
+    font-size: 3rem !important;
+  }
+
+  .mode-badge {
+    padding: 6px 12px !important;
+    font-size: 0.88rem !important;
+  }
+  
+  .stats-row {
+    font-size: 0.85rem !important;
+  }
+}
+
