@@ -44,6 +44,16 @@ export const translations = {
     gameSeason: "认季节",
     gameShopping: "购物启蒙",
     
+    // New modules (2026)
+    gamePlaceValue: "数位认知",
+    gameOddOneOut: "找不同",
+    gameMultiStep: "连加连减",
+    gameSortClassify: "分类排列",
+    gameMeasurement: "长度与重量",
+    gameMultiTable: "乘法口诀",
+    gameFractions: "分数初步",
+    gameTimeDiff: "时间差",
+    
     // Guardian Gate
     guardianTitle: "家长通道",
     guardianQText: "为了验证是家长操作，请回答：",
@@ -145,6 +155,16 @@ export const translations = {
     gameWeekday: "Weekdays",
     gameSeason: "Seasons",
     gameShopping: "Shopping",
+    
+    // New modules (2026)
+    gamePlaceValue: "Place Values",
+    gameOddOneOut: "Odd One Out",
+    gameMultiStep: "Multi-Step",
+    gameSortClassify: "Sort & Order",
+    gameMeasurement: "Measurement",
+    gameMultiTable: "Times Tables",
+    gameFractions: "Fractions",
+    gameTimeDiff: "Time Difference",
     
     // Guardian Gate
     guardianTitle: "Parent Gate",

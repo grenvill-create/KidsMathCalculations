@@ -20,6 +20,14 @@ import WeekdayGame from './components/WeekdayGame';
 import SeasonGame from './components/SeasonGame';
 import ShoppingGame from './components/ShoppingGame';
 import BreakingTenGame from './components/BreakingTenGame';
+import PlaceValueGame from './components/PlaceValueGame';
+import OddOneOutGame from './components/OddOneOutGame';
+import MultiStepGame from './components/MultiStepGame';
+import SortClassifyGame from './components/SortClassifyGame';
+import MeasurementGame from './components/MeasurementGame';
+import MultiplicationTableGame from './components/MultiplicationTableGame';
+import FractionsGame from './components/FractionsGame';
+import TimeDiffGame from './components/TimeDiffGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -538,6 +546,9 @@ export default function App() {
             { label: t('gameMakeTen', gameState.lang),     emoji: '🎯',  screen: 'makeTen',    bg: 'linear-gradient(135deg, #ffb347, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
             { label: t('gameBreakingTen', gameState.lang), emoji: '🎋',  screen: 'breakingTen',bg: 'linear-gradient(135deg, #ff758c, #ff7eb3)', shadow: 'rgba(255,117,140,0.35)' },
             { label: t('gameMultiIntro', gameState.lang),   emoji: '✖️',  screen: 'multiIntro', bg: 'linear-gradient(135deg, #a78bfa, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
+            { label: t('gamePlaceValue', gameState.lang),  emoji: '📦',  screen: 'placeValue', bg: 'linear-gradient(135deg, #c4b5fd, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
+            { label: t('gameOddOneOut', gameState.lang),   emoji: '🔍',  screen: 'oddOneOut',  bg: 'linear-gradient(135deg, #fde68a, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
+            { label: t('gameMultiStep', gameState.lang),   emoji: '🔗',  screen: 'multiStep',  bg: 'linear-gradient(135deg, #7dd3fc, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 图形与空间 ── */}
@@ -555,6 +566,11 @@ export default function App() {
             { label: t('gameWeekday', gameState.lang),   emoji: '📅', screen: 'weekday',  bg: 'linear-gradient(135deg, #fbbf24, #f59e0b)', shadow: 'rgba(251,191,36,0.35)' },
             { label: t('gameSeason', gameState.lang),   emoji: '🌍', screen: 'season',   bg: 'linear-gradient(135deg, #6ee7b7, #10b981)', shadow: 'rgba(16,185,129,0.35)' },
             { label: t('gameShopping', gameState.lang), emoji: '🛒', screen: 'shopping', bg: 'linear-gradient(135deg, #fca5a5, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
+            { label: t('gameSortClassify', gameState.lang), emoji: '🎯', screen: 'sortClassify', bg: 'linear-gradient(135deg, #ddd6fe, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
+            { label: t('gameMeasurement', gameState.lang),  emoji: '📍', screen: 'measurement', bg: 'linear-gradient(135deg, #6ee7b7, #059669)', shadow: 'rgba(5,150,105,0.35)' },
+            { label: t('gameMultiTable', gameState.lang),   emoji: '✖️', screen: 'multiTable',  bg: 'linear-gradient(135deg, #fcd34d, #d97706)', shadow: 'rgba(217,119,6,0.35)' },
+            { label: t('gameFractions', gameState.lang),    emoji: '🍕', screen: 'fractions',   bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
+            { label: t('gameTimeDiff', gameState.lang),     emoji: '⏱️', screen: 'timeDiff',    bg: 'linear-gradient(135deg, #7dd3fc, #0284c7)', shadow: 'rgba(2,132,199,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
         </div>
@@ -1016,7 +1032,15 @@ export default function App() {
       {screen === 'color'      && <ColorGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'weekday'    && <WeekdayGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'season'     && <SeasonGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
-      {screen === 'shopping'   && <ShoppingGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'shopping'      && <ShoppingGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'placeValue'     && <PlaceValueGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'oddOneOut'      && <OddOneOutGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'multiStep'      && <MultiStepGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'sortClassify'   && <SortClassifyGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'measurement'    && <MeasurementGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'multiTable'     && <MultiplicationTableGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'fractions'      && <FractionsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'timeDiff'       && <TimeDiffGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
 
       {/* --- EDUCATION PHILOSOPHY MODAL --- */}
       {showPhilosophy && (
