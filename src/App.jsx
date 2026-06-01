@@ -28,6 +28,15 @@ import MeasurementGame from './components/MeasurementGame';
 import MultiplicationTableGame from './components/MultiplicationTableGame';
 import FractionsGame from './components/FractionsGame';
 import TimeDiffGame from './components/TimeDiffGame';
+import MissingNumberGame from './components/MissingNumberGame';
+import MathMatchingGame from './components/MathMatchingGame';
+import ColumnMathGame from './components/ColumnMathGame';
+import DivisionIntroGame from './components/DivisionIntroGame';
+import NumberLineGame from './components/NumberLineGame';
+import AreaPerimeterGame from './components/AreaPerimeterGame';
+import DataChartsGame from './components/DataChartsGame';
+import MoneyGame from './components/MoneyGame';
+import TemperatureGame from './components/TemperatureGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -549,6 +558,11 @@ export default function App() {
             { label: t('gamePlaceValue', gameState.lang),  emoji: '📦',  screen: 'placeValue', bg: 'linear-gradient(135deg, #c4b5fd, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
             { label: t('gameOddOneOut', gameState.lang),   emoji: '🔍',  screen: 'oddOneOut',  bg: 'linear-gradient(135deg, #fde68a, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
             { label: t('gameMultiStep', gameState.lang),   emoji: '🔗',  screen: 'multiStep',  bg: 'linear-gradient(135deg, #7dd3fc, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
+            { label: t('gameMissingNum', gameState.lang),  emoji: '❓',  screen: 'missingNum', bg: 'linear-gradient(135deg, #fde68a, #eab308)', shadow: 'rgba(234,179,8,0.35)' },
+            { label: t('gameMathMatch', gameState.lang),   emoji: '🔗',  screen: 'mathMatch',  bg: 'linear-gradient(135deg, #c4b5fd, #8b5cf6)', shadow: 'rgba(139,92,246,0.35)' },
+            { label: t('gameColumnMath', gameState.lang),  emoji: '📝',  screen: 'columnMath', bg: 'linear-gradient(135deg, #93c5fd, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
+            { label: t('gameDivision', gameState.lang),    emoji: '➗',  screen: 'division',   bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
+            { label: t('gameNumberLine', gameState.lang),  emoji: '📐',  screen: 'numberLine', bg: 'linear-gradient(135deg, #7dd3fc, #0284c7)', shadow: 'rgba(2,132,199,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 图形与空间 ── */}
@@ -571,6 +585,10 @@ export default function App() {
             { label: t('gameMultiTable', gameState.lang),   emoji: '✖️', screen: 'multiTable',  bg: 'linear-gradient(135deg, #fcd34d, #d97706)', shadow: 'rgba(217,119,6,0.35)' },
             { label: t('gameFractions', gameState.lang),    emoji: '🍕', screen: 'fractions',   bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
             { label: t('gameTimeDiff', gameState.lang),     emoji: '⏱️', screen: 'timeDiff',    bg: 'linear-gradient(135deg, #7dd3fc, #0284c7)', shadow: 'rgba(2,132,199,0.35)' },
+            { label: t('gameAreaPerim', gameState.lang),     emoji: '📐', screen: 'areaPerim',   bg: 'linear-gradient(135deg, #c4b5fd, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
+            { label: t('gameDataCharts', gameState.lang),    emoji: '📊', screen: 'dataCharts',  bg: 'linear-gradient(135deg, #5eead4, #0d9488)', shadow: 'rgba(13,148,136,0.35)' },
+            { label: t('gameMoney', gameState.lang),         emoji: '💰', screen: 'money',       bg: 'linear-gradient(135deg, #86efac, #16a34a)', shadow: 'rgba(22,163,74,0.35)' },
+            { label: t('gameTemp', gameState.lang),          emoji: '🌡️', screen: 'temperature', bg: 'linear-gradient(135deg, #fde68a, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
         </div>
@@ -1041,6 +1059,15 @@ export default function App() {
       {screen === 'multiTable'     && <MultiplicationTableGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'fractions'      && <FractionsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'timeDiff'       && <TimeDiffGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'missingNum'     && <MissingNumberGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'mathMatch'      && <MathMatchingGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'columnMath'     && <ColumnMathGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'division'       && <DivisionIntroGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'numberLine'     && <NumberLineGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'areaPerim'      && <AreaPerimeterGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'dataCharts'     && <DataChartsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'money'          && <MoneyGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'temperature'    && <TemperatureGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
 
       {/* --- EDUCATION PHILOSOPHY MODAL --- */}
       {showPhilosophy && (

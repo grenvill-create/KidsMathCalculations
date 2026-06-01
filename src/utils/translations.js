@@ -53,6 +53,16 @@ export const translations = {
     gameMultiTable: "乘法口诀",
     gameFractions: "分数初步",
     gameTimeDiff: "时间差",
+    // Priority-1 modules
+    gameMissingNum: "找缺失数字",
+    gameMathMatch: "数字连线",
+    gameColumnMath: "竖式计算",
+    gameDivision: "除法初步",
+    gameNumberLine: "数轴游戏",
+    gameAreaPerim: "面积周长",
+    gameDataCharts: "统计图表",
+    gameMoney: "钱币认知",
+    gameTemp: "温度计",
     
     // Guardian Gate
     guardianTitle: "家长通道",
@@ -165,6 +175,16 @@ export const translations = {
     gameMultiTable: "Times Tables",
     gameFractions: "Fractions",
     gameTimeDiff: "Time Difference",
+    // Priority-1 modules
+    gameMissingNum: "Missing Number",
+    gameMathMatch: "Math Matching",
+    gameColumnMath: "Column Math",
+    gameDivision: "Division",
+    gameNumberLine: "Number Line",
+    gameAreaPerim: "Area & Perimeter",
+    gameDataCharts: "Data Charts",
+    gameMoney: "Money",
+    gameTemp: "Temperature",
     
     // Guardian Gate
     guardianTitle: "Parent Gate",
