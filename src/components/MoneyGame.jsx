@@ -94,6 +94,10 @@ export default function MoneyGame({ lang = 'zh', onBack }) {
     audioSynth.playClick();
     if (k === 'C') { setUserAns(''); return; }
     if (k === '✓') { submit(); return; }
+    if (k === '.') {
+      if (userAns.includes('.')) return;
+      if (userAns === '') { setUserAns('0.'); return; }
+    }
     if (userAns.length < 5) setUserAns(p => p + k);
   };
 
@@ -230,14 +234,19 @@ export default function MoneyGame({ lang = 'zh', onBack }) {
       </div>
 
       {!feedback && (
-        <div className="keypad-grid" style={{ maxWidth: '340px' }}>
-          {['1','2','3','4','5','6','7','8','9','C','0','✓'].map(k => (
-            <button key={k}
-              className={`keypad-btn ${k === 'C' ? 'action-clear' : k === '✓' ? 'action-submit' : ''}`}
-              onClick={() => handlePad(k)}>
-              {k}
-            </button>
-          ))}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%', maxWidth: '340px', margin: '0 auto' }}>
+          <div className="keypad-grid" style={{ width: '100%' }}>
+            {['1','2','3','4','5','6','7','8','9','.','0','C'].map(k => (
+              <button key={k}
+                className={`keypad-btn ${k === 'C' ? 'action-clear' : ''}`}
+                onClick={() => handlePad(k)}>
+                {k}
+              </button>
+            ))}
+          </div>
+          <button className="bouncy-button primary" onClick={submit} style={{ width: '100%', padding: '12px 0', fontSize: '1.2rem' }}>
+            {zh ? '✓ 确认' : '✓ Confirm'}
+          </button>
         </div>
       )}
 
