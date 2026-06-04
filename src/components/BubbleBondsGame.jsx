@@ -4,10 +4,10 @@ import { audioSynth } from '../utils/audioSynth';
 
 const THEMES = {
   sky: {
-    bg: 'linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%)',
-    bubbleColor: 'radial-gradient(circle at 30% 30%, #fff0f5, #ffb6c1)', // Soft 3D pink balloon
-    bubbleBorder: '2px solid #ff9ebb',
-    bubbleShadow: 'inset -5px -5px 15px rgba(255,105,180,0.3), 0 5px 15px rgba(0,0,0,0.1)',
+    bg: 'linear-gradient(to bottom, #fff0f5 0%, #ffb6c1 100%)', // Soft pink background
+    bubbleColor: 'radial-gradient(circle at 30% 30%, #ffffff, #ff9ebb)', // Make balloons slightly lighter to stand out against pink bg
+    bubbleBorder: '2px solid #ff69b4',
+    bubbleShadow: 'inset -5px -5px 15px rgba(255,20,147,0.2), 0 5px 15px rgba(0,0,0,0.1)',
     textColor: '#d81b60',
     icon: '🧸', // Cute teddy bear
     name: '天空彩球'
