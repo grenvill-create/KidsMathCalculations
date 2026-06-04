@@ -8,11 +8,11 @@ const THEMES = {
     icon: '🧸', // Cute teddy bear
     name: '天空彩球',
     balloonColors: [
-      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #ff9ebb)', border: '2px solid #ff69b4', shadow: 'inset -5px -5px 15px rgba(255,20,147,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#d81b60', knot: '#ffb6c1', string: 'rgba(255,255,255,0.8)' }, // Pink
-      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #86efac)', border: '2px solid #22c55e', shadow: 'inset -5px -5px 15px rgba(34,197,94,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#15803d', knot: '#bbf7d0', string: 'rgba(255,255,255,0.8)' }, // Green
-      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #7dd3fc)', border: '2px solid #38bdf8', shadow: 'inset -5px -5px 15px rgba(56,189,248,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#0369a1', knot: '#bae6fd', string: 'rgba(255,255,255,0.8)' }, // Blue
-      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #fde047)', border: '2px solid #eab308', shadow: 'inset -5px -5px 15px rgba(234,179,8,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#a16207', knot: '#fef08a', string: 'rgba(255,255,255,0.8)' }, // Yellow
-      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #c4b5fd)', border: '2px solid #a78bfa', shadow: 'inset -5px -5px 15px rgba(167,139,250,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#6d28d9', knot: '#ddd6fe', string: 'rgba(255,255,255,0.8)' }, // Purple
+      { color: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,158,187,0.8))', border: '2px solid rgba(255,105,180,0.8)', shadow: 'inset -5px -5px 15px rgba(255,20,147,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#d81b60', knot: 'rgba(255,182,193,0.8)', string: 'rgba(255,255,255,0.8)' }, // Pink
+      { color: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(134,239,172,0.8))', border: '2px solid rgba(34,197,94,0.8)', shadow: 'inset -5px -5px 15px rgba(34,197,94,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#15803d', knot: 'rgba(187,247,208,0.8)', string: 'rgba(255,255,255,0.8)' }, // Green
+      { color: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(125,211,252,0.8))', border: '2px solid rgba(56,189,248,0.8)', shadow: 'inset -5px -5px 15px rgba(56,189,248,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#0369a1', knot: 'rgba(186,230,253,0.8)', string: 'rgba(255,255,255,0.8)' }, // Blue
+      { color: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(253,224,71,0.8))', border: '2px solid rgba(234,179,8,0.8)', shadow: 'inset -5px -5px 15px rgba(234,179,8,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#a16207', knot: 'rgba(254,240,138,0.8)', string: 'rgba(255,255,255,0.8)' }, // Yellow
+      { color: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(196,181,253,0.8))', border: '2px solid rgba(167,139,250,0.8)', shadow: 'inset -5px -5px 15px rgba(167,139,250,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#6d28d9', knot: 'rgba(221,214,254,0.8)', string: 'rgba(255,255,255,0.8)' }, // Purple
     ]
   }
 };
