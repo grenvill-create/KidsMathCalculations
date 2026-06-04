@@ -37,6 +37,7 @@ import AreaPerimeterGame from './components/AreaPerimeterGame';
 import DataChartsGame from './components/DataChartsGame';
 import MoneyGame from './components/MoneyGame';
 import TemperatureGame from './components/TemperatureGame';
+import BubbleBondsGame from './components/BubbleBondsGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -549,6 +550,7 @@ export default function App() {
 
           {/* ── Section: 数感与数字 ── */}
           <GameSection title={t('catNumber', gameState.lang)} color="#5bb8d4" buttons={[
+            { label: t('gameBubbleBonds', gameState.lang), emoji: '🫧', screen: 'bubbleBonds', bg: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', shadow: 'rgba(14,165,233,0.35)' },
             { label: t('gameCompare', gameState.lang),     emoji: '⚖️',  screen: 'compare',    bg: 'linear-gradient(135deg, #6dd99a, #3dc87a)', shadow: 'rgba(61,200,122,0.35)' },
             { label: t('gameSort', gameState.lang),   emoji: '🔢',  screen: 'numberSort', bg: 'linear-gradient(135deg, #5bb8d4, #3b9fc4)', shadow: 'rgba(59,159,196,0.35)' },
             { label: t('gameSeqFill', gameState.lang),   emoji: '❓',  screen: 'seqFill',    bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
@@ -1036,6 +1038,7 @@ export default function App() {
           )}
         </div>
       )}
+      {screen === 'bubbleBonds'  && <BubbleBondsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'shape'      && <ShapeGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'compare'    && <CompareGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'clock'      && <ClockGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}

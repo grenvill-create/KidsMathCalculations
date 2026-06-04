@@ -63,6 +63,7 @@ export const translations = {
     gameDataCharts: "统计图表",
     gameMoney: "钱币认知",
     gameTemp: "温度计",
+    gameBubbleBonds: "凑数泡泡龙",
     
     // Guardian Gate
     guardianTitle: "家长通道",
@@ -185,6 +186,7 @@ export const translations = {
     gameDataCharts: "Data Charts",
     gameMoney: "Money",
     gameTemp: "Temperature",
+    gameBubbleBonds: "Number Bonds",
     
     // Guardian Gate
     guardianTitle: "Parent Gate",
