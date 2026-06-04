@@ -87,10 +87,28 @@ export default function ShapeTrainGame({ lang, onBack }) {
     initLevel();
     // Handle resize
     const handleResize = () => {
-      setWagons(prev => prev.map((w, idx) => ({
-        ...w,
-        targetX: window.innerWidth > 800 ? (window.innerWidth / 2 + 150) - (idx + 1) * 200 : (window.innerWidth / 2 + 100) - (idx + 1) * 140
-      })));
+      setWagons(prev => {
+        const next = prev.map((w, idx) => ({
+          ...w,
+          targetX: window.innerWidth > 800 ? (window.innerWidth / 2 + 150) - (idx + 1) * 200 : (window.innerWidth / 2 + 100) - (idx + 1) * 140
+        }));
+        
+        setItems(prevItems => prevItems.map(item => {
+          if (item.isLoaded && item.wagonIdx !== null && item.wagonIdx !== undefined) {
+            const wagon = next[item.wagonIdx];
+            if (wagon) {
+              return {
+                ...item,
+                x: wagon.targetX - 40,
+                y: window.innerHeight - 150 - (item.yOffset || 0)
+              };
+            }
+          }
+          return item;
+        }));
+        
+        return next;
+      });
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -100,12 +118,24 @@ export default function ShapeTrainGame({ lang, onBack }) {
     if (trainState === 'playing' && items.length > 0 && items.every(i => i.isLoaded)) {
       // All loaded! Win!
       audioSynth.playCorrect();
-      setTrainState('departing');
-      setTimeout(() => {
-        setLevel(l => l + 1);
-      }, 3000);
+      setTrainState('all-loaded');
+      
+      const timer = setTimeout(() => {
+        setTrainState('departing');
+      }, 800);
+      
+      return () => clearTimeout(timer);
     }
   }, [items, trainState]);
+
+  useEffect(() => {
+    if (trainState === 'departing') {
+      const timer = setTimeout(() => {
+        setLevel(l => l + 1);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [trainState]);
 
   const startDrag = (evt, item) => {
     if (item.isLoaded || trainState !== 'playing') return;
@@ -169,14 +199,16 @@ export default function ShapeTrainGame({ lang, onBack }) {
       if (Math.abs(itemCenterX - wagon.targetX) < 100) {
         loaded = true;
         audioSynth.playClick();
+        const yOffset = Math.random() * 20;
         setItems(prev => prev.map(i => {
           if (i.uid === id) {
             return { 
               ...i, 
               isLoaded: true, 
               x: wagon.targetX - 40, // Center in wagon
-              y: window.innerHeight - 150 - Math.random() * 20, // Inside wagon
-              wagonIdx: correctWagonIndex
+              y: window.innerHeight - 150 - yOffset, // Inside wagon
+              wagonIdx: correctWagonIndex,
+              yOffset: yOffset
             };
           }
           return i;
@@ -264,11 +296,17 @@ export default function ShapeTrainGame({ lang, onBack }) {
           style={{
             position: 'absolute',
             left: 0, top: 0,
-            transform: `translate(${item.x}px, ${item.y}px) ${item.isLoaded ? 'scale(0.8)' : 'scale(1)'}`,
+            transform: `translate(${item.x}px, ${item.y}px) ${item.isLoaded ? 'scale(0.8)' : 'scale(1)'} ${
+              trainState === 'departing' ? 'translateX(-100vw)' : ''
+            }`,
             fontSize: '4rem',
             cursor: item.isLoaded ? 'default' : 'grab',
             zIndex: item.isLoaded ? 10 : 50,
-            transition: dragInfo.current.id === item.uid ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            transition: dragInfo.current.id === item.uid 
+              ? 'none' 
+              : trainState === 'departing'
+                ? 'transform 3s ease-in'
+                : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
             userSelect: 'none'
           }}
