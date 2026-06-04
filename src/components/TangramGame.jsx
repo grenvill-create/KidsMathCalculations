@@ -58,9 +58,9 @@ export default function TangramGame({ lang, onBack }) {
     setIsWon(false);
     const newPieces = currentLevel.pieces.map((p, idx) => ({
       ...p,
-      // Scatter pieces at the bottom
+      // Scatter pieces safely within the 0-600 height bounds
       x: 150 + (idx * 120) % 500,
-      y: 500 + Math.random() * 50,
+      y: 430 + Math.random() * 40,
       isLocked: false
     }));
     setPieces(newPieces);
@@ -221,8 +221,8 @@ export default function TangramGame({ lang, onBack }) {
 
         <svg
           ref={svgRef}
-          viewBox="-100 -100 1000 800"
-          style={{ width: '100%', height: '100%', maxWidth: '1000px', touchAction: 'none' }}
+          viewBox="0 0 800 600"
+          style={{ width: '100%', height: '100%', maxWidth: '1000px', touchAction: 'none', overflow: 'visible' }}
           onPointerMove={drag}
           onPointerUp={endDrag}
           onPointerLeave={endDrag}
