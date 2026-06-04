@@ -4,7 +4,7 @@ import { audioSynth } from '../utils/audioSynth';
 
 const THEMES = {
   sky: {
-    bg: 'linear-gradient(to bottom, #fff0f5 0%, #ffb6c1 100%)', // Soft pink background
+    bg: 'linear-gradient(to bottom, #e0f2fe 0%, #bae6fd 100%)', // Soft pastel sky blue for contrast
     bubbleColor: 'radial-gradient(circle at 30% 30%, #ffffff, #ff9ebb)', // Make balloons slightly lighter to stand out against pink bg
     bubbleBorder: '2px solid #ff69b4',
     bubbleShadow: 'inset -5px -5px 15px rgba(255,20,147,0.2), 0 5px 15px rgba(0,0,0,0.1)',
@@ -186,7 +186,7 @@ export default function BubbleBondsGame({ lang, onBack }) {
           fontSize: '1.5rem', fontWeight: 'bold', color: 'white',
           textShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}>
-          {lang === 'en' ? 'Make ' : '凑成 '} <span style={{ color: '#fde047', fontSize: '1.8rem' }}>{targetSum}</span>
+          {lang === 'en' ? 'Make ' : '凑成 '} <span style={{ color: '#ef4444', fontSize: '1.8rem', textShadow: '0 2px 4px rgba(239,68,68,0.3)' }}>{targetSum}</span>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
