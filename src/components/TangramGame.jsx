@@ -221,7 +221,7 @@ export default function TangramGame({ lang, onBack }) {
 
         <svg
           ref={svgRef}
-          viewBox="0 0 800 600"
+          viewBox="-100 -100 1000 800"
           style={{ width: '100%', height: '100%', maxWidth: '1000px', touchAction: 'none' }}
           onPointerMove={drag}
           onPointerUp={endDrag}
