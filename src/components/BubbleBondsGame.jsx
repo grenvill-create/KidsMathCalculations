@@ -4,13 +4,16 @@ import { audioSynth } from '../utils/audioSynth';
 
 const THEMES = {
   sky: {
-    bg: 'linear-gradient(to bottom, #e0f2fe 0%, #bae6fd 100%)', // Soft pastel sky blue for contrast
-    bubbleColor: 'radial-gradient(circle at 30% 30%, #ffffff, #ff9ebb)', // Make balloons slightly lighter to stand out against pink bg
-    bubbleBorder: '2px solid #ff69b4',
-    bubbleShadow: 'inset -5px -5px 15px rgba(255,20,147,0.2), 0 5px 15px rgba(0,0,0,0.1)',
-    textColor: '#d81b60',
+    bg: 'linear-gradient(to bottom, #fff0f5 0%, #ffb6c1 100%)', // Pink background
     icon: '🧸', // Cute teddy bear
-    name: '天空彩球'
+    name: '天空彩球',
+    balloonColors: [
+      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #ff9ebb)', border: '2px solid #ff69b4', shadow: 'inset -5px -5px 15px rgba(255,20,147,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#d81b60', knot: '#ffb6c1', string: 'rgba(255,255,255,0.8)' }, // Pink
+      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #86efac)', border: '2px solid #22c55e', shadow: 'inset -5px -5px 15px rgba(34,197,94,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#15803d', knot: '#bbf7d0', string: 'rgba(255,255,255,0.8)' }, // Green
+      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #7dd3fc)', border: '2px solid #38bdf8', shadow: 'inset -5px -5px 15px rgba(56,189,248,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#0369a1', knot: '#bae6fd', string: 'rgba(255,255,255,0.8)' }, // Blue
+      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #fde047)', border: '2px solid #eab308', shadow: 'inset -5px -5px 15px rgba(234,179,8,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#a16207', knot: '#fef08a', string: 'rgba(255,255,255,0.8)' }, // Yellow
+      { color: 'radial-gradient(circle at 30% 30%, #ffffff, #c4b5fd)', border: '2px solid #a78bfa', shadow: 'inset -5px -5px 15px rgba(167,139,250,0.2), 0 5px 15px rgba(0,0,0,0.1)', text: '#6d28d9', knot: '#ddd6fe', string: 'rgba(255,255,255,0.8)' }, // Purple
+    ]
   }
 };
 
@@ -66,9 +69,11 @@ export default function BubbleBondsGame({ lang, onBack }) {
 
   const createBubble = (number) => {
     bubbleIdCounter.current += 1;
+    const colorTheme = THEMES.sky.balloonColors[Math.floor(Math.random() * THEMES.sky.balloonColors.length)];
     return {
       id: bubbleIdCounter.current,
       number,
+      colorTheme,
       left: 10 + Math.random() * 70, // percentage 10% to 80%
       size: 60 + Math.random() * 30, // 60px to 90px
       speed: 8 + Math.random() * 7, // 8s to 15s animation duration
@@ -213,14 +218,14 @@ export default function BubbleBondsGame({ lang, onBack }) {
               left: `${bubble.left}%`,
               width: `${bubble.size}px`,
               height: `${bubble.size}px`,
-              borderRadius: themeId === 'sky' ? '40% 60% 70% 30% / 40% 50% 60% 50%' : '50%', // Balloons have slightly irregular shape
-              background: theme.bubbleColor,
-              border: theme.bubbleBorder,
-              boxShadow: theme.bubbleShadow,
+              borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%', // Balloons have slightly irregular shape
+              background: bubble.colorTheme.color,
+              border: bubble.colorTheme.border,
+              boxShadow: bubble.colorTheme.shadow,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: `${bubble.size * 0.4}px`,
               fontWeight: 'bold',
-              color: theme.textColor,
+              color: bubble.colorTheme.text,
               cursor: 'pointer',
               userSelect: 'none',
               animation: bubble.popping 
@@ -234,12 +239,12 @@ export default function BubbleBondsGame({ lang, onBack }) {
               <>
                 <div style={{
                   position: 'absolute', bottom: '-4px', width: '12px', height: '8px',
-                  background: '#ffb6c1', border: '1px solid #ff9ebb', borderRadius: '50%',
+                  background: bubble.colorTheme.knot, border: bubble.colorTheme.border, borderRadius: '50%',
                   zIndex: 2
                 }} />
                 <div style={{
                   position: 'absolute', bottom: '-25px', width: '2px', height: '25px',
-                  background: 'rgba(255,255,255,0.8)', zIndex: -1,
+                  background: bubble.colorTheme.string, zIndex: -1,
                   transform: 'rotate(-5deg)'
                 }} />
               </>
