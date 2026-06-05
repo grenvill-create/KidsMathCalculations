@@ -160,36 +160,41 @@ export default function CodingMazeGame({ lang, onBack }) {
       for (let c = 0; c < currentLevel.size; c++) {
         let content = null;
         let bg = (r + c) % 2 === 0 ? tTheme.bgFloor : tTheme.bgAlt;
-        let innerShadow = '';
+        let shadowColor = (r + c) % 2 === 0 ? tTheme.bgAlt : '#cbd5e1';
+        let borderColor = (r + c) % 2 === 0 ? tTheme.bgAlt : '#cbd5e1';
 
         if (r === currentLevel.target.r && c === currentLevel.target.c) {
-          content = <span style={{ animation: 'targetPulse 1.5s infinite' }}>{tTheme.target}</span>;
+          content = <span style={{ animation: 'targetPulse 1.5s infinite', display: 'inline-block' }}>{tTheme.target}</span>;
           bg = '#bbf7d0';
-          innerShadow = 'inset 0 4px 6px rgba(34, 197, 94, 0.2)';
+          shadowColor = '#86efac';
+          borderColor = '#4ade80';
         } else if (currentLevel.obstacles.some(o => o.r === r && o.c === c)) {
-          content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center' }}>{tTheme.obstacle}</span>;
+          content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center', transform: 'scale(1.2) translateY(-5px)' }}>{tTheme.obstacle}</span>;
           bg = tTheme.bgObstacle;
-          innerShadow = 'inset 0 4px 6px rgba(0, 0, 0, 0.1)';
+          shadowColor = '#fca5a5';
+          borderColor = '#f87171';
         }
 
         row.push(
           <div key={`${r}-${c}`} style={{
             width: '60px', height: '60px',
             backgroundColor: bg,
-            borderRadius: '12px',
+            borderRadius: '14px',
+            border: `2px solid ${borderColor}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '2.5rem',
-            boxShadow: innerShadow || 'inset 0 2px 4px rgba(0,0,0,0.05)',
-            position: 'relative'
+            boxShadow: `0 6px 0 ${shadowColor}, 0 8px 10px rgba(0,0,0,0.1)`,
+            position: 'relative',
+            transform: 'translateY(-6px)'
           }}>
             {content}
           </div>
         );
       }
-      grid.push(<div key={r} style={{ display: 'flex', gap: '6px' }}>{row}</div>);
+      grid.push(<div key={r} style={{ display: 'flex', gap: '8px' }}>{row}</div>);
     }
     return (
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '6px', padding: '12px', backgroundColor: '#94a3b8', borderRadius: '16px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '14px', padding: '20px', backgroundColor: 'rgba(255,255,255,0.6)', borderRadius: '24px', border: '4px solid #e2e8f0' }}>
         <style>
           {`
             @keyframes targetPulse {
@@ -221,8 +226,8 @@ export default function CodingMazeGame({ lang, onBack }) {
         {/* Animated Robot Overlay */}
         <div style={{
           position: 'absolute',
-          top: `calc(12px + ${pos.r * 66}px)`, // 60px size + 6px gap
-          left: `calc(12px + ${pos.c * 66}px)`,
+          top: `calc(20px + ${pos.r * 74}px)`, // 60px + 14px gap
+          left: `calc(20px + ${pos.c * 68}px)`, // 60px + 8px gap
           width: '60px', height: '60px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '3rem',

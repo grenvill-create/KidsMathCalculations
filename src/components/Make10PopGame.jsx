@@ -218,6 +218,7 @@ export default function Make10PopGame({ lang, onBack }) {
       <style>{`
         .make10-board {
           position: relative;
+          box-sizing: content-box;
           width: ${COLS * CELL_SIZE}px;
           height: ${ROWS * CELL_SIZE}px;
           background: rgba(255,255,255,0.6);

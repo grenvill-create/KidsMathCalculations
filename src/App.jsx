@@ -46,6 +46,8 @@ import BalanceScaleGame from './components/BalanceScaleGame';
 import ProbabilityGame from './components/ProbabilityGame';
 import Make10PopGame from './components/Make10PopGame';
 import MathLinkGame from './components/MathLinkGame';
+import SubPopGame from './components/SubPopGame';
+import WaterJugGame from './components/WaterJugGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -574,6 +576,7 @@ export default function App() {
             { label: t('gameDivision', gameState.lang),    emoji: '➗',  screen: 'division',   bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
             { label: t('gameNumberLine', gameState.lang),  emoji: '📐',  screen: 'numberLine', bg: 'linear-gradient(135deg, #7dd3fc, #0284c7)', shadow: 'rgba(2,132,199,0.35)' },
             { label: gameState.lang === 'en' ? 'Make-10 Pop' : '凑十消消乐', emoji: '💥', screen: 'make10Pop', bg: 'linear-gradient(135deg, #f87171, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
+            { label: gameState.lang === 'en' ? 'Sub Pop' : '减法消消乐', emoji: '➖', screen: 'subpop', bg: 'linear-gradient(135deg, #60a5fa, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
             { label: gameState.lang === 'en' ? 'Equation Link' : '算式连连看', emoji: '🔗', screen: 'mathLink', bg: 'linear-gradient(135deg, #a78bfa, #6366f1)', shadow: 'rgba(99,102,241,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
@@ -601,6 +604,7 @@ export default function App() {
             { label: t('gameMultiTable', gameState.lang),   emoji: '✖️', screen: 'multiTable',  bg: 'linear-gradient(135deg, #fcd34d, #d97706)', shadow: 'rgba(217,119,6,0.35)' },
             { label: t('gameFractions', gameState.lang),    emoji: '🍕', screen: 'fractions',   bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
             { label: t('gameTimeDiff', gameState.lang),     emoji: '⏱️', screen: 'timeDiff',    bg: 'linear-gradient(135deg, #7dd3fc, #0284c7)', shadow: 'rgba(2,132,199,0.35)' },
+            { label: gameState.lang === 'en' ? 'Water Jug' : '神奇倒水', emoji: '💧', screen: 'waterJug', bg: 'linear-gradient(135deg, #60a5fa, #2563eb)', shadow: 'rgba(37,99,235,0.35)' },
             { label: t('gameAreaPerim', gameState.lang),     emoji: '📐', screen: 'areaPerim',   bg: 'linear-gradient(135deg, #c4b5fd, #7c3aed)', shadow: 'rgba(124,58,237,0.35)' },
             { label: t('gameDataCharts', gameState.lang),    emoji: '📊', screen: 'dataCharts',  bg: 'linear-gradient(135deg, #5eead4, #0d9488)', shadow: 'rgba(13,148,136,0.35)' },
             { label: t('gameMoney', gameState.lang),         emoji: '💰', screen: 'money',       bg: 'linear-gradient(135deg, #86efac, #16a34a)', shadow: 'rgba(22,163,74,0.35)' },
@@ -1095,6 +1099,8 @@ export default function App() {
       {screen === 'probability'    && <ProbabilityGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'make10Pop'      && <Make10PopGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'mathLink'       && <MathLinkGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'subpop'         && <SubPopGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'waterJug'       && <WaterJugGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {/* --- EDUCATION PHILOSOPHY MODAL --- */}
       {showPhilosophy && (
         <div className="fade-in" style={{
