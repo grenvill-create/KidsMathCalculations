@@ -1,338 +1,367 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, RefreshCw, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, RefreshCw, Clock, Star, Play } from 'lucide-react';
 import { audioSynth } from '../utils/audioSynth';
 
 const ROWS = 6;
 const COLS = 5;
-const CELL_SIZE = 60;
-const BUBBLE_SIZE = 50;
+const CELL_SIZE = 65;
+const BUBBLE_SIZE = 55;
 
-const randNum = () => Math.floor(Math.random() * 9) + 1;
-const genId   = () => Math.random().toString(36).substr(2, 9);
+const BUBBLE_COLORS = [
+  '#f87171', // 1
+  '#fb923c', // 2
+  '#fbbf24', // 3
+  '#a3e635', // 4
+  '#34d399', // 5
+  '#22d3ee', // 6
+  '#60a5fa', // 7
+  '#a78bfa', // 8
+  '#f472b6'  // 9
+];
 
-// ── pure helpers (defined at module level to avoid hoisting issues) ─────────
-function hasMatch(bList) {
-  const map = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-  bList.forEach(b => { if (!b.isPopping) map[b.r][b.c] = b; });
+const randomValue = () => Math.floor(Math.random() * 9) + 1;
+const generateId = () => Math.random().toString(36).substr(2, 9);
+
+function hasPossibleMatch(grid) {
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      const b = map[r][c];
-      if (!b) continue;
-      if (c < COLS - 1 && map[r][c + 1] && b.num + map[r][c + 1].num === 10) return true;
-      if (r < ROWS - 1 && map[r + 1][c] && b.num + map[r + 1][c].num === 10) return true;
+      const val = grid[r][c]?.val;
+      if (!val) continue;
+      // check right
+      if (c < COLS - 1 && grid[r][c + 1] && val + grid[r][c + 1].val === 10) return true;
+      // check down
+      if (r < ROWS - 1 && grid[r + 1][c] && val + grid[r + 1][c].val === 10) return true;
     }
   }
   return false;
 }
 
-function buildBoard() {
+function generateBoard() {
+  let grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
   let bubbles = [];
-  for (let r = 0; r < ROWS; r++)
-    for (let c = 0; c < COLS; c++)
-      bubbles.push({ id: genId(), r, c, num: randNum(), isPopping: false });
 
-  if (!hasMatch(bubbles)) {
-    bubbles[0] = { ...bubbles[0], num: 3 };
-    bubbles[1] = { ...bubbles[1], num: 7 };
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const b = { id: generateId(), r, c, val: randomValue(), popping: false };
+      grid[r][c] = b;
+      bubbles.push(b);
+    }
   }
+
+  // Guarantee at least one match
+  if (!hasPossibleMatch(grid)) {
+    bubbles[0].val = 4;
+    bubbles[1].val = 6;
+  }
+
   return bubbles;
 }
 
-function getBubbleColor(num) {
-  const colors = ['#f87171','#fb923c','#fbbf24','#a3e635','#34d399','#22d3ee','#60a5fa','#a78bfa','#f472b6'];
-  return colors[num - 1] || '#60a5fa';
+function applyGravity(bubbles, poppedIds) {
+  // 1. Remove popped bubbles
+  const remaining = bubbles.filter(b => !poppedIds.includes(b.id));
+
+  // 2. Group by column
+  const cols = Array.from({ length: COLS }, () => []);
+  remaining.forEach(b => cols[b.c].push(b));
+
+  // 3. Sort by row (bottom first, i.e. highest r value)
+  cols.forEach(col => col.sort((a, b) => b.r - a.r));
+
+  // 4. Re-assign rows and spawn new
+  const newBubbles = [];
+  let grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
+
+  for (let c = 0; c < COLS; c++) {
+    let currentRow = ROWS - 1;
+
+    // Existing bubbles fall down
+    for (const b of cols[c]) {
+      const updatedBubble = { ...b, r: currentRow };
+      newBubbles.push(updatedBubble);
+      grid[currentRow][c] = updatedBubble;
+      currentRow--;
+    }
+
+    // Spawn new bubbles at top
+    while (currentRow >= 0) {
+      const newB = { id: generateId(), r: currentRow, c, val: randomValue(), popping: false };
+      newBubbles.push(newB);
+      grid[currentRow][c] = newB;
+      currentRow--;
+    }
+  }
+
+  // 5. Ensure match exists
+  let attempts = 0;
+  while (!hasPossibleMatch(grid) && attempts < 20) {
+    newBubbles.forEach(b => b.val = randomValue());
+    // Update grid with new values
+    newBubbles.forEach(b => { grid[b.r][b.c] = b; });
+    attempts++;
+  }
+
+  return newBubbles;
 }
 
-// ── component ──────────────────────────────────────────────────────────────
 export default function Make10PopGame({ lang, onBack }) {
-  // mode: 'playing' | 'roundWin' | 'gameover'
-  const [mode,        setMode]        = useState('playing');
-  const [bubbles,     setBubbles]     = useState(() => buildBoard());
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [score,       setScore]       = useState(0);
-  const [timeLeft,    setTimeLeft]    = useState(60);
-  const [isShaking,   setIsShaking]   = useState(false);
-  const [combo,       setCombo]       = useState(0);
-  const [round,       setRound]       = useState(1);
+  const [round, setRound] = useState(1);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameState, setGameState] = useState('playing'); // playing | won | lost
+
+  const [bubbles, setBubbles] = useState(() => generateBoard());
+  const [selIds, setSelIds] = useState([]);
+  const [shake, setShake] = useState(false);
 
   const targetScore = round * 100;
 
-  // Keep a ref of current score so the timer can read it without stale closures
-  const scoreRef    = useRef(score);
-  const targetRef   = useRef(targetScore);
-  scoreRef.current  = score;
-  targetRef.current = targetScore;
-
-  // ── timer ──────────────────────────────────────────────────────────────
+  // Timer
   useEffect(() => {
-    if (mode !== 'playing') return;
-
+    if (gameState !== 'playing') return;
     const interval = setInterval(() => {
-      setTimeLeft(prev => {
-        const next = prev - 1;
-        if (next <= 0) {
+      setTimeLeft(t => {
+        if (t <= 1) {
           clearInterval(interval);
-          setMode('gameover');
-          audioSynth.playWin();
+          setGameState('lost');
+          audioSynth.playIncorrect();
           return 0;
         }
-        return next;
+        return t - 1;
       });
     }, 1000);
-
     return () => clearInterval(interval);
-  }, [mode]); // only re-run when mode changes
+  }, [gameState]);
 
-  // ── detect round-win by score change ──────────────────────────────────
-  useEffect(() => {
-    if (mode !== 'playing') return;
-    if (score >= targetScore) {
-      setMode('roundWin');
-      audioSynth.playWin();
+  const handleBubbleClick = (clickedBubble) => {
+    if (gameState !== 'playing' || clickedBubble.popping) return;
+
+    if (selIds.length === 0) {
+      audioSynth.playClick();
+      setSelIds([clickedBubble.id]);
+      return;
     }
-  }, [score]); // intentionally only score, not targetScore (targetScore is derived and stable per round)
 
-  // ── gravity + refill (pure function of bubbles snapshot) ──────────────
-  const applyGravityAndRefill = useCallback((poppedIds) => {
-    setBubbles(prev => {
-      const remaining = prev.filter(b => !poppedIds.includes(b.id));
-      const columns   = Array.from({ length: COLS }, () => []);
-      remaining.forEach(b => columns[b.c].push(b));
-      columns.forEach(col => col.sort((a, b) => b.r - a.r));
+    const firstId = selIds[0];
+    if (firstId === clickedBubble.id) {
+      // Deselect
+      audioSynth.playClick();
+      setSelIds([]);
+      return;
+    }
 
-      const next = [];
-      for (let c = 0; c < COLS; c++) {
-        let row = ROWS - 1;
-        for (const b of columns[c]) { b.r = row--; next.push(b); }
-        while (row >= 0) next.push({ id: genId(), r: row--, c, num: randNum(), isPopping: false });
-      }
+    const b1 = bubbles.find(b => b.id === firstId);
+    const b2 = clickedBubble;
 
-      // Guarantee at least one match
-      if (!hasMatch(next)) {
-        next[0].num = 3;
-        next[1].num = 7;
-      }
-      return next;
-    });
-  }, []);
+    // Check adjacency
+    const isAdjacent = Math.abs(b1.r - b2.r) + Math.abs(b1.c - b2.c) === 1;
+    if (!isAdjacent) {
+      audioSynth.playClick();
+      setSelIds([clickedBubble.id]);
+      return;
+    }
 
-  // ── bubble click ──────────────────────────────────────────────────────
-  const handleBubbleClick = useCallback((clicked) => {
-    if (clicked.isPopping) return;
-    audioSynth.playClick();
+    // Check sum
+    if (b1.val + b2.val === 10) {
+      audioSynth.playCorrect();
+      setSelIds([]);
 
-    setSelectedIds(prev => {
-      if (prev.includes(clicked.id)) return prev.filter(id => id !== clicked.id);
+      // Mark as popping
+      setBubbles(prev => prev.map(b => (b.id === b1.id || b.id === b2.id) ? { ...b, popping: true } : b));
 
-      const next = [...prev, clicked.id];
-      if (next.length < 2) return next;
-
-      // We have 2 selected — evaluate immediately
-      setBubbles(snap => {
-        const b1 = snap.find(b => b.id === next[0]);
-        const b2 = snap.find(b => b.id === next[1]);
-        if (!b1 || !b2) return snap;
-
-        const dr = Math.abs(b1.r - b2.r);
-        const dc = Math.abs(b1.c - b2.c);
-        const adjacent = (dr === 1 && dc === 0) || (dr === 0 && dc === 1);
-
-        if (!adjacent) return snap; // handled below (reset selection)
-
-        if (b1.num + b2.num === 10) {
-          audioSynth.playCorrect();
-          setCombo(c => c + 1);
-          setScore(s => s + 10 + combo * 2);
-          const marked = snap.map(b => next.includes(b.id) ? { ...b, isPopping: true } : b);
-          setTimeout(() => applyGravityAndRefill(next), 300);
-          return marked;
-        } else {
-          audioSynth.playIncorrect();
-          setCombo(0);
-          setIsShaking(true);
-          setTimeout(() => { setIsShaking(false); setSelectedIds([]); }, 450);
-        }
-        return snap;
+      // Update score and check win
+      let won = false;
+      setScore(s => {
+        const newScore = s + 10;
+        if (newScore >= targetScore) won = true;
+        return newScore;
       });
 
-      return []; // clear selection after evaluation
-    });
-  }, [combo, applyGravityAndRefill]);
+      // Apply gravity after animation
+      setTimeout(() => {
+        if (won) {
+          setGameState('won');
+          audioSynth.playWin();
+        } else {
+          setBubbles(prev => applyGravity(prev, [b1.id, b2.id]));
+        }
+      }, 300);
 
-  // ── next round ────────────────────────────────────────────────────────
-  const nextRound = useCallback(() => {
+    } else {
+      // Wrong match
+      audioSynth.playIncorrect();
+      setSelIds([]);
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+    }
+  };
+
+  const startNextRound = () => {
     setRound(r => r + 1);
-    setTimeLeft(t => t + 45);
-    setBubbles(buildBoard());
-    setSelectedIds([]);
-    setCombo(0);
-    setMode('playing');
-  }, []);
+    setTimeLeft(t => t + 40); // Bonus time
+    setBubbles(generateBoard());
+    setSelIds([]);
+    setGameState('playing');
+  };
 
-  // ── full restart ──────────────────────────────────────────────────────
-  const restart = useCallback(() => {
+  const restartGame = () => {
     setRound(1);
     setScore(0);
     setTimeLeft(60);
-    setCombo(0);
-    setBubbles(buildBoard());
-    setSelectedIds([]);
-    setMode('playing');
-  }, []);
+    setBubbles(generateBoard());
+    setSelIds([]);
+    setGameState('playing');
+  };
 
-  // ── render ────────────────────────────────────────────────────────────
   return (
     <div className="screen-wrapper fade-in" style={{ padding: '20px', overflowY: 'auto' }}>
       <style>{`
-        .bubble-grid {
+        .make10-board {
           position: relative;
-          width: ${COLS * CELL_SIZE}px; height: ${ROWS * CELL_SIZE}px;
-          background: rgba(255,255,255,0.5);
-          border-radius: 16px; border: 4px solid #e2e8f0;
-          overflow: hidden; margin: 0 auto;
+          width: ${COLS * CELL_SIZE}px;
+          height: ${ROWS * CELL_SIZE}px;
+          background: rgba(255,255,255,0.6);
+          border-radius: 16px;
+          border: 4px solid #e2e8f0;
+          overflow: hidden;
+          margin: 20px auto;
         }
         .bubble {
           position: absolute;
-          width: ${BUBBLE_SIZE}px; height: ${BUBBLE_SIZE}px;
+          width: ${BUBBLE_SIZE}px;
+          height: ${BUBBLE_SIZE}px;
           border-radius: 50%;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 24px; font-weight: 800; color: white; cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-          box-shadow: inset -4px -4px 10px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: white;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          box-shadow: inset -4px -4px 10px rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.1);
           user-select: none;
         }
         .bubble::after {
-          content: ''; position: absolute;
-          top: 15%; left: 20%; width: 30%; height: 30%;
-          background: rgba(255,255,255,0.4); border-radius: 50%;
+          content: '';
+          position: absolute;
+          top: 15%;
+          left: 20%;
+          width: 30%;
+          height: 30%;
+          background: rgba(255,255,255,0.4);
+          border-radius: 50%;
         }
-        .bubble.selected { transform: scale(1.15); box-shadow: 0 0 0 4px white, 0 0 15px rgba(255,255,255,0.8); z-index: 10; }
-        .bubble.popping  { transform: scale(0); opacity: 0; }
-        @keyframes popShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
-        .shake-board { animation: popShake 0.4s ease-in-out; }
-        @keyframes popIn { 0%{transform:scale(0.6);opacity:0} 80%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-        .pop-in-card { animation: popIn 0.4s ease forwards; }
+        .bubble.selected {
+          transform: scale(1.15);
+          box-shadow: 0 0 0 4px white, 0 0 15px rgba(0,0,0,0.2);
+          z-index: 10;
+        }
+        .bubble.popping {
+          transform: scale(0);
+          opacity: 0;
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          75% { transform: translateX(6px); }
+        }
+        .shake-board {
+          animation: shake 0.4s ease-in-out;
+        }
       `}</style>
 
       <div className="card-shadow" style={{
         width: '100%', maxWidth: '500px', margin: '0 auto',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(10px)',
-        padding: '20px', gap: '16px',
+        background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)',
+        padding: '24px', borderRadius: '24px'
       }}>
-        {/* ── Header ── */}
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-          <button className="bouncy-button secondary" onClick={onBack} style={{ padding: '8px 12px', flexShrink: 0 }}>
-            <ArrowLeft size={20} />
+        
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+          <button className="bouncy-button secondary" onClick={onBack} style={{ padding: '8px 12px' }}>
+            <ArrowLeft size={20}/>
           </button>
-
-          {/* Progress to target */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, color: '#6b7280' }}>
+          
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: 700, color: '#64748b', marginBottom: '4px' }}>
               <span>{lang === 'en' ? `Round ${round}` : `第 ${round} 关`}</span>
               <span>{score} / {targetScore}</span>
             </div>
-            <div style={{ background: '#f1f5f9', borderRadius: '99px', height: '8px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                background: 'linear-gradient(90deg,#f87171,#ef4444)',
-                width: `${Math.min(100, (score / targetScore) * 100)}%`,
-                transition: 'width 0.3s'
-              }} />
+            <div style={{ background: '#f1f5f9', borderRadius: '99px', height: '10px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', background: 'linear-gradient(90deg, #f87171, #ef4444)', width: `${Math.min(100, (score/targetScore)*100)}%`, transition: 'width 0.3s ease' }} />
             </div>
           </div>
 
-          {/* Timer */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0,
-            background: timeLeft <= 10 ? '#fecaca' : '#e0e7ff', padding: '6px 12px',
-            borderRadius: '20px', fontWeight: 'bold',
-            color: timeLeft <= 10 ? '#991b1b' : '#3730a3', fontSize: '0.9rem',
-          }}>
-            <Clock size={16} />
-            {String(Math.floor(timeLeft / 60)).padStart(2,'0')}:{String(timeLeft % 60).padStart(2,'0')}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: timeLeft <= 10 ? '#fef2f2' : '#eff6ff', padding: '8px 14px', borderRadius: '20px', fontWeight: 800, color: timeLeft <= 10 ? '#ef4444' : '#3b82f6' }}>
+            <Clock size={16}/>
+            {String(Math.floor(timeLeft / 60)).padStart(2, '0')}:{String(timeLeft % 60).padStart(2, '0')}
           </div>
         </div>
 
-        {/* ── Mode: playing ── */}
-        {mode === 'playing' && (
+        {/* Game Area */}
+        {gameState === 'playing' && (
           <>
-            <p style={{ color: '#4b5563', margin: 0, fontWeight: 700, fontSize: '0.9rem', textAlign: 'center' }}>
-              {lang === 'en' ? '💧 Connect adjacent bubbles that sum to 10!' : '💧 点击相邻的两个气泡，让它们相加等于10！'}
+            <p style={{ textAlign: 'center', color: '#64748b', fontWeight: 700, margin: 0, fontSize: '0.95rem' }}>
+              {lang === 'en' ? 'Click adjacent bubbles that sum to 10!' : '点击相邻的两个气泡，让它们相加等于10！'}
             </p>
-            <div className={`bubble-grid ${isShaking ? 'shake-board' : ''}`}>
+            
+            <div className={`make10-board ${shake ? 'shake-board' : ''}`}>
               {bubbles.map(b => (
-                <div
-                  key={b.id}
-                  className={`bubble ${selectedIds.includes(b.id) ? 'selected' : ''} ${b.isPopping ? 'popping' : ''}`}
-                  style={{
-                    backgroundColor: getBubbleColor(b.num),
-                    left: b.c * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
-                    top:  b.r * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
-                  }}
-                  onClick={() => mode === 'playing' && !b.isPopping && handleBubbleClick(b)}
-                >
-                  {b.num}
+                <div key={b.id}
+                     className={`bubble ${selIds.includes(b.id) ? 'selected' : ''} ${b.popping ? 'popping' : ''}`}
+                     style={{
+                       background: BUBBLE_COLORS[b.val - 1],
+                       left: b.c * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
+                       top: b.r * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
+                     }}
+                     onClick={() => handleBubbleClick(b)}>
+                  {b.val}
                 </div>
               ))}
             </div>
-            {combo >= 2 && (
-              <div className="bounce-in" style={{
-                background: 'linear-gradient(135deg,#fde68a,#f59e0b)',
-                borderRadius: '20px', padding: '6px 20px',
-                fontWeight: 800, color: '#78350f', fontSize: '0.95rem'
-              }}>
-                🔥 {combo} Combo!
-              </div>
-            )}
           </>
         )}
 
-        {/* ── Mode: roundWin ── */}
-        {mode === 'roundWin' && (
-          <div className="pop-in-card" style={{
-            textAlign: 'center', padding: '30px 20px', width: '100%',
-            background: 'linear-gradient(135deg,#f0fdf4,#dcfce7)',
-            borderRadius: '20px', border: '3px solid #4ade80',
-          }}>
-            <div style={{ fontSize: '3rem' }}>🎉</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#15803d', margin: '8px 0 4px' }}>
+        {/* Win Screen */}
+        {gameState === 'won' && (
+          <div className="bounce-in" style={{ textAlign: 'center', padding: '40px 20px', background: '#f0fdf4', borderRadius: '20px', border: '3px solid #86efac', margin: '20px 0' }}>
+            <div style={{ fontSize: '4rem', marginBottom: '10px' }}>🌟</div>
+            <h2 style={{ color: '#166534', margin: '0 0 10px 0' }}>
               {lang === 'en' ? `Round ${round} Cleared!` : `第 ${round} 关通过！`}
-            </div>
-            <div style={{ fontSize: '1rem', color: '#166534', marginBottom: '20px' }}>
-              {lang === 'en' ? `Score: ${score} pts 🌟` : `得分：${score} 分 🌟`}<br />
-              <span style={{ color: '#b45309', fontWeight: 700 }}>
-                {lang === 'en' ? '+45 seconds bonus!' : '+45秒奖励时间！'}
-              </span>
-            </div>
-            <button className="bouncy-button primary" onClick={nextRound}
-              style={{ padding: '12px 32px', fontSize: '1.1rem', background: 'linear-gradient(135deg,#4ade80,#22c55e)', borderColor: '#16a34a' }}>
-              {lang === 'en' ? '▶ Next Round' : '▶ 下一关'}
+            </h2>
+            <p style={{ color: '#15803d', fontWeight: 700 }}>
+              {lang === 'en' ? '+40 seconds bonus!' : '+40秒奖励时间！'}
+            </p>
+            <button className="bouncy-button primary" onClick={startNextRound} style={{ marginTop: '20px', padding: '14px 30px', fontSize: '1.1rem' }}>
+              <Play size={20} style={{ marginRight: '8px' }}/>
+              {lang === 'en' ? 'Next Round' : '下一关'}
             </button>
           </div>
         )}
 
-        {/* ── Mode: gameover ── */}
-        {mode === 'gameover' && (
-          <div className="pop-in-card" style={{
-            textAlign: 'center', padding: '30px 20px', width: '100%',
-            background: 'linear-gradient(135deg,#fff1f2,#ffe4e6)',
-            borderRadius: '20px', border: '3px solid #fca5a5',
-          }}>
-            <div style={{ fontSize: '3rem' }}>⏰</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#be123c', margin: '8px 0 4px' }}>
-              {lang === 'en' ? "Time's Up!" : '时间到！'}
-            </div>
-            <div style={{ fontSize: '1.1rem', color: '#9f1239', marginBottom: '20px' }}>
-              {lang === 'en' ? `Final Score: ${score}` : `最终得分：${score} 分`}
-            </div>
-            <button className="bouncy-button primary" onClick={restart}
-              style={{ padding: '12px 32px', fontSize: '1.1rem' }}>
-              <RefreshCw size={18} style={{ marginRight: '6px' }} />
-              {lang === 'en' ? 'Play Again' : '再玩一次'}
+        {/* Lose Screen */}
+        {gameState === 'lost' && (
+          <div className="bounce-in" style={{ textAlign: 'center', padding: '40px 20px', background: '#fef2f2', borderRadius: '20px', border: '3px solid #fca5a5', margin: '20px 0' }}>
+            <div style={{ fontSize: '4rem', marginBottom: '10px' }}>⏰</div>
+            <h2 style={{ color: '#991b1b', margin: '0 0 10px 0' }}>
+              {lang === 'en' ? "Time's Up!" : '时间到了！'}
+            </h2>
+            <button className="bouncy-button primary" onClick={restartGame} style={{ marginTop: '20px', padding: '14px 30px', fontSize: '1.1rem', background: '#ef4444' }}>
+              <RefreshCw size={20} style={{ marginRight: '8px' }}/>
+              {lang === 'en' ? 'Try Again' : '再试一次'}
             </button>
           </div>
         )}
+
+        {/* Restart Button */}
+        {gameState === 'playing' && (
+          <button className="bouncy-button secondary" onClick={restartGame} style={{ width: '100%', padding: '12px' }}>
+            <RefreshCw size={18} style={{ marginRight: '8px' }}/>
+            {lang === 'en' ? 'Restart Game' : '重新开始'}
+          </button>
+        )}
+
       </div>
     </div>
   );
