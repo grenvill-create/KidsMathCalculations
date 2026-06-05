@@ -330,6 +330,13 @@ export default function TangramGame({ lang, onBack }) {
         .pulse-hint {
           animation: pulse-hint 1.5s infinite ease-in-out;
         }
+        @keyframes pop-in {
+          0% { transform: scale(0.85); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-in {
+          animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
       `}</style>
 
       {/* Header */}
@@ -440,34 +447,49 @@ export default function TangramGame({ lang, onBack }) {
         
         {/* Win Overlay */}
         {isWon && (
-          <div className="bounce-in" style={{
-            position: 'absolute', top: '15%', zIndex: 50,
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            background: 'rgba(255,255,255,0.92)', padding: '24px 44px', borderRadius: '30px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.15)', border: '4px solid #fde047',
-            backdropFilter: 'blur(5px)'
+          <div className="pop-in" style={{
+            position: 'absolute',
+            bottom: '25px',
+            left: 0,
+            right: 0,
+            margin: '0 auto',
+            width: 'fit-content',
+            zIndex: 50,
+            display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '20px',
+            background: 'rgba(255,255,255,0.96)', padding: '12px 28px', borderRadius: '24px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.15)', border: '3.5px solid #10b981',
+            backdropFilter: 'blur(10px)'
           }}>
-            <div style={{ fontSize: '3rem', display: 'flex', gap: '10px' }}>
-              <Star color="#fde047" fill="#fde047" />
-              <Star color="#fde047" fill="#fde047" />
-              <Star color="#fde047" fill="#fde047" />
+            <div style={{ display: 'flex', gap: '4px', fontSize: '1.4rem' }}>
+              <Star size={18} color="#fde047" fill="#fde047" />
+              <Star size={18} color="#fde047" fill="#fde047" />
+              <Star size={18} color="#fde047" fill="#fde047" />
             </div>
             
-            <div className="happy-bounce" style={{ fontSize: '5.5rem', margin: '8px 0' }}>
+            <div className="happy-bounce" style={{ fontSize: '2.8rem' }}>
               {currentLevel.emoji}
             </div>
 
-            <h2 style={{ color: '#22c55e', margin: '5px 0', fontSize: '1.8rem' }}>
-              {lang === 'en' ? `Completed: ${currentLevel.nameEn}!` : `拼好啦：${currentLevel.nameZh}!`}
-            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 'bold', letterSpacing: '0.5px' }}>
+                {lang === 'en' ? 'WELL DONE!' : '拼得太棒啦！'}
+              </div>
+              <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#10b981' }}>
+                {lang === 'en' ? currentLevel.nameEn : currentLevel.nameZh}
+              </div>
+            </div>
 
             <button onClick={nextLevel} style={{
               background: 'linear-gradient(135deg, #a78bfa, #8b5cf6)', color: 'white',
-              border: 'none', padding: '12px 36px', fontSize: '1.25rem', borderRadius: '24px',
-              cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(139,92,246,0.4)',
-              marginTop: '15px'
+              border: 'none', padding: '10px 24px', fontSize: '1.1rem', borderRadius: '16px',
+              cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 10px rgba(139,92,246,0.3)',
+              marginLeft: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}>
-              {lang === 'en' ? 'Next Puzzle' : '下一关 ➔'}
+              <span>{lang === 'en' ? 'Next' : '下一关'}</span>
+              <span>➔</span>
             </button>
           </div>
         )}
