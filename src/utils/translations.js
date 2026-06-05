@@ -65,6 +65,11 @@ export const translations = {
     gameTemp: "温度计",
     gameBubbleBonds: "凑数泡泡龙",
     gameTangram: "趣味七巧板",
+    gameSymmetry: "对称图形",
+    gameCodingMaze: "编程迷宫",
+    game3DBlock: "数立体积木",
+    gameBalance: "天平游戏",
+    gameProbability: "转盘概率",
     
     // Guardian Gate
     guardianTitle: "家长通道",
@@ -189,6 +194,11 @@ export const translations = {
     gameTemp: "Temperature",
     gameBubbleBonds: "Number Bonds",
     gameTangram: "Tangram Puzzles",
+    gameSymmetry: "Symmetry",
+    gameCodingMaze: "Coding Maze",
+    game3DBlock: "3D Blocks",
+    gameBalance: "Balance Scale",
+    gameProbability: "Probability",
     
     // Guardian Gate
     guardianTitle: "Parent Gate",

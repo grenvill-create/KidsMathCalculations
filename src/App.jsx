@@ -39,6 +39,13 @@ import MoneyGame from './components/MoneyGame';
 import TemperatureGame from './components/TemperatureGame';
 import BubbleBondsGame from './components/BubbleBondsGame';
 import TangramGame from './components/TangramGame';
+import SymmetryGame from './components/SymmetryGame';
+import CodingMazeGame from './components/CodingMazeGame';
+import Block3DGame from './components/Block3DGame';
+import BalanceScaleGame from './components/BalanceScaleGame';
+import ProbabilityGame from './components/ProbabilityGame';
+import Make10PopGame from './components/Make10PopGame';
+import MathLinkGame from './components/MathLinkGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -566,6 +573,8 @@ export default function App() {
             { label: t('gameColumnMath', gameState.lang),  emoji: '📝',  screen: 'columnMath', bg: 'linear-gradient(135deg, #93c5fd, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
             { label: t('gameDivision', gameState.lang),    emoji: '➗',  screen: 'division',   bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
             { label: t('gameNumberLine', gameState.lang),  emoji: '📐',  screen: 'numberLine', bg: 'linear-gradient(135deg, #7dd3fc, #0284c7)', shadow: 'rgba(2,132,199,0.35)' },
+            { label: gameState.lang === 'en' ? 'Make-10 Pop' : '凑十消消乐', emoji: '💥', screen: 'make10Pop', bg: 'linear-gradient(135deg, #f87171, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
+            { label: gameState.lang === 'en' ? 'Equation Link' : '算式连连看', emoji: '🔗', screen: 'mathLink', bg: 'linear-gradient(135deg, #a78bfa, #6366f1)', shadow: 'rgba(99,102,241,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 图形与空间 ── */}
@@ -575,6 +584,9 @@ export default function App() {
             { label: t('gamePattern', gameState.lang),   emoji: '🔁', screen: 'pattern',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
             { label: t('gameShapeCount', gameState.lang),   emoji: '🔍', screen: 'shapeCount', bg: 'linear-gradient(135deg, #f9a8d4, #ec4899)', shadow: 'rgba(236,72,153,0.35)' },
             { label: t('gameSpatial', gameState.lang), emoji: '🧭', screen: 'spatial',    bg: 'linear-gradient(135deg, #86efac, #22c55e)', shadow: 'rgba(34,197,94,0.35)' },
+            { label: t('gameSymmetry', gameState.lang), emoji: '🦋', screen: 'symmetry',    bg: 'linear-gradient(135deg, #fcd34d, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
+            { label: t('gameCodingMaze', gameState.lang), emoji: '🤖', screen: 'codingMaze',    bg: 'linear-gradient(135deg, #86efac, #10b981)', shadow: 'rgba(16,185,129,0.35)' },
+            { label: t('game3DBlock', gameState.lang), emoji: '🧊', screen: 'block3D',    bg: 'linear-gradient(135deg, #93c5fd, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 综合认知 ── */}
@@ -593,6 +605,8 @@ export default function App() {
             { label: t('gameDataCharts', gameState.lang),    emoji: '📊', screen: 'dataCharts',  bg: 'linear-gradient(135deg, #5eead4, #0d9488)', shadow: 'rgba(13,148,136,0.35)' },
             { label: t('gameMoney', gameState.lang),         emoji: '💰', screen: 'money',       bg: 'linear-gradient(135deg, #86efac, #16a34a)', shadow: 'rgba(22,163,74,0.35)' },
             { label: t('gameTemp', gameState.lang),          emoji: '🌡️', screen: 'temperature', bg: 'linear-gradient(135deg, #fde68a, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
+            { label: t('gameBalance', gameState.lang),     emoji: '⚖️', screen: 'balance',   bg: 'linear-gradient(135deg, #fca5a5, #ef4444)', shadow: 'rgba(239,68,68,0.35)' },
+            { label: t('gameProbability', gameState.lang),    emoji: '🎡', screen: 'probability',  bg: 'linear-gradient(135deg, #c4b5fd, #8b5cf6)', shadow: 'rgba(139,92,246,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
         </div>
@@ -1074,7 +1088,13 @@ export default function App() {
       {screen === 'dataCharts'     && <DataChartsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'money'          && <MoneyGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'temperature'    && <TemperatureGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-
+      {screen === 'symmetry'       && <SymmetryGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'codingMaze'     && <CodingMazeGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'block3D'        && <Block3DGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'balance'        && <BalanceScaleGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'probability'    && <ProbabilityGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'make10Pop'      && <Make10PopGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'mathLink'       && <MathLinkGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {/* --- EDUCATION PHILOSOPHY MODAL --- */}
       {showPhilosophy && (
         <div className="fade-in" style={{
