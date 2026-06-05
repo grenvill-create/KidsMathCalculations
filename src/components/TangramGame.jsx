@@ -122,27 +122,53 @@ export default function TangramGame({ lang, onBack }) {
   const [isWon, setIsWon] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [showLevelSelect, setShowLevelSelect] = useState(false);
+  const [isHardMode, setIsHardMode] = useState(false);
   
   const svgRef = useRef(null);
-  const dragInfo = useRef({ id: null, offsetX: 0, offsetY: 0 });
+  const dragInfo = useRef({ id: null, offsetX: 0, offsetY: 0, hasMoved: false });
+  const clickStart = useRef({ x: 0, y: 0, time: 0 });
 
   const currentLevel = LEVELS[levelIdx];
 
+  const isRotationMatch = (rot1, rot2, shape) => {
+    const r1 = (rot1 % 360 + 360) % 360;
+    const r2 = (rot2 % 360 + 360) % 360;
+    const diff = Math.abs(r1 - r2) % 360;
+    
+    if (shape === 'square') {
+      return diff % 90 === 0;
+    }
+    if (shape === 'parallelogram') {
+      return diff % 180 === 0;
+    }
+    return diff === 0;
+  };
+
   const initLevel = () => {
     setIsWon(false);
-    const newPieces = currentLevel.pieces.map((p, idx) => ({
-      ...p,
-      // Scatter pieces safely within the bottom play area bounds
-      x: 150 + (idx * 110) % 520,
-      y: 450 + Math.random() * 30,
-      isLocked: false
-    }));
+    const rotations = [0, 45, 90, 135, 180, 225, 270, 315];
+    const newPieces = currentLevel.pieces.map((p, idx) => {
+      let initialRotation = p.rotation;
+      if (isHardMode) {
+        // Find a random rotation
+        initialRotation = rotations[Math.floor(Math.random() * rotations.length)];
+      }
+      
+      return {
+        ...p,
+        rotation: initialRotation,
+        // Scatter pieces safely within the bottom play area bounds
+        x: 150 + (idx * 110) % 520,
+        y: 450 + Math.random() * 30,
+        isLocked: false
+      };
+    });
     setPieces(newPieces);
   };
 
   useEffect(() => {
     initLevel();
-  }, [levelIdx]);
+  }, [levelIdx, isHardMode]);
 
   useEffect(() => {
     // Check win condition
@@ -176,11 +202,20 @@ export default function TangramGame({ lang, onBack }) {
   const startDrag = (evt, piece) => {
     if (piece.isLocked) return;
     const pos = getMousePosition(evt);
+    
+    clickStart.current = {
+      x: evt.clientX || (evt.touches && evt.touches[0].clientX) || 0,
+      y: evt.clientY || (evt.touches && evt.touches[0].clientY) || 0,
+      time: Date.now()
+    };
+
     dragInfo.current = {
       id: piece.id,
       offsetX: pos.x - piece.x,
-      offsetY: pos.y - piece.y
+      offsetY: pos.y - piece.y,
+      hasMoved: false
     };
+
     // Bring to front by moving it to end of array
     setPieces(prev => {
       const filtered = prev.filter(p => p.id !== piece.id);
@@ -194,6 +229,14 @@ export default function TangramGame({ lang, onBack }) {
     evt.preventDefault();
     const pos = getMousePosition(evt);
     const id = dragInfo.current.id;
+
+    // Check if pointer moved significantly to count as drag
+    const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX) || 0;
+    const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY) || 0;
+    const moveDist = Math.hypot(clientX - clickStart.current.x, clientY - clickStart.current.y);
+    if (moveDist > 6) {
+      dragInfo.current.hasMoved = true;
+    }
 
     setPieces(prev => prev.map(p => {
       if (p.id === id) {
@@ -212,20 +255,44 @@ export default function TangramGame({ lang, onBack }) {
     const id = dragInfo.current.id;
     const piece = pieces.find(p => p.id === id);
     if (!piece) return;
-    
-    // Check snap distance
-    const dist = Math.hypot(piece.x - piece.targetX, piece.y - piece.targetY);
-    if (dist < 40) { // Snap threshold
+
+    const duration = Date.now() - clickStart.current.time;
+
+    if (!dragInfo.current.hasMoved && duration < 300) {
+      // It is a click/tap! Rotate clockwise by 45 degrees
+      audioSynth.playClick();
       setPieces(prev => prev.map(p => {
         if (p.id === id) {
-          audioSynth.playClick(); // Snap sound
-          return { ...p, x: p.targetX, y: p.targetY, isLocked: true };
+          const nextRotation = (p.rotation + 45) % 360;
+          const target = currentLevel.pieces.find(tp => tp.id === p.id);
+          const dist = Math.hypot(p.x - p.targetX, p.y - p.targetY);
+          const fitsRotation = !isHardMode || isRotationMatch(nextRotation, target.rotation, p.shape);
+          
+          if (dist < 40 && fitsRotation) {
+            return { ...p, x: p.targetX, y: p.targetY, rotation: target.rotation, isLocked: true };
+          }
+          return { ...p, rotation: nextRotation };
         }
         return p;
       }));
+    } else {
+      // Standard drop snap check
+      const target = currentLevel.pieces.find(tp => tp.id === id);
+      const dist = Math.hypot(piece.x - piece.targetX, piece.y - piece.targetY);
+      const fitsRotation = !isHardMode || isRotationMatch(piece.rotation, target.rotation, piece.shape);
+      
+      if (dist < 40 && fitsRotation) {
+        setPieces(prev => prev.map(p => {
+          if (p.id === id) {
+            audioSynth.playClick();
+            return { ...p, x: p.targetX, y: p.targetY, rotation: target.rotation, isLocked: true };
+          }
+          return p;
+        }));
+      }
     }
 
-    dragInfo.current = { id: null, offsetX: 0, offsetY: 0 };
+    dragInfo.current = { id: null, offsetX: 0, offsetY: 0, hasMoved: false };
     try {
       evt.target.releasePointerCapture(evt.pointerId);
     } catch (e) {}
@@ -313,7 +380,33 @@ export default function TangramGame({ lang, onBack }) {
         </div>
 
         {/* Action Controls */}
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {/* Difficulty Toggle */}
+          <button
+            onClick={() => {
+              audioSynth.playClick();
+              setIsHardMode(!isHardMode);
+            }}
+            style={{
+              background: isHardMode ? 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' : '#e2e8f0',
+              border: 'none',
+              borderRadius: '15px',
+              padding: '6px 14px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              color: isHardMode ? 'white' : '#64748b',
+              cursor: 'pointer',
+              boxShadow: isHardMode ? '0 2px 6px rgba(225,29,72,0.3)' : 'none',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <span>{isHardMode ? '🔥' : '🌱'}</span>
+            <span>{isHardMode ? (lang === 'en' ? 'Hard' : '挑战模式') : (lang === 'en' ? 'Easy' : '普通模式')}</span>
+          </button>
+
           <button 
             onClick={() => {
               audioSynth.playClick();
@@ -402,40 +495,37 @@ export default function TangramGame({ lang, onBack }) {
 
           {/* Target Outlines / Hint Areas */}
           {currentLevel.pieces.map(target => (
-            <g key={`target-${target.id}`} transform={`translate(${target.targetX}, ${target.targetY}) rotate(${target.rotation})`}>
-              <polygon
-                points={SHAPES[target.shape]}
-                fill={showHint ? target.color : 'none'}
-                fillOpacity={showHint ? 0.25 : 0}
-                stroke={showHint ? target.color : '#cbd5e1'}
-                strokeWidth={showHint ? "4" : "3"}
-                strokeDasharray={showHint ? "none" : "6 6"}
-                className={showHint ? "pulse-hint" : ""}
-                style={{ transition: 'all 0.3s' }}
-              />
-            </g>
+            <polygon
+              key={`target-${target.id}`}
+              points={SHAPES[target.shape]}
+              transform={`translate(${target.targetX}, ${target.targetY}) rotate(${target.rotation})`}
+              fill={showHint ? target.color : 'none'}
+              fillOpacity={showHint ? 0.25 : 0}
+              stroke={showHint ? target.color : '#cbd5e1'}
+              strokeWidth={showHint ? "4" : "3"}
+              strokeDasharray={showHint ? "none" : "6 6"}
+              className={showHint ? "pulse-hint" : ""}
+              style={{ transition: 'all 0.3s' }}
+            />
           ))}
 
           {/* Movable Pieces */}
           {pieces.map(piece => (
-            <g 
+            <polygon
               key={piece.id}
+              points={SHAPES[piece.shape]}
               transform={`translate(${piece.x}, ${piece.y}) rotate(${piece.rotation})`}
               onPointerDown={(e) => startDrag(e, piece)}
+              fill={piece.color}
+              stroke="white"
+              strokeWidth="3.5"
+              filter={piece.isLocked ? '' : 'url(#shadow)'}
               style={{ 
                 cursor: piece.isLocked ? 'default' : 'grab', 
-                transition: dragInfo.current.id === piece.id ? 'none' : 'transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1)' 
+                transition: dragInfo.current.id === piece.id ? 'none' : 'transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                opacity: piece.isLocked ? 0.95 : 1
               }}
-            >
-              <polygon
-                points={SHAPES[piece.shape]}
-                fill={piece.color}
-                stroke="white"
-                strokeWidth="3.5"
-                filter={piece.isLocked ? '' : 'url(#shadow)'}
-                style={{ opacity: piece.isLocked ? 0.95 : 1 }}
-              />
-            </g>
+            />
           ))}
         </svg>
       </div>
@@ -534,7 +624,10 @@ export default function TangramGame({ lang, onBack }) {
         <div style={{
           position: 'absolute', top: '10px', left: '20px', fontSize: '0.85rem', color: '#94a3b8', fontWeight: 'bold'
         }}>
-          {lang === 'en' ? 'Drag pieces from here:' : '从这里拖拽碎片：'}
+          {isHardMode 
+            ? (lang === 'en' ? 'Drag pieces to place, tap a piece to rotate it!' : '从这里拖拽碎片，点击可以旋转角度哦！')
+            : (lang === 'en' ? 'Drag pieces from here:' : '从这里拖拽碎片：')
+          }
         </div>
       </div>
     </div>
