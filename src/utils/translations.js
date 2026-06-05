@@ -65,7 +65,6 @@ export const translations = {
     gameTemp: "温度计",
     gameBubbleBonds: "凑数泡泡龙",
     gameTangram: "趣味七巧板",
-    gameShapeTrain: "分类小火车",
     
     // Guardian Gate
     guardianTitle: "家长通道",
@@ -190,7 +189,6 @@ export const translations = {
     gameTemp: "Temperature",
     gameBubbleBonds: "Number Bonds",
     gameTangram: "Tangram Puzzles",
-    gameShapeTrain: "Shape Train",
     
     // Guardian Gate
     guardianTitle: "Parent Gate",

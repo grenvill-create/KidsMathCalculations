@@ -39,7 +39,6 @@ import MoneyGame from './components/MoneyGame';
 import TemperatureGame from './components/TemperatureGame';
 import BubbleBondsGame from './components/BubbleBondsGame';
 import TangramGame from './components/TangramGame';
-import ShapeTrainGame from './components/ShapeTrainGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -571,7 +570,6 @@ export default function App() {
 
           {/* ── Section: 图形与空间 ── */}
           <GameSection title={t('catShape', gameState.lang)} color="#a57bc4" buttons={[
-            { label: t('gameShapeTrain', gameState.lang), emoji: '🚂', screen: 'shapeTrain', bg: 'linear-gradient(135deg, #fcd34d, #f59e0b)', shadow: 'rgba(245,158,11,0.35)' },
             { label: t('gameTangram', gameState.lang), emoji: '🧩', screen: 'tangram',    bg: 'linear-gradient(135deg, #c4b5fd, #8b5cf6)', shadow: 'rgba(139,92,246,0.35)' },
             { label: t('gameShape', gameState.lang),   emoji: '🔷', screen: 'shape',      bg: 'linear-gradient(135deg, #87ceeb, #5bb8d4)', shadow: 'rgba(91,184,212,0.35)' },
             { label: t('gamePattern', gameState.lang),   emoji: '🔁', screen: 'pattern',    bg: 'linear-gradient(135deg, #c9a0dc, #a57bc4)', shadow: 'rgba(165,123,196,0.35)' },
@@ -1044,7 +1042,6 @@ export default function App() {
       )}
       {screen === 'bubbleBonds'  && <BubbleBondsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'tangram'      && <TangramGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'shapeTrain'   && <ShapeTrainGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
       {screen === 'shape'      && <ShapeGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'compare'    && <CompareGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'clock'      && <ClockGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
