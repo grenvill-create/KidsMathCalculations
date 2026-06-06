@@ -136,5 +136,32 @@ export const audioSynth = {
         osc.stop(time + 0.35);
       });
     } catch (e) {}
+  },
+
+  // Cheerful victory sound
+  playWin() {
+    if (isMuted) return;
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const time = now + idx * 0.1;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, time);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.setValueAtTime(0.1, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(time);
+        osc.stop(time + 0.45);
+      });
+    } catch (e) {}
   }
 };
