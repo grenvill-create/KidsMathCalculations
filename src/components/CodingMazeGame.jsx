@@ -71,43 +71,34 @@ export default function CodingMazeGame({ lang, onBack }) {
   
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
+  const containerRef = useRef(null);
   const [mazeSize, setMazeSize] = useState(200);
 
   const currentLevel = LEVELS[levelIdx];
 
-  // Calculate maze size from actual viewport dimensions
+  // Pure CSS layout handles the actual dimensions.
+  // We use ResizeObserver ONLY to read the final size and compute font sizes.
   useEffect(() => {
-    const calcLayout = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const mobile = vw < 600;
-      setIsMobile(mobile);
+    const handleResize = () => setIsMobile(window.innerWidth < 600);
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
-      // Fixed UI heights (header + status + commands + controls + run button + paddings)
-      // On mobile: header~36 + status~22 + commands~48 + controls~52 + button~40 + gaps/margins~50 + card padding~20 + viewport padding~24 = ~292
-      // On desktop: header~48 + status~28 + commands~70 + controls~72 + button~52 + gaps/margins~80 + card padding~48 + viewport padding~44 = ~442
-      const fixedUIHeight = mobile ? 280 : 420;
-      const availableHeight = vh - fixedUIHeight;
-      
-      // Width constraint: card max-width 600, minus card padding, minus outer padding
-      const cardPadX = mobile ? 20 : 48;
-      const outerPadX = mobile ? 8 : 40;
-      const viewportPadX = 32; // #app-viewport padding
-      const availableWidth = Math.min(vw - outerPadX - viewportPadX, 600 - cardPadX);
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0) {
+          setMazeSize(Math.min(width, height));
+        }
+      }
+    });
 
-      // Maze must be square, take the smaller dimension, clamp to reasonable min/max
-      const raw = Math.min(availableWidth, availableHeight);
-      const clamped = Math.max(120, Math.min(raw, 500));
-      setMazeSize(clamped);
-    };
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
-    calcLayout();
-    window.addEventListener('resize', calcLayout);
-    // Also recalc on orientation change for mobile
-    window.addEventListener('orientationchange', () => setTimeout(calcLayout, 150));
     return () => {
-      window.removeEventListener('resize', calcLayout);
-      window.removeEventListener('orientationchange', calcLayout);
+      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
       if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
     };
   }, []);
@@ -289,7 +280,8 @@ export default function CodingMazeGame({ lang, onBack }) {
     }
     return (
       <div className="maze-grid-container" style={{
-        position: 'relative',
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
         display: 'flex',
         flexDirection: 'column',
         gap: `${gridGap}px`,
@@ -297,10 +289,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         backgroundColor: 'rgba(255,255,255,0.6)',
         borderRadius: isMobile ? '12px' : '20px',
         border: `${isMobile ? 2 : 3}px solid #e2e8f0`,
-        width: `${mazeSize}px`,
-        height: `${mazeSize}px`,
-        boxSizing: 'border-box',
-        flexShrink: 0
+        boxSizing: 'border-box'
       }}>
         <style>
           {`
@@ -366,9 +355,13 @@ export default function CodingMazeGame({ lang, onBack }) {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      width: '100%',
+      height: '100%'
     }}>
       <div className="card-shadow" style={{ 
+        flex: '1 1 0',
+        minHeight: 0,
         width: '100%', 
         maxWidth: '600px', 
         display: 'flex', 
@@ -381,7 +374,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       }}>
         
         {/* Header */}
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px' }}>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px', flexShrink: 0 }}>
           <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
             <ArrowLeft size={isMobile ? 16 : 20} />
           </button>
@@ -393,24 +386,36 @@ export default function CodingMazeGame({ lang, onBack }) {
           </button>
         </div>
 
-        {/* Maze */}
+        {/* Maze Container (Flex area that takes remaining vertical space) */}
         <div style={{ 
+          flex: '1 1 0',
+          minHeight: 0,
+          width: '100%',
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center',
           marginBottom: isMobile ? '3px' : '10px'
         }}>
-          {renderGrid()}
+          {/* Inner container forced to be a square, sizing itself purely by CSS constraints */}
+          <div ref={containerRef} style={{
+             height: '100%',
+             maxWidth: '100%',
+             aspectRatio: '1 / 1',
+             position: 'relative'
+          }}>
+            {renderGrid()}
+          </div>
         </div>
 
         {/* Status */}
-        <div style={{ height: isMobile ? '16px' : '22px', fontSize: isMobile ? '0.8rem' : '0.95rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '2px' : '6px' }}>
+        <div style={{ flexShrink: 0, height: isMobile ? '16px' : '22px', fontSize: isMobile ? '0.8rem' : '0.95rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '2px' : '6px' }}>
           {statusMsg}
         </div>
 
         {/* Commands strip */}
         <div style={{ 
           width: '100%', 
+          flexShrink: 0,
           minHeight: `${cmdBtnSize + 8}px`, 
           maxHeight: `${cmdBtnSize * 2 + 16}px`,
           overflowY: 'auto',
@@ -472,7 +477,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         </div>
 
         {/* Direction buttons */}
-        <div style={{ display: 'flex', gap: isMobile ? '6px' : '12px', marginBottom: isMobile ? '4px' : '12px' }}>
+        <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', marginBottom: isMobile ? '4px' : '12px' }}>
           {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
             <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
               style={{
@@ -497,11 +502,11 @@ export default function CodingMazeGame({ lang, onBack }) {
 
         {/* Run / Next button */}
         {isSolved ? (
-          <button className="bouncy-button primary" onClick={nextLevel} style={{ padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
+          <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
             {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
           </button>
         ) : (
-          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
+          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
             <Play size={isMobile ? 14 : 18} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
           </button>
         )}
