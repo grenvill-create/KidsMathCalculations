@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight, Play, RefreshCw, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight, Play, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { audioSynth } from '../utils/audioSynth';
 
 const THEMES = {
@@ -229,6 +229,14 @@ export default function CodingMazeGame({ lang, onBack }) {
     localStorage.setItem('codingMazeLevel', nextIdx.toString());
   };
 
+  const resetAllProgress = () => {
+    if (window.confirm(lang === 'en' ? 'Reset all progress?' : '确定要重置所有闯关进度并回到第一关吗？')) {
+      audioSynth.playClick();
+      localStorage.removeItem('codingMazeLevel');
+      setLevelIdx(0);
+    }
+  };
+
   const handleZoomIn = () => setZoomScale(prev => Math.min(prev + 0.1, 1.5));
   const handleZoomOut = () => setZoomScale(prev => Math.max(prev - 0.1, 0.4));
 
@@ -383,9 +391,14 @@ export default function CodingMazeGame({ lang, onBack }) {
         
         {/* Header */}
         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px', flexShrink: 0 }}>
-          <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
-            <ArrowLeft size={isMobile ? 16 : 20} />
-          </button>
+          <div style={{ display: 'flex', gap: isMobile ? '2px' : '6px' }}>
+            <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
+              <ArrowLeft size={isMobile ? 16 : 20} />
+            </button>
+            <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
+              <RotateCcw size={isMobile ? 16 : 20} />
+            </button>
+          </div>
           <h2 style={{ color: '#c0487a', margin: 0, fontSize: isMobile ? '0.9rem' : '1.4rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {lang === 'en' ? `Maze (${levelIdx + 1}/${LEVELS.length})` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`}
           </h2>
