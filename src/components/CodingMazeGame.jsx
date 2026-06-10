@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight, Play, RefreshCw, X } from 'lucide-react';
+import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight, Play, RefreshCw, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { audioSynth } from '../utils/audioSynth';
 
 const THEMES = {
@@ -59,22 +59,25 @@ const LEVELS = [
 ];
 
 export default function CodingMazeGame({ lang, onBack }) {
-  const [levelIdx, setLevelIdx] = useState(0);
+  const [levelIdx, setLevelIdx] = useState(() => {
+    const saved = localStorage.getItem('codingMazeLevel');
+    return saved ? Math.min(parseInt(saved, 10), LEVELS.length - 1) : 0;
+  });
+  const currentLevel = LEVELS[levelIdx];
   const [commands, setCommands] = useState([]);
-  const [pos, setPos] = useState({ ...LEVELS[0].start });
+  const [pos, setPos] = useState({ ...currentLevel.start });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
   const [executingIdx, setExecutingIdx] = useState(-1);
   const [isShaking, setIsShaking] = useState(false);
   const [isJumping, setIsJumping] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1.0);
   
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
   const [mazeSize, setMazeSize] = useState(200);
-
-  const currentLevel = LEVELS[levelIdx];
 
   // Pure CSS layout handles the actual dimensions.
   // We use ResizeObserver ONLY to read the final size and compute font sizes.
@@ -221,8 +224,13 @@ export default function CodingMazeGame({ lang, onBack }) {
 
   const nextLevel = () => {
     audioSynth.playClick();
-    setLevelIdx((prev) => (prev + 1) % LEVELS.length);
+    const nextIdx = (levelIdx + 1) % LEVELS.length;
+    setLevelIdx(nextIdx);
+    localStorage.setItem('codingMazeLevel', nextIdx.toString());
   };
+
+  const handleZoomIn = () => setZoomScale(prev => Math.min(prev + 0.1, 1.5));
+  const handleZoomOut = () => setZoomScale(prev => Math.max(prev - 0.1, 0.4));
 
   const size = currentLevel.size;
   const gridPadding = isMobile ? 4 : 10;
@@ -378,12 +386,20 @@ export default function CodingMazeGame({ lang, onBack }) {
           <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
             <ArrowLeft size={isMobile ? 16 : 20} />
           </button>
-          <h2 style={{ color: '#c0487a', margin: 0, fontSize: isMobile ? '1rem' : '1.4rem' }}>
+          <h2 style={{ color: '#c0487a', margin: 0, fontSize: isMobile ? '0.9rem' : '1.4rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {lang === 'en' ? `Maze (${levelIdx + 1}/${LEVELS.length})` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`}
           </h2>
-          <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
-            <RefreshCw size={isMobile ? 16 : 20} />
-          </button>
+          <div style={{ display: 'flex', gap: isMobile ? '2px' : '6px' }}>
+            <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title="缩小">
+              <ZoomOut size={isMobile ? 14 : 18} />
+            </button>
+            <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title="放大">
+              <ZoomIn size={isMobile ? 14 : 18} />
+            </button>
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ padding: isMobile ? '4px 6px' : '8px 12px', marginLeft: isMobile ? '0' : '4px' }}>
+              <RefreshCw size={isMobile ? 16 : 20} />
+            </button>
+          </div>
         </div>
 
         {/* Maze Container (Flex area that takes remaining vertical space) */}
@@ -401,7 +417,10 @@ export default function CodingMazeGame({ lang, onBack }) {
              height: '100%',
              maxWidth: '100%',
              aspectRatio: '1 / 1',
-             position: 'relative'
+             position: 'relative',
+             transform: `scale(${zoomScale})`,
+             transformOrigin: 'center center',
+             transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
           }}>
             {renderGrid()}
           </div>
