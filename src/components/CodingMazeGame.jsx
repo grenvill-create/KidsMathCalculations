@@ -61,7 +61,7 @@ const LEVELS = [
 export default function CodingMazeGame({ lang, onBack }) {
   const [levelIdx, setLevelIdx] = useState(0);
   const [commands, setCommands] = useState([]);
-  const [pos, setPos] = useState({ ...LEVELS[0].start }); // Current execution position
+  const [pos, setPos] = useState({ ...LEVELS[0].start });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -71,32 +71,43 @@ export default function CodingMazeGame({ lang, onBack }) {
   
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
-  const containerRef = useRef(null);
-  const [mazeSize, setMazeSize] = useState(300);
+  const [mazeSize, setMazeSize] = useState(200);
 
   const currentLevel = LEVELS[levelIdx];
 
+  // Calculate maze size from actual viewport dimensions
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 600);
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    const calcLayout = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const mobile = vw < 600;
+      setIsMobile(mobile);
 
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          setMazeSize(Math.min(width, height));
-        }
-      }
-    });
+      // Fixed UI heights (header + status + commands + controls + run button + paddings)
+      // On mobile: header~36 + status~22 + commands~48 + controls~52 + button~40 + gaps/margins~50 + card padding~20 + viewport padding~24 = ~292
+      // On desktop: header~48 + status~28 + commands~70 + controls~72 + button~52 + gaps/margins~80 + card padding~48 + viewport padding~44 = ~442
+      const fixedUIHeight = mobile ? 280 : 420;
+      const availableHeight = vh - fixedUIHeight;
+      
+      // Width constraint: card max-width 600, minus card padding, minus outer padding
+      const cardPadX = mobile ? 20 : 48;
+      const outerPadX = mobile ? 8 : 40;
+      const viewportPadX = 32; // #app-viewport padding
+      const availableWidth = Math.min(vw - outerPadX - viewportPadX, 600 - cardPadX);
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
+      // Maze must be square, take the smaller dimension, clamp to reasonable min/max
+      const raw = Math.min(availableWidth, availableHeight);
+      const clamped = Math.max(120, Math.min(raw, 500));
+      setMazeSize(clamped);
+    };
 
+    calcLayout();
+    window.addEventListener('resize', calcLayout);
+    // Also recalc on orientation change for mobile
+    window.addEventListener('orientationchange', () => setTimeout(calcLayout, 150));
     return () => {
-      window.removeEventListener('resize', handleResize);
-      observer.disconnect();
+      window.removeEventListener('resize', calcLayout);
+      window.removeEventListener('orientationchange', calcLayout);
       if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
     };
   }, []);
@@ -155,8 +166,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     for (let i = 0; i < commands.length; i++) {
       setExecutingIdx(i);
       const cmd = commands[i];
-      // small delay for animation
-      await new Promise(res => setTimeout(res, 500));
+      await new Promise(res => setTimeout(res, 450));
 
       let nextR = currentPos.r;
       let nextC = currentPos.c;
@@ -166,7 +176,6 @@ export default function CodingMazeGame({ lang, onBack }) {
       if (cmd === 'LEFT') nextC--;
       if (cmd === 'RIGHT') nextC++;
 
-      // Check bounds
       if (nextR < 0 || nextR >= currentLevel.size || nextC < 0 || nextC >= currentLevel.size) {
         audioSynth.playIncorrect();
         setStatusMsg(lang === 'en' ? 'Oops! Hit a wall.' : '哎呀，撞墙了。');
@@ -180,7 +189,6 @@ export default function CodingMazeGame({ lang, onBack }) {
         return;
       }
 
-      // Check obstacles
       const hitObstacle = currentLevel.obstacles.some(o => o.r === nextR && o.c === nextC);
       if (hitObstacle) {
         audioSynth.playIncorrect();
@@ -197,13 +205,12 @@ export default function CodingMazeGame({ lang, onBack }) {
 
       currentPos = { r: nextR, c: nextC };
       setPos(currentPos);
-      audioSynth.playClick(); // step sound
+      audioSynth.playClick();
     }
 
     setExecutingIdx(-1);
     await new Promise(res => setTimeout(res, 300));
 
-    // Check if target reached
     if (currentPos.r === currentLevel.target.r && currentPos.c === currentLevel.target.c) {
       audioSynth.playCorrect();
       setStatusMsg(lang === 'en' ? 'Target reached!' : '到达终点啦！');
@@ -226,11 +233,14 @@ export default function CodingMazeGame({ lang, onBack }) {
     setLevelIdx((prev) => (prev + 1) % LEVELS.length);
   };
 
-  // Dynamic layout parameters based on measured mazeSize
   const size = currentLevel.size;
-  const gridPadding = isMobile ? 6 : 12;
-  const gridGap = isMobile ? 4 : 8;
-  const cellSize = (mazeSize - 2 * gridPadding - (size - 1) * gridGap) / size;
+  const gridPadding = isMobile ? 4 : 10;
+  const gridGap = isMobile ? 3 : 6;
+  const cellSize = Math.max(10, (mazeSize - 2 * gridPadding - (size - 1) * gridGap) / size);
+  
+  // Compact sizes for mobile controls
+  const cmdBtnSize = isMobile ? 28 : 45;
+  const dirBtnSize = isMobile ? 40 : 56;
 
   const renderGrid = () => {
     const tTheme = THEMES[currentLevel.theme] || THEMES.fox;
@@ -249,7 +259,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           shadowColor = '#86efac';
           borderColor = '#4ade80';
         } else if (currentLevel.obstacles.some(o => o.r === r && o.c === c)) {
-          content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center', transform: `scale(${isMobile ? 1.05 : 1.2}) translateY(-5px)` }}>{tTheme.obstacle}</span>;
+          content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center' }}>{tTheme.obstacle}</span>;
           bg = tTheme.bgObstacle;
           shadowColor = '#fca5a5';
           borderColor = '#f87171';
@@ -260,13 +270,12 @@ export default function CodingMazeGame({ lang, onBack }) {
             flex: 1,
             height: '100%',
             backgroundColor: bg,
-            borderRadius: isMobile ? '8px' : '14px',
-            border: `2px solid ${borderColor}`,
+            borderRadius: isMobile ? '6px' : '12px',
+            border: `${isMobile ? 1 : 2}px solid ${borderColor}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: `${cellSize * 0.65}px`,
-            boxShadow: `0 ${isMobile ? 3 : 6}px 0 ${shadowColor}, 0 ${isMobile ? 4 : 8}px ${isMobile ? 5 : 10}px rgba(0,0,0,0.1)`,
-            position: 'relative',
-            transform: `translateY(-${isMobile ? 3 : 6}px)`
+            fontSize: `${cellSize * 0.6}px`,
+            boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
+            position: 'relative'
           }}>
             {content}
           </div>
@@ -286,41 +295,42 @@ export default function CodingMazeGame({ lang, onBack }) {
         gap: `${gridGap}px`,
         padding: `${gridPadding}px`,
         backgroundColor: 'rgba(255,255,255,0.6)',
-        borderRadius: isMobile ? '16px' : '24px',
-        border: '4px solid #e2e8f0',
+        borderRadius: isMobile ? '12px' : '20px',
+        border: `${isMobile ? 2 : 3}px solid #e2e8f0`,
         width: `${mazeSize}px`,
         height: `${mazeSize}px`,
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        flexShrink: 0
       }}>
         <style>
           {`
             @keyframes targetPulse {
               0%, 100% { transform: scale(1); }
-              50% { transform: scale(1.15); filter: brightness(1.2); }
+              50% { transform: scale(1.12); filter: brightness(1.15); }
             }
             @keyframes heroShake {
               0%, 100% { transform: translateX(0); }
-              25% { transform: translateX(-8px) rotate(-10deg); }
-              50% { transform: translateX(8px) rotate(10deg); }
-              75% { transform: translateX(-8px) rotate(-10deg); }
+              25% { transform: translateX(-6px) rotate(-8deg); }
+              50% { transform: translateX(6px) rotate(8deg); }
+              75% { transform: translateX(-6px) rotate(-8deg); }
             }
             @keyframes heroJump {
               0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(-20px) scale(1.1); }
+              50% { transform: translateY(-14px) scale(1.08); }
             }
             @keyframes cmdActive {
-              0% { transform: scale(1) translateY(-2px); box-shadow: 0 4px 0 #1e40af; }
-              50% { transform: scale(1.15) translateY(-6px); box-shadow: 0 8px 15px rgba(59, 130, 246, 0.7), 0 4px 0 #1e40af; z-index: 10; }
-              100% { transform: scale(1) translateY(-2px); box-shadow: 0 4px 0 #1e40af; }
+              0% { transform: scale(1); box-shadow: 0 3px 0 #1e40af; }
+              50% { transform: scale(1.12); box-shadow: 0 6px 10px rgba(59, 130, 246, 0.6), 0 3px 0 #1e40af; z-index: 10; }
+              100% { transform: scale(1); box-shadow: 0 3px 0 #1e40af; }
             }
             @keyframes obstacleSway {
               0%, 100% { transform: rotate(0deg); }
-              50% { transform: rotate(5deg); }
+              50% { transform: rotate(4deg); }
             }
           `}
         </style>
         {grid}
-        {/* Animated Robot Overlay - perfectly aligned via percentages of parent width/height */}
+        {/* Hero overlay */}
         <div style={{
           position: 'absolute',
           top: `calc(${gridPadding}px + ${pos.r} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
@@ -328,11 +338,11 @@ export default function CodingMazeGame({ lang, onBack }) {
           width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: `${cellSize * 0.75}px`,
-          transition: 'all 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
+          fontSize: `${cellSize * 0.7}px`,
+          transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
           animation: isShaking ? 'heroShake 0.4s' : (isJumping ? 'heroJump 0.5s infinite' : 'none'),
           zIndex: 10,
-          filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))'
+          filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.25))'
         }}>
           {tTheme.hero}
         </div>
@@ -341,165 +351,158 @@ export default function CodingMazeGame({ lang, onBack }) {
   };
 
   const getCmdIcon = (cmd) => {
-    if (cmd === 'UP') return <ArrowUp size={20} />;
-    if (cmd === 'DOWN') return <ArrowDown size={20} />;
-    if (cmd === 'LEFT') return <ArrowLeft size={20} />;
-    if (cmd === 'RIGHT') return <ArrowRight size={20} />;
+    const s = isMobile ? 16 : 20;
+    if (cmd === 'UP') return <ArrowUp size={s} />;
+    if (cmd === 'DOWN') return <ArrowDown size={s} />;
+    if (cmd === 'LEFT') return <ArrowLeft size={s} />;
+    if (cmd === 'RIGHT') return <ArrowRight size={s} />;
     return null;
   };
 
   return (
-    <div className="screen-wrapper fade-in" style={{ padding: isMobile ? '4px' : '20px', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className="screen-wrapper fade-in" style={{
+      padding: isMobile ? '2px' : '16px',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
       <div className="card-shadow" style={{ 
         width: '100%', 
-        height: '100%',
         maxWidth: '600px', 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        background: 'rgba(255,255,255,0.85)', 
+        background: 'rgba(255,255,255,0.88)', 
         backdropFilter: 'blur(10px)',
-        padding: isMobile ? '8px 10px' : '24px',
-        boxSizing: 'border-box',
-        overflow: 'hidden'
+        padding: isMobile ? '6px 8px' : '20px',
+        boxSizing: 'border-box'
       }}>
         
         {/* Header */}
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '4px' : '16px', flexShrink: 0 }}>
-          <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '6px 8px' : '8px 12px' }}>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px' }}>
+          <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
             <ArrowLeft size={isMobile ? 16 : 20} />
           </button>
-          <h2 style={{ color: '#c0487a', margin: 0, fontSize: isMobile ? '1.1rem' : '1.5rem' }}>
-            {lang === 'en' ? `Coding Maze (${levelIdx + 1}/${LEVELS.length})` : `编程迷宫 (第 ${levelIdx + 1}/${LEVELS.length} 关)`}
+          <h2 style={{ color: '#c0487a', margin: 0, fontSize: isMobile ? '1rem' : '1.4rem' }}>
+            {lang === 'en' ? `Maze (${levelIdx + 1}/${LEVELS.length})` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`}
           </h2>
-          <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ padding: isMobile ? '6px 8px' : '8px 12px' }}>
+          <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
             <RefreshCw size={isMobile ? 16 : 20} />
           </button>
         </div>
 
-        {/* Maze Container */}
-        <div ref={containerRef} style={{ 
-          flex: '1 1 0', 
-          width: '100%', 
-          minHeight: '150px',
+        {/* Maze */}
+        <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center',
-          marginBottom: isMobile ? '4px' : '12px'
+          marginBottom: isMobile ? '3px' : '10px'
         }}>
-          {mazeSize > 0 && renderGrid()}
+          {renderGrid()}
         </div>
 
-        {/* Status Msg */}
-        <div style={{ height: isMobile ? '18px' : '24px', flexShrink: 0, fontSize: isMobile ? '0.85rem' : '1rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '4px' : '8px' }}>
+        {/* Status */}
+        <div style={{ height: isMobile ? '16px' : '22px', fontSize: isMobile ? '0.8rem' : '0.95rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '2px' : '6px' }}>
           {statusMsg}
         </div>
 
-        {/* Commands Line */}
+        {/* Commands strip */}
         <div style={{ 
           width: '100%', 
-          flexShrink: 0,
-          minHeight: isMobile ? '40px' : '60px', 
-          maxHeight: isMobile ? '80px' : '120px',
+          minHeight: `${cmdBtnSize + 8}px`, 
+          maxHeight: `${cmdBtnSize * 2 + 16}px`,
           overflowY: 'auto',
-          border: '3px solid #cbd5e1', 
-          borderRadius: '12px', 
+          border: '2px solid #cbd5e1', 
+          borderRadius: '10px', 
           display: 'flex', 
           flexWrap: 'wrap', 
           alignContent: 'flex-start',
-          gap: isMobile ? '4px' : '8px', 
-          padding: isMobile ? '4px' : '8px', 
-          marginBottom: isMobile ? '8px' : '16px',
+          gap: isMobile ? '3px' : '6px', 
+          padding: isMobile ? '3px' : '6px', 
+          marginBottom: isMobile ? '4px' : '12px',
           backgroundColor: '#f8fafc', 
-          boxShadow: 'inset 0 4px 6px rgba(0,0,0,0.05)',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)',
           boxSizing: 'border-box'
         }}>
-          {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: isMobile ? '0.8rem' : '1rem', marginTop: '4px' }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
+          {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: isMobile ? '0.75rem' : '0.9rem', lineHeight: `${cmdBtnSize}px` }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
           {commands.map((cmd, idx) => (
             <div key={idx} onClick={() => removeCommand(idx)} style={{
-              width: isMobile ? '30px' : '45px', 
-              height: isMobile ? '30px' : '45px', 
+              width: `${cmdBtnSize}px`, 
+              height: `${cmdBtnSize}px`, 
               background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white',
-              borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: isPlaying || isSolved ? 'default' : 'pointer', 
-              boxShadow: `0 ${isMobile ? 2 : 4}px 0 #1e40af`,
+              boxShadow: `0 ${isMobile ? 2 : 3}px 0 #1e40af`,
               position: 'relative',
-              transform: `translateY(-${isMobile ? 1 : 2}px)`,
               animation: idx === executingIdx ? 'cmdActive 0.5s' : 'none',
-              zIndex: idx === executingIdx ? 10 : 1
+              zIndex: idx === executingIdx ? 10 : 1,
+              flexShrink: 0
             }}>
-              <span style={{ transform: isMobile ? 'scale(0.75)' : 'none' }}>{getCmdIcon(cmd)}</span>
+              {getCmdIcon(cmd)}
               
-              {/* Step Number Badge */}
+              {/* Step badge */}
               <div style={{ 
                 position: 'absolute', 
-                top: isMobile ? -3 : -6, 
-                left: isMobile ? -3 : -6, 
-                background: '#10b981', 
-                color: 'white', 
-                fontSize: isMobile ? '0.6rem' : '0.75rem', 
-                fontWeight: 'bold', 
-                width: isMobile ? '13px' : '20px', 
-                height: isMobile ? '13px' : '20px', 
+                top: -3, left: -3, 
+                background: '#10b981', color: 'white', 
+                fontSize: '0.55rem', fontWeight: 'bold', 
+                width: '14px', height: '14px', 
                 borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)' 
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.2)' 
               }}>
                 {idx + 1}
               </div>
 
               {!isPlaying && !isSolved && (
                 <div style={{ 
-                  position: 'absolute', 
-                  top: isMobile ? -3 : -6, 
-                  right: isMobile ? -3 : -6, 
-                  background: '#ef4444', 
-                  borderRadius: '50%', 
-                  padding: '1px', 
-                  color: 'white', 
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)' 
+                  position: 'absolute', top: -3, right: -3, 
+                  background: '#ef4444', borderRadius: '50%', 
+                  padding: '1px', color: 'white', 
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  lineHeight: 0
                 }}>
-                  <X size={isMobile ? 8 : 12} strokeWidth={3} />
+                  <X size={8} strokeWidth={3} />
                 </div>
               )}
             </div>
           ))}
         </div>
 
-        {/* Controls */}
-        <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '8px' : '15px', marginBottom: isMobile ? '8px' : '16px' }}>
+        {/* Direction buttons */}
+        <div style={{ display: 'flex', gap: isMobile ? '6px' : '12px', marginBottom: isMobile ? '4px' : '12px' }}>
           {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
             <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
               style={{
-                width: isMobile ? '44px' : '60px', 
-                height: isMobile ? '44px' : '60px',
-                borderRadius: '16px',
+                width: `${dirBtnSize}px`, 
+                height: `${dirBtnSize}px`,
+                borderRadius: '12px',
                 background: isPlaying || isSolved ? '#cbd5e1' : 'linear-gradient(135deg, #fcd34d, #f59e0b)',
                 border: 'none', color: isPlaying || isSolved ? '#94a3b8' : 'white',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: isPlaying || isSolved ? 'none' : `0 ${isMobile ? 3 : 6}px 0 #d97706`,
+                boxShadow: isPlaying || isSolved ? 'none' : `0 ${isMobile ? 2 : 4}px 0 #d97706`,
                 cursor: isPlaying || isSolved ? 'default' : 'pointer',
-                transform: `translateY(-${isMobile ? 1 : 2}px)`,
                 transition: 'all 0.1s'
               }}
-              onMouseDown={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = `translateY(${isMobile ? 2 : 4}px)`; e.currentTarget.style.boxShadow = '0 0 0 #d97706'; } }}
-              onMouseUp={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = `translateY(-${isMobile ? 1 : 2}px)`; e.currentTarget.style.boxShadow = `0 ${isMobile ? 3 : 6}px 0 #d97706`; } }}
-              onMouseLeave={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = `translateY(-${isMobile ? 1 : 2}px)`; e.currentTarget.style.boxShadow = `0 ${isMobile ? 3 : 6}px 0 #d97706`; } }}
+              onMouseDown={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.boxShadow = '0 0 0 #d97706'; } }}
+              onMouseUp={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 ${isMobile ? 2 : 4}px 0 #d97706`; } }}
+              onMouseLeave={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 ${isMobile ? 2 : 4}px 0 #d97706`; } }}
             >
-              <span style={{ transform: isMobile ? 'scale(0.8)' : 'none' }}>{getCmdIcon(cmd)}</span>
+              {getCmdIcon(cmd)}
             </button>
           ))}
         </div>
 
+        {/* Run / Next button */}
         {isSolved ? (
-          <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '8px 16px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1.2rem', marginBottom: '8px' }}>
+          <button className="bouncy-button primary" onClick={nextLevel} style={{ padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
             {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
           </button>
         ) : (
-          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '8px 16px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', background: isPlaying ? '#94a3b8' : '', marginBottom: '8px' }}>
-            <Play size={isMobile ? 14 : 20} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
+          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
+            <Play size={isMobile ? 14 : 18} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
           </button>
         )}
 
