@@ -71,17 +71,32 @@ export default function CodingMazeGame({ lang, onBack }) {
   
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
+  const containerRef = useRef(null);
+  const [mazeSize, setMazeSize] = useState(300);
 
   const currentLevel = LEVELS[levelIdx];
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 600);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth < 600);
     handleResize();
     window.addEventListener('resize', handleResize);
+
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0) {
+          setMazeSize(Math.min(width, height));
+        }
+      }
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
     return () => {
       window.removeEventListener('resize', handleResize);
+      observer.disconnect();
       if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
     };
   }, []);
@@ -102,11 +117,20 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
   };
 
+  const resetToStart = () => {
+    if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    setIsShaking(false);
+    setIsJumping(false);
+    setPos({ ...currentLevel.start });
+    setStatusMsg('');
+  };
+
   const addCommand = (cmd) => {
     if (isPlaying || isSolved) return;
     audioSynth.playClick();
     if (commands.length < 15) {
       setCommands([...commands, cmd]);
+      resetToStart();
     }
   };
 
@@ -114,6 +138,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     if (isPlaying || isSolved) return;
     audioSynth.playClick();
     setCommands(commands.filter((_, i) => i !== idx));
+    resetToStart();
   };
 
   const executeCommands = async () => {
@@ -151,7 +176,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-        }, 1200);
+        }, 500);
         return;
       }
 
@@ -166,7 +191,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-        }, 1200);
+        }, 500);
         return;
       }
 
@@ -191,7 +216,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       resetTimeoutRef.current = setTimeout(() => {
         setIsShaking(false);
         setPos({ ...currentLevel.start });
-      }, 1200);
+      }, 500);
     }
     setIsPlaying(false);
   };
@@ -201,14 +226,11 @@ export default function CodingMazeGame({ lang, onBack }) {
     setLevelIdx((prev) => (prev + 1) % LEVELS.length);
   };
 
-  // Purely CSS-variable driven fluid layout parameters
+  // Dynamic layout parameters based on measured mazeSize
   const size = currentLevel.size;
-  const gridPadding = isMobile ? 10 : 16;
-  const gridGap = isMobile ? 6 : 10;
-
-  // Virtual cell width calculation for scale-based font sizing
-  const containerWidth = isMobile ? Math.min(window.innerWidth - 44, 400) : 450;
-  const cellSize = (containerWidth - 2 * gridPadding - (size - 1) * gridGap) / size;
+  const gridPadding = isMobile ? 6 : 12;
+  const gridGap = isMobile ? 4 : 8;
+  const cellSize = (mazeSize - 2 * gridPadding - (size - 1) * gridGap) / size;
 
   const renderGrid = () => {
     const tTheme = THEMES[currentLevel.theme] || THEMES.fox;
@@ -264,10 +286,10 @@ export default function CodingMazeGame({ lang, onBack }) {
         gap: `${gridGap}px`,
         padding: `${gridPadding}px`,
         backgroundColor: 'rgba(255,255,255,0.6)',
-        borderRadius: '24px',
+        borderRadius: isMobile ? '16px' : '24px',
         border: '4px solid #e2e8f0',
-        width: '100%',
-        aspectRatio: '1',
+        width: `${mazeSize}px`,
+        height: `${mazeSize}px`,
         boxSizing: 'border-box'
       }}>
         <style>
@@ -327,20 +349,23 @@ export default function CodingMazeGame({ lang, onBack }) {
   };
 
   return (
-    <div className="screen-wrapper fade-in" style={{ padding: isMobile ? '8px 4px' : '20px', overflowY: 'auto' }}>
+    <div className="screen-wrapper fade-in" style={{ padding: isMobile ? '4px' : '20px', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div className="card-shadow" style={{ 
         width: '100%', 
+        height: '100%',
         maxWidth: '600px', 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
         background: 'rgba(255,255,255,0.85)', 
         backdropFilter: 'blur(10px)',
-        padding: isMobile ? '10px 10px' : '24px'
+        padding: isMobile ? '8px 10px' : '24px',
+        boxSizing: 'border-box',
+        overflow: 'hidden'
       }}>
         
         {/* Header */}
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '8px' : '20px' }}>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '4px' : '16px', flexShrink: 0 }}>
           <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '6px 8px' : '8px 12px' }}>
             <ArrowLeft size={isMobile ? 16 : 20} />
           </button>
@@ -352,30 +377,44 @@ export default function CodingMazeGame({ lang, onBack }) {
           </button>
         </div>
 
-        {/* Maze & Status */}
-        <div style={{ marginBottom: isMobile ? '8px' : '20px', width: '100%', maxWidth: '420px' }}>
-          {renderGrid()}
+        {/* Maze Container */}
+        <div ref={containerRef} style={{ 
+          flex: '1 1 0', 
+          width: '100%', 
+          minHeight: '150px',
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          marginBottom: isMobile ? '4px' : '12px'
+        }}>
+          {mazeSize > 0 && renderGrid()}
         </div>
 
-        <div style={{ height: isMobile ? '18px' : '24px', fontSize: isMobile ? '0.85rem' : '1rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '4px' : '10px' }}>
+        {/* Status Msg */}
+        <div style={{ height: isMobile ? '18px' : '24px', flexShrink: 0, fontSize: isMobile ? '0.85rem' : '1rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '4px' : '8px' }}>
           {statusMsg}
         </div>
 
         {/* Commands Line */}
         <div style={{ 
           width: '100%', 
-          minHeight: isMobile ? '46px' : '70px', 
+          flexShrink: 0,
+          minHeight: isMobile ? '40px' : '60px', 
+          maxHeight: isMobile ? '80px' : '120px',
+          overflowY: 'auto',
           border: '3px solid #cbd5e1', 
-          borderRadius: '16px', 
+          borderRadius: '12px', 
           display: 'flex', 
           flexWrap: 'wrap', 
+          alignContent: 'flex-start',
           gap: isMobile ? '4px' : '8px', 
-          padding: isMobile ? '4px 6px' : '12px', 
-          marginBottom: isMobile ? '8px' : '20px',
+          padding: isMobile ? '4px' : '8px', 
+          marginBottom: isMobile ? '8px' : '16px',
           backgroundColor: '#f8fafc', 
-          boxShadow: 'inset 0 4px 6px rgba(0,0,0,0.05)'
+          boxShadow: 'inset 0 4px 6px rgba(0,0,0,0.05)',
+          boxSizing: 'border-box'
         }}>
-          {commands.length === 0 && <div style={{ color: '#94a3b8', alignSelf: 'center', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: isMobile ? '0.8rem' : '1rem' }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
+          {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: isMobile ? '0.8rem' : '1rem', marginTop: '4px' }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
           {commands.map((cmd, idx) => (
             <div key={idx} onClick={() => removeCommand(idx)} style={{
               width: isMobile ? '30px' : '45px', 
@@ -430,7 +469,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         </div>
 
         {/* Controls */}
-        <div style={{ display: 'flex', gap: isMobile ? '8px' : '15px', marginBottom: isMobile ? '10px' : '25px' }}>
+        <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '8px' : '15px', marginBottom: isMobile ? '8px' : '16px' }}>
           {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
             <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
               style={{
@@ -455,11 +494,11 @@ export default function CodingMazeGame({ lang, onBack }) {
         </div>
 
         {isSolved ? (
-          <button className="bouncy-button primary" onClick={nextLevel} style={{ padding: isMobile ? '8px 16px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1.2rem' }}>
+          <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '8px 16px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1.2rem', marginBottom: '8px' }}>
             {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
           </button>
         ) : (
-          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ padding: isMobile ? '8px 16px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', background: isPlaying ? '#94a3b8' : '' }}>
+          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '8px 16px' : '12px 24px', fontSize: isMobile ? '0.95rem' : '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', background: isPlaying ? '#94a3b8' : '', marginBottom: '8px' }}>
             <Play size={isMobile ? 14 : 20} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
           </button>
         )}
