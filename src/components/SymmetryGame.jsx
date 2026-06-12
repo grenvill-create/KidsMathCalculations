@@ -41,6 +41,20 @@ export default function SymmetryGame({ lang, onBack }) {
   const [level, setLevel] = useState(0);
   const [userGrid, setUserGrid] = useState([]);
   const [isSolved, setIsSolved] = useState(false);
+  const [cellSize, setCellSize] = useState(40);
+
+  useEffect(() => {
+    const updateSize = () => {
+      const w = window.innerWidth;
+      let size = Math.floor((w - 100) / 10);
+      if (size > 40) size = 40;
+      if (size < 15) size = 15;
+      setCellSize(size);
+    };
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   const currentPattern = PATTERNS[level];
 
@@ -121,12 +135,12 @@ export default function SymmetryGame({ lang, onBack }) {
         {/* Game Area */}
         <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: '4px', marginBottom: '30px' }}>
           {/* Left Grid (Fixed) */}
-          <div style={{ display: 'grid', gridTemplateRows: `repeat(${currentPattern.grid.length}, 40px)`, gap: '2px', border: `3px solid ${leftColor}`, padding: '4px', borderRadius: '8px', background: '#fdf2f8' }}>
+          <div style={{ display: 'grid', gridTemplateRows: `repeat(${currentPattern.grid.length}, ${cellSize}px)`, gap: '2px', border: `3px solid ${leftColor}`, padding: '4px', borderRadius: '8px', background: '#fdf2f8' }}>
             {currentPattern.grid.map((row, r) => (
               <div key={`l-row-${r}`} style={{ display: 'flex', gap: '2px' }}>
                 {row.map((val, c) => (
                   <div key={`l-${r}-${c}`} style={{
-                    width: '40px', height: '40px',
+                    width: `${cellSize}px`, height: `${cellSize}px`,
                     backgroundColor: val ? leftColor : 'white',
                     border: '1px solid #fbcfe8',
                     borderRadius: '4px'
@@ -140,14 +154,14 @@ export default function SymmetryGame({ lang, onBack }) {
           <div style={{ width: '4px', backgroundColor: '#94a3b8', borderRadius: '2px', alignSelf: 'stretch', margin: '0 10px' }} />
 
           {/* Right Grid (Interactive) */}
-          <div style={{ display: 'grid', gridTemplateRows: `repeat(${userGrid.length}, 40px)`, gap: '2px', border: `3px dashed ${rightColor}`, padding: '4px', borderRadius: '8px', background: '#eff6ff' }}>
+          <div style={{ display: 'grid', gridTemplateRows: `repeat(${userGrid.length}, ${cellSize}px)`, gap: '2px', border: `3px dashed ${rightColor}`, padding: '4px', borderRadius: '8px', background: '#eff6ff' }}>
             {userGrid.map((row, r) => (
               <div key={`r-row-${r}`} style={{ display: 'flex', gap: '2px' }}>
                 {row.map((val, c) => (
                   <div key={`r-${r}-${c}`} 
                     onClick={() => handleCellClick(r, c)}
                     style={{
-                      width: '40px', height: '40px',
+                      width: `${cellSize}px`, height: `${cellSize}px`,
                       backgroundColor: val ? rightColor : 'white',
                       border: '1px solid #bfdbfe',
                       borderRadius: '4px',
