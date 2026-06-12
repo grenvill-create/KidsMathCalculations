@@ -80,6 +80,11 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [isBombMode, setIsBombMode] = useState(false);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
   
+  const [showMathQuiz, setShowMathQuiz] = useState(false);
+  const [mathProblem, setMathProblem] = useState(null);
+  const [mathInput, setMathInput] = useState('');
+  const [isMathShaking, setIsMathShaking] = useState(false);
+
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
@@ -136,6 +141,39 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setPos({ ...currentLevel.start });
     setStatusMsg('');
+  };
+
+  const triggerMathQuiz = () => {
+    audioSynth.playClick();
+    const isAdd = Math.random() > 0.5;
+    let a, b;
+    if (isAdd) {
+      a = Math.floor(Math.random() * 11); // 0-10
+      b = Math.floor(Math.random() * (20 - a + 1)); // a+b <= 20
+      setMathProblem({ a, b, op: '+', ans: a + b });
+    } else {
+      a = Math.floor(Math.random() * 21); // 0-20
+      b = Math.floor(Math.random() * (a + 1)); // b <= a
+      setMathProblem({ a, b, op: '-', ans: a - b });
+    }
+    setMathInput('');
+    setShowMathQuiz(true);
+  };
+
+  const handleMathSubmit = (e) => {
+    e.preventDefault();
+    if (parseInt(mathInput, 10) === mathProblem.ans) {
+      audioSynth.playCorrect();
+      const newBombs = bombCount + 2;
+      setBombCount(newBombs);
+      localStorage.setItem('codingMazeBombs', newBombs.toString());
+      setShowMathQuiz(false);
+    } else {
+      audioSynth.playIncorrect();
+      setIsMathShaking(true);
+      setMathInput('');
+      setTimeout(() => setIsMathShaking(false), 500);
+    }
   };
 
   const addCommand = (cmd) => {
@@ -572,21 +610,27 @@ export default function CodingMazeGame({ lang, onBack }) {
           
           <button 
              className="bouncy-button secondary" 
-             onClick={() => { if(bombCount > 0 && !isPlaying && !isSolved) setIsBombMode(!isBombMode); }}
+             onClick={() => { 
+               if(bombCount > 0 && !isPlaying && !isSolved) setIsBombMode(!isBombMode); 
+               else if(bombCount === 0 && !isPlaying && !isSolved) triggerMathQuiz();
+             }}
              style={{ 
                 padding: isMobile ? '6px 10px' : '10px 18px', 
                 fontSize: isMobile ? '0.9rem' : '1rem',
-                background: isBombMode ? '#fca5a5' : '#f8fafc',
-                border: `2px solid ${isBombMode ? '#ef4444' : '#cbd5e1'}`,
-                color: '#334155',
+                background: bombCount === 0 ? '#bfdbfe' : (isBombMode ? '#fca5a5' : '#f8fafc'),
+                border: `2px solid ${bombCount === 0 ? '#3b82f6' : (isBombMode ? '#ef4444' : '#cbd5e1')}`,
+                color: bombCount === 0 ? '#1e40af' : '#334155',
                 display: 'flex', alignItems: 'center', gap: '4px',
-                opacity: bombCount > 0 ? 1 : 0.5,
                 borderRadius: '12px',
-                boxShadow: `0 ${isMobile ? 2 : 4}px 0 #94a3b8`
+                boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${bombCount === 0 ? '#60a5fa' : '#94a3b8'}`
              }}
-             title={lang === 'en' ? 'Use Bomb' : '使用炸弹（点击后选择要炸毁的障碍物）'}
+             title={bombCount === 0 ? (lang === 'en' ? 'Get Bombs' : '获取炸弹') : (lang === 'en' ? 'Use Bomb' : '使用炸弹（点击后选择要炸毁的障碍物）')}
           >
-            💣 <span style={{fontWeight:'bold'}}>x {bombCount}</span>
+            {bombCount > 0 ? (
+              <>💣 <span style={{fontWeight:'bold'}}>x {bombCount}</span></>
+            ) : (
+              <span style={{fontWeight:'bold'}}>{lang === 'en' ? '➕ Get Bombs' : '➕ 获取炸弹'}</span>
+            )}
           </button>
 
           {isSolved ? (
@@ -601,6 +645,63 @@ export default function CodingMazeGame({ lang, onBack }) {
         </div>
 
       </div>
+
+      {/* Math Quiz Modal */}
+      {showMathQuiz && mathProblem && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, margin: 0, padding: 0
+        }}>
+          <div className={isMathShaking ? 'shake-animation' : ''} style={{
+            background: 'white', padding: isMobile ? '20px' : '30px', borderRadius: '24px',
+            textAlign: 'center', width: '85%', maxWidth: '350px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+            border: '4px solid #60a5fa'
+          }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#1e40af', fontSize: '1.4rem' }}>
+              {lang === 'en' ? 'Math Challenge' : '算术挑战'}
+            </h3>
+            <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '0.95rem' }}>
+              {lang === 'en' ? 'Solve it to get 2 bombs!' : '算对这道题，就能获得 2 颗炸弹哦！'}
+            </p>
+            
+            <div style={{ fontSize: '2.8rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '25px', letterSpacing: '3px' }}>
+              {mathProblem.a} {mathProblem.op} {mathProblem.b} = ?
+            </div>
+            
+            <form onSubmit={handleMathSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <input 
+                type="number" 
+                value={mathInput}
+                onChange={(e) => setMathInput(e.target.value)}
+                autoFocus
+                style={{
+                  fontSize: '2rem', padding: '10px', textAlign: 'center',
+                  borderRadius: '12px', border: '3px solid #cbd5e1', outline: 'none',
+                  color: '#0f172a', fontWeight: 'bold'
+                }}
+                placeholder="?"
+              />
+              <button type="submit" className="bouncy-button primary" style={{ padding: '14px', fontSize: '1.2rem', borderRadius: '12px' }}>
+                {lang === 'en' ? 'Submit' : '提交答案'}
+              </button>
+            </form>
+            
+            <button 
+              onClick={() => { audioSynth.playClick(); setShowMathQuiz(false); }}
+              style={{
+                marginTop: '15px', background: 'none', border: 'none', color: '#94a3b8',
+                textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem',
+                padding: '10px'
+              }}
+            >
+              {lang === 'en' ? 'Cancel' : '放弃挑战'}
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
