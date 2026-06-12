@@ -102,7 +102,11 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [zoomScale, setZoomScale] = useState(1.0);
   const [bombCount, setBombCount] = useState(() => {
     const saved = localStorage.getItem('codingMazeBombs');
-    return saved ? parseInt(saved, 10) : 0;
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      return isNaN(parsed) ? 1 : parsed;
+    }
+    return 1;
   });
   const [isBombMode, setIsBombMode] = useState(false);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
@@ -301,7 +305,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     const nextIdx = (levelIdx + 1) % LEVELS.length;
     setLevelIdx(nextIdx);
     localStorage.setItem('codingMazeLevel', nextIdx.toString());
-    const newBombs = bombCount + 2;
+    const newBombs = bombCount + 1;
     setBombCount(newBombs);
     localStorage.setItem('codingMazeBombs', newBombs.toString());
     setIsBombMode(false);
@@ -314,7 +318,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       localStorage.removeItem('codingMazeLevel');
       localStorage.removeItem('codingMazeBombs');
       setLevelIdx(0);
-      setBombCount(0);
+      setBombCount(1);
       setIsBombMode(false);
       setDestroyedObstacles([]);
     }
