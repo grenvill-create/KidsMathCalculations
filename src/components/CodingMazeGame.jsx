@@ -82,9 +82,15 @@ const LEVELS = [
 export default function CodingMazeGame({ lang, onBack }) {
   const [levelIdx, setLevelIdx] = useState(() => {
     const saved = localStorage.getItem('codingMazeLevel');
-    return saved ? Math.min(parseInt(saved, 10), LEVELS.length - 1) : 0;
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (isNaN(parsed)) return 0;
+      return Math.min(Math.max(0, parsed), LEVELS.length - 1);
+    }
+    return 0;
   });
-  const currentLevel = LEVELS[levelIdx];
+
+  const currentLevel = LEVELS[levelIdx] || LEVELS[0];
   const [commands, setCommands] = useState([]);
   const [pos, setPos] = useState({ ...currentLevel.start });
   const [isPlaying, setIsPlaying] = useState(false);
@@ -476,6 +482,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     if (cmd === 'RIGHT') return <ArrowRight size={s} />;
     return null;
   };
+
 
   return (
     <div className="screen-wrapper fade-in" style={{
