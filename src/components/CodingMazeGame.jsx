@@ -22,7 +22,7 @@ const THEMES = {
   alien: { hero: '👽', target: '🛸', obstacle: '☄️', bgFloor: '#1e293b', bgAlt: '#334155', bgObstacle: '#ef4444' }
 };
 
-const LEVELS = [
+const RAW_LEVELS = [
   // 1
   { theme: 'fox', size: 4, start: { r: 3, c: 0 }, target: { r: 0, c: 3 }, obstacles: [{ r: 1, c: 1 }, { r: 2, c: 1 }, { r: 1, c: 2 }] },
   // 2
@@ -85,6 +85,25 @@ const LEVELS = [
   {theme:"alien",size:9,start:{r:0,c:0},target:{r:0,c:8},obstacles:[{r:7,c:7},{r:2,c:0},{r:1,c:4},{r:2,c:7},{r:4,c:7},{r:3,c:8},{r:8,c:2},{r:8,c:0},{r:6,c:3},{r:7,c:2},{r:1,c:2},{r:6,c:4},{r:4,c:8},{r:5,c:2},{r:4,c:3},{r:3,c:2},{r:3,c:0},{r:8,c:4},{r:5,c:4},{r:2,c:3},{r:8,c:4},{r:7,c:3},{r:8,c:3},{r:6,c:7}], enemies: [{ start: {r: 1, c: 1}, commands: ['DOWN', 'UP'] }, { start: {r: 8, c: 7}, commands: ['LEFT', 'RIGHT'] }]},
 ];
 
+const LEVELS = RAW_LEVELS.map((lvl, idx) => {
+  // 第十关之后的关卡 (index >= 10 表示第11关及以后)
+  if (idx < 10) return lvl;
+  const newObs = [...lvl.obstacles];
+  const sr = lvl.start.r, sc = lvl.start.c;
+  const neighbors = [
+    {r: sr - 1, c: sc}, {r: sr + 1, c: sc}, {r: sr, c: sc - 1}, {r: sr, c: sc + 1}
+  ].filter(n => n.r >= 0 && n.r < lvl.size && n.c >= 0 && n.c < lvl.size);
+  
+  neighbors.forEach(n => {
+    const isTarget = (n.r === lvl.target.r && n.c === lvl.target.c);
+    const hasObs = newObs.some(o => o.r === n.r && o.c === n.c);
+    if (!isTarget && !hasObs) {
+      newObs.push({r: n.r, c: n.c});
+    }
+  });
+  return { ...lvl, obstacles: newObs };
+});
+
 export default function CodingMazeGame({ lang, onBack }) {
   const [levelIdx, setLevelIdx] = useState(() => {
     const saved = localStorage.getItem('codingMazeLevel');
@@ -110,9 +129,9 @@ export default function CodingMazeGame({ lang, onBack }) {
     const saved = localStorage.getItem('codingMazeBombs');
     if (saved) {
       const parsed = parseInt(saved, 10);
-      return isNaN(parsed) ? 1 : parsed;
+      return isNaN(parsed) ? 0 : parsed;
     }
-    return 1;
+    return 0;
   });
   const [isBombMode, setIsBombMode] = useState(false);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
@@ -361,7 +380,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       localStorage.removeItem('codingMazeLevel');
       localStorage.removeItem('codingMazeBombs');
       setLevelIdx(0);
-      setBombCount(1);
+      setBombCount(0);
       setIsBombMode(false);
       setDestroyedObstacles([]);
     }
