@@ -30,8 +30,8 @@ const LEVELS = [
   { theme: 'bear', size: 6, start: { r: 5, c: 3 }, target: { r: 0, c: 2 }, obstacles: [{ r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 }] },
   // 7
   { theme: 'mouse', size: 7, start: { r: 6, c: 0 }, target: { r: 0, c: 6 }, obstacles: [{ r: 5, c: 1 }, { r: 4, c: 1 }, { r: 3, c: 1 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 2, c: 5 }] },
-  // 8
-  { theme: 'penguin', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 0 }, obstacles: [{ r: 2, c: 3 }, { r: 4, c: 3 }, { r: 3, c: 2 }, { r: 3, c: 4 }, { r: 1, c: 1 }] },
+  // 8 (Fixed: Removed {r:3, c:4})
+  { theme: 'penguin', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 0 }, obstacles: [{ r: 2, c: 3 }, { r: 4, c: 3 }, { r: 3, c: 2 }, { r: 1, c: 1 }] },
   // 9
   { theme: 'frog', size: 7, start: { r: 6, c: 6 }, target: { r: 0, c: 0 }, obstacles: [{ r: 5, c: 5 }, { r: 4, c: 4 }, { r: 3, c: 3 }, { r: 2, c: 2 }, { r: 1, c: 1 }] },
   // 10
@@ -46,16 +46,16 @@ const LEVELS = [
   { theme: 'bear', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 3 }, { r: 3, c: 3 }, { r: 1, c: 3 }, { r: 4, c: 1 }, { r: 4, c: 5 }, { r: 2, c: 1 }, { r: 2, c: 5 }] },
   // 15
   { theme: 'alien', size: 7, start: { r: 3, c: 0 }, target: { r: 3, c: 6 }, obstacles: [{ r: 3, c: 3 }, { r: 2, c: 3 }, { r: 4, c: 3 }, { r: 1, c: 2 }, { r: 5, c: 2 }, { r: 1, c: 4 }, { r: 5, c: 4 }] },
-  // 16
-  { theme: 'rabbit', size: 6, start: { r: 0, c: 3 }, target: { r: 5, c: 3 }, obstacles: [{ r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 }, { r: 3, c: 3 }, { r: 3, c: 4 }, { r: 3, c: 5 }] },
+  // 16 (Fixed: Removed {r:2, c:3})
+  { theme: 'rabbit', size: 6, start: { r: 0, c: 3 }, target: { r: 5, c: 3 }, obstacles: [{ r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }] },
   // 17
   { theme: 'cat', size: 7, start: { r: 6, c: 6 }, target: { r: 0, c: 0 }, obstacles: [{ r: 5, c: 6 }, { r: 4, c: 5 }, { r: 3, c: 4 }, { r: 2, c: 3 }, { r: 1, c: 2 }, { r: 0, c: 1 }, { r: 5, c: 1 }, { r: 1, c: 5 }] },
-  // 18
-  { theme: 'dog', size: 7, start: { r: 0, c: 0 }, target: { r: 6, c: 6 }, obstacles: [{ r: 1, c: 1 }, { r: 2, c: 2 }, { r: 3, c: 3 }, { r: 4, c: 4 }, { r: 5, c: 5 }, { r: 0, c: 2 }, { r: 2, c: 0 }, { r: 4, c: 6 }, { r: 6, c: 4 }] },
+  // 18 (Fixed: Removed {r:3, c:3})
+  { theme: 'dog', size: 7, start: { r: 0, c: 0 }, target: { r: 6, c: 6 }, obstacles: [{ r: 1, c: 1 }, { r: 2, c: 2 }, { r: 4, c: 4 }, { r: 5, c: 5 }, { r: 0, c: 2 }, { r: 2, c: 0 }, { r: 4, c: 6 }, { r: 6, c: 4 }] },
   // 19
   { theme: 'fox', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 2 }, { r: 5, c: 3 }, { r: 5, c: 4 }, { r: 3, c: 0 }, { r: 3, c: 1 }, { r: 3, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }, { r: 3, c: 6 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }] },
-  // 20
-  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 3, c: 4 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }] }
+  // 20 (Fixed: Removed {r:3, c:4})
+  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }] }
 ];
 
 export default function CodingMazeGame({ lang, onBack }) {
@@ -73,6 +73,12 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [isShaking, setIsShaking] = useState(false);
   const [isJumping, setIsJumping] = useState(false);
   const [zoomScale, setZoomScale] = useState(1.0);
+  const [bombCount, setBombCount] = useState(() => {
+    const saved = localStorage.getItem('codingMazeBombs');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [isBombMode, setIsBombMode] = useState(false);
+  const [destroyedObstacles, setDestroyedObstacles] = useState([]);
   
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
@@ -120,6 +126,8 @@ export default function CodingMazeGame({ lang, onBack }) {
     setExecutingIdx(-1);
     setIsShaking(false);
     setIsJumping(false);
+    setIsBombMode(false);
+    setDestroyedObstacles([]);
   };
 
   const resetToStart = () => {
@@ -184,7 +192,8 @@ export default function CodingMazeGame({ lang, onBack }) {
       }
 
       const hitObstacle = currentLevel.obstacles.some(o => o.r === nextR && o.c === nextC);
-      if (hitObstacle) {
+      const isDestroyed = destroyedObstacles.some(o => o.r === nextR && o.c === nextC);
+      if (hitObstacle && !isDestroyed) {
         audioSynth.playIncorrect();
         setStatusMsg(lang === 'en' ? 'Oops! Hit an obstacle.' : '哎呀，撞到障碍物了。');
         setIsPlaying(false);
@@ -227,13 +236,22 @@ export default function CodingMazeGame({ lang, onBack }) {
     const nextIdx = (levelIdx + 1) % LEVELS.length;
     setLevelIdx(nextIdx);
     localStorage.setItem('codingMazeLevel', nextIdx.toString());
+    const newBombs = bombCount + 2;
+    setBombCount(newBombs);
+    localStorage.setItem('codingMazeBombs', newBombs.toString());
+    setIsBombMode(false);
+    setDestroyedObstacles([]);
   };
 
   const resetAllProgress = () => {
     if (window.confirm(lang === 'en' ? 'Reset all progress?' : '确定要重置所有闯关进度并回到第一关吗？')) {
       audioSynth.playClick();
       localStorage.removeItem('codingMazeLevel');
+      localStorage.removeItem('codingMazeBombs');
       setLevelIdx(0);
+      setBombCount(0);
+      setIsBombMode(false);
+      setDestroyedObstacles([]);
     }
   };
 
@@ -260,16 +278,21 @@ export default function CodingMazeGame({ lang, onBack }) {
         let shadowColor = (r + c) % 2 === 0 ? tTheme.bgAlt : '#cbd5e1';
         let borderColor = (r + c) % 2 === 0 ? tTheme.bgAlt : '#cbd5e1';
 
+        const isObstacle = currentLevel.obstacles.some(o => o.r === r && o.c === c);
+        const isDestroyed = destroyedObstacles.some(o => o.r === r && o.c === c);
+
         if (r === currentLevel.target.r && c === currentLevel.target.c) {
           content = <span style={{ animation: 'targetPulse 1.5s infinite', display: 'inline-block' }}>{tTheme.target}</span>;
           bg = '#bbf7d0';
           shadowColor = '#86efac';
           borderColor = '#4ade80';
-        } else if (currentLevel.obstacles.some(o => o.r === r && o.c === c)) {
+        } else if (isObstacle && !isDestroyed) {
           content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center' }}>{tTheme.obstacle}</span>;
           bg = tTheme.bgObstacle;
           shadowColor = '#fca5a5';
           borderColor = '#f87171';
+        } else if (isObstacle && isDestroyed) {
+          content = <span style={{ opacity: 0.3, filter: 'grayscale(100%)' }}>💥</span>;
         }
 
         row.push(
@@ -282,7 +305,19 @@ export default function CodingMazeGame({ lang, onBack }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: `${cellSize * 0.6}px`,
             boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
-            position: 'relative'
+            position: 'relative',
+            cursor: (isBombMode && isObstacle && !isDestroyed) ? 'crosshair' : 'default',
+            outline: (isBombMode && isObstacle && !isDestroyed) ? '2px solid red' : 'none',
+            outlineOffset: '-2px'
+          }} onClick={() => {
+            if (isBombMode && isObstacle && !isDestroyed) {
+              audioSynth.playBomb();
+              setDestroyedObstacles([...destroyedObstacles, { r, c }]);
+              const newBombs = bombCount - 1;
+              setBombCount(newBombs);
+              localStorage.setItem('codingMazeBombs', newBombs.toString());
+              setIsBombMode(false);
+            }
           }}>
             {content}
           </div>
@@ -532,16 +567,38 @@ export default function CodingMazeGame({ lang, onBack }) {
           ))}
         </div>
 
-        {/* Run / Next button */}
-        {isSolved ? (
-          <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
-            {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
+        {/* Controls and Run area */}
+        <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', width: '100%', justifyContent: 'center', alignItems: 'stretch' }}>
+          
+          <button 
+             className="bouncy-button secondary" 
+             onClick={() => { if(bombCount > 0 && !isPlaying && !isSolved) setIsBombMode(!isBombMode); }}
+             style={{ 
+                padding: isMobile ? '6px 10px' : '10px 18px', 
+                fontSize: isMobile ? '0.9rem' : '1rem',
+                background: isBombMode ? '#fca5a5' : '#f8fafc',
+                border: `2px solid ${isBombMode ? '#ef4444' : '#cbd5e1'}`,
+                color: '#334155',
+                display: 'flex', alignItems: 'center', gap: '4px',
+                opacity: bombCount > 0 ? 1 : 0.5,
+                borderRadius: '12px',
+                boxShadow: `0 ${isMobile ? 2 : 4}px 0 #94a3b8`
+             }}
+             title={lang === 'en' ? 'Use Bomb' : '使用炸弹（点击后选择要炸毁的障碍物）'}
+          >
+            💣 <span style={{fontWeight:'bold'}}>x {bombCount}</span>
           </button>
-        ) : (
-          <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
-            <Play size={isMobile ? 14 : 18} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
-          </button>
-        )}
+
+          {isSolved ? (
+            <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
+              {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
+            </button>
+          ) : (
+            <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
+              <Play size={isMobile ? 14 : 18} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
+            </button>
+          )}
+        </div>
 
       </div>
     </div>
