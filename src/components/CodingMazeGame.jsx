@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight, Play, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X, ZoomIn, ZoomOut, RefreshCw, Play } from 'lucide-react';
+import forestBg from '../assets/forest_bg.png';
 import { audioSynth } from '../utils/audioSynth';
 
 const THEMES = {
@@ -55,7 +56,27 @@ const LEVELS = [
   // 19
   { theme: 'fox', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 2 }, { r: 5, c: 3 }, { r: 5, c: 4 }, { r: 3, c: 0 }, { r: 3, c: 1 }, { r: 3, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }, { r: 3, c: 6 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }] },
   // 20 (Fixed: Removed {r:3, c:4})
-  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }] }
+  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }] },
+  // 21
+  {theme:"fox",size:8,start:{r:5,c:0},target:{r:3,c:7},obstacles:[{r:7,c:4},{r:5,c:4},{r:6,c:5},{r:7,c:1},{r:7,c:6},{r:0,c:3},{r:6,c:7},{r:0,c:0},{r:2,c:0},{r:7,c:7},{r:4,c:6},{r:0,c:4},{r:4,c:6},{r:7,c:6},{r:1,c:1},{r:0,c:4},{r:2,c:1},{r:4,c:6},{r:2,c:6},{r:1,c:6},{r:5,c:3}]},
+  // 22
+  {theme:"rabbit",size:8,start:{r:2,c:0},target:{r:7,c:7},obstacles:[{r:3,c:7},{r:7,c:0},{r:0,c:4},{r:4,c:0},{r:1,c:0},{r:3,c:0},{r:5,c:0},{r:2,c:6},{r:1,c:3},{r:1,c:6},{r:1,c:1},{r:7,c:4},{r:0,c:5},{r:1,c:7},{r:1,c:6},{r:3,c:7},{r:3,c:1},{r:5,c:0}]},
+  // 23
+  {theme:"dog",size:8,start:{r:3,c:0},target:{r:6,c:7},obstacles:[{r:0,c:7},{r:4,c:7},{r:4,c:6},{r:3,c:5},{r:2,c:4},{r:5,c:2},{r:2,c:6},{r:6,c:0},{r:1,c:7},{r:0,c:4},{r:2,c:3},{r:2,c:5},{r:4,c:7},{r:2,c:0},{r:5,c:3},{r:5,c:3},{r:7,c:4},{r:2,c:2},{r:5,c:5}]},
+  // 24
+  {theme:"cat",size:8,start:{r:2,c:0},target:{r:5,c:7},obstacles:[{r:7,c:6},{r:5,c:1},{r:3,c:4},{r:7,c:1},{r:1,c:0},{r:0,c:6},{r:2,c:6},{r:2,c:2},{r:1,c:0},{r:1,c:3},{r:1,c:7},{r:5,c:1},{r:5,c:0},{r:2,c:6},{r:6,c:2},{r:1,c:4},{r:1,c:3}]},
+  // 25
+  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}]},
+  // 26
+  {theme:"bear",size:9,start:{r:4,c:0},target:{r:5,c:8},obstacles:[{r:6,c:0},{r:2,c:1},{r:3,c:1},{r:4,c:6},{r:2,c:1},{r:4,c:8},{r:6,c:6},{r:6,c:1},{r:4,c:5},{r:1,c:8},{r:8,c:7},{r:4,c:5},{r:4,c:7},{r:0,c:7},{r:7,c:4},{r:2,c:8},{r:2,c:0},{r:3,c:2},{r:1,c:2},{r:2,c:8},{r:0,c:6},{r:7,c:7}]},
+  // 27
+  {theme:"mouse",size:9,start:{r:4,c:0},target:{r:3,c:8},obstacles:[{r:0,c:6},{r:4,c:8},{r:8,c:0},{r:0,c:4},{r:5,c:2},{r:8,c:7},{r:2,c:2},{r:4,c:7},{r:6,c:1},{r:5,c:0},{r:6,c:6},{r:5,c:6},{r:7,c:2},{r:5,c:8},{r:6,c:4},{r:6,c:6},{r:0,c:5},{r:1,c:7},{r:5,c:0},{r:0,c:4},{r:0,c:5},{r:7,c:1},{r:4,c:2}]},
+  // 28
+  {theme:"penguin",size:9,start:{r:2,c:0},target:{r:6,c:8},obstacles:[{r:8,c:0},{r:1,c:5},{r:0,c:6},{r:1,c:0},{r:2,c:3},{r:0,c:0},{r:1,c:2},{r:8,c:1},{r:1,c:4},{r:1,c:7},{r:8,c:2},{r:8,c:5},{r:3,c:8},{r:1,c:8},{r:1,c:0},{r:8,c:2},{r:5,c:7},{r:2,c:5},{r:7,c:7},{r:0,c:6},{r:4,c:6}]},
+  // 29
+  {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
+  // 30
+  {theme:"alien",size:9,start:{r:0,c:0},target:{r:0,c:8},obstacles:[{r:7,c:7},{r:2,c:0},{r:1,c:4},{r:2,c:7},{r:4,c:7},{r:3,c:8},{r:8,c:2},{r:8,c:0},{r:6,c:3},{r:7,c:2},{r:1,c:2},{r:6,c:4},{r:4,c:8},{r:5,c:2},{r:4,c:3},{r:3,c:2},{r:3,c:0},{r:8,c:4},{r:5,c:4},{r:2,c:3},{r:8,c:4},{r:7,c:3},{r:8,c:3},{r:6,c:7}]},
 ];
 
 export default function CodingMazeGame({ lang, onBack }) {
@@ -375,9 +396,12 @@ export default function CodingMazeGame({ lang, onBack }) {
         flexDirection: 'column',
         gap: `${gridGap}px`,
         padding: `${gridPadding}px`,
-        backgroundColor: 'rgba(255,255,255,0.6)',
-        borderRadius: isMobile ? '12px' : '20px',
-        border: `${isMobile ? 2 : 3}px solid #e2e8f0`,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderRadius: isMobile ? '12px' : '24px',
+        border: `${isMobile ? 2 : 4}px solid rgba(255, 255, 255, 0.9)`,
+        boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
         boxSizing: 'border-box'
       }}>
         <style>
@@ -405,8 +429,24 @@ export default function CodingMazeGame({ lang, onBack }) {
               0%, 100% { transform: rotate(0deg); }
               50% { transform: rotate(4deg); }
             }
+            @keyframes floatFloat {
+              0%, 100% { transform: translateY(0) rotate(0deg); }
+              50% { transform: translateY(-8px) rotate(3deg); }
+            }
+            @keyframes twinkleScale {
+              0%, 100% { transform: scale(1); opacity: 0.7; }
+              50% { transform: scale(1.3); opacity: 1; }
+            }
           `}
         </style>
+        
+        {/* Floating Nature Decorations behind the grid but inside container */}
+        <div style={{ position: 'absolute', top: '-15px', left: '-10px', fontSize: '1.5rem', animation: 'floatFloat 4s infinite ease-in-out', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>☁️</div>
+        <div style={{ position: 'absolute', bottom: '-10px', right: '-15px', fontSize: '1.6rem', animation: 'floatFloat 5s infinite ease-in-out reverse', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>🍄</div>
+        <div style={{ position: 'absolute', top: '20%', right: '-20px', fontSize: '1.2rem', animation: 'twinkleScale 3s infinite ease-in-out', zIndex: 5 }}>✨</div>
+        <div style={{ position: 'absolute', bottom: '15%', left: '-18px', fontSize: '1.2rem', animation: 'twinkleScale 4s infinite ease-in-out 1s', zIndex: 5 }}>✨</div>
+        <div style={{ position: 'absolute', top: '-25px', right: '30%', fontSize: '1.8rem', animation: 'floatFloat 6s infinite ease-in-out', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>☁️</div>
+        <div style={{ position: 'absolute', bottom: '-15px', left: '20%', fontSize: '1.4rem', animation: 'floatFloat 4.5s infinite ease-in-out reverse', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>🌱</div>
         {grid}
         {/* Hero overlay */}
         <div style={{
@@ -439,15 +479,34 @@ export default function CodingMazeGame({ lang, onBack }) {
 
   return (
     <div className="screen-wrapper fade-in" style={{
-      padding: isMobile ? '2px' : '16px',
+      padding: isMobile ? '4px' : '16px',
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
-      height: '100%'
+      height: '100%',
+      backgroundImage: `url(${forestBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
     }}>
+      {/* Main glassmorphism card holding all controls */}
+      <div style={{
+        width: '100%',
+        height: '100%',
+        maxWidth: '600px',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: 'rgba(255, 255, 255, 0.45)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRadius: isMobile ? '16px' : '32px',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        padding: isMobile ? '8px' : '20px',
+        boxSizing: 'border-box'
+      }}>
       <div className="card-shadow" style={{ 
         flex: '1 1 0',
         minHeight: 0,
@@ -644,6 +703,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           )}
         </div>
 
+      </div>
       </div>
 
       {/* Math Quiz Modal */}
