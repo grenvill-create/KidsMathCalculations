@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X, ZoomIn, ZoomOut, RefreshCw, Play, RotateCcw } from 'lucide-react';
-import forestBg from '../assets/forest_bg.png';
+import bg1 from '../assets/bg_random_1.jpg';
+import bg2 from '../assets/bg_random_2.jpg';
+import bg3 from '../assets/bg_random_3.jpg';
+import bg4 from '../assets/bg_random_4.jpg';
+import bg5 from '../assets/bg_random_5.jpg';
 import { audioSynth } from '../utils/audioSynth';
+
+const BACKGROUNDS = [bg1, bg2, bg3, bg4, bg5];
 
 const THEMES = {
   fox: { hero: '🦊', target: '⭐', obstacle: '🌲', bgFloor: '#f8fafc', bgAlt: '#e2e8f0', bgObstacle: '#fecdd3' },
@@ -46,7 +52,7 @@ const LEVELS = [
   // 14
   { theme: 'bear', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 3 }, { r: 3, c: 3 }, { r: 1, c: 3 }, { r: 4, c: 1 }, { r: 4, c: 5 }, { r: 2, c: 1 }, { r: 2, c: 5 }] },
   // 15
-  { theme: 'alien', size: 7, start: { r: 3, c: 0 }, target: { r: 3, c: 6 }, obstacles: [{ r: 3, c: 3 }, { r: 2, c: 3 }, { r: 4, c: 3 }, { r: 1, c: 2 }, { r: 5, c: 2 }, { r: 1, c: 4 }, { r: 5, c: 4 }] },
+  { theme: 'alien', size: 7, start: { r: 3, c: 0 }, target: { r: 3, c: 6 }, obstacles: [{ r: 3, c: 3 }, { r: 2, c: 3 }, { r: 4, c: 3 }, { r: 1, c: 2 }, { r: 5, c: 2 }, { r: 1, c: 4 }, { r: 5, c: 4 }], enemies: [{ start: {r: 1, c: 3}, commands: ['DOWN', 'UP'] }, { start: {r: 5, c: 3}, commands: ['UP', 'DOWN'] }] },
   // 16 (Fixed: Removed {r:2, c:3})
   { theme: 'rabbit', size: 6, start: { r: 0, c: 3 }, target: { r: 5, c: 3 }, obstacles: [{ r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }] },
   // 17
@@ -56,7 +62,7 @@ const LEVELS = [
   // 19
   { theme: 'fox', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 2 }, { r: 5, c: 3 }, { r: 5, c: 4 }, { r: 3, c: 0 }, { r: 3, c: 1 }, { r: 3, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }, { r: 3, c: 6 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }] },
   // 20 (Fixed: Removed {r:3, c:4})
-  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }] },
+  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }], enemies: [{ start: {r: 1, c: 1}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }] },
   // 21
   {theme:"fox",size:8,start:{r:5,c:0},target:{r:3,c:7},obstacles:[{r:7,c:4},{r:5,c:4},{r:6,c:5},{r:7,c:1},{r:7,c:6},{r:0,c:3},{r:6,c:7},{r:0,c:0},{r:2,c:0},{r:7,c:7},{r:4,c:6},{r:0,c:4},{r:4,c:6},{r:7,c:6},{r:1,c:1},{r:0,c:4},{r:2,c:1},{r:4,c:6},{r:2,c:6},{r:1,c:6},{r:5,c:3}]},
   // 22
@@ -66,7 +72,7 @@ const LEVELS = [
   // 24
   {theme:"cat",size:8,start:{r:2,c:0},target:{r:5,c:7},obstacles:[{r:7,c:6},{r:5,c:1},{r:3,c:4},{r:7,c:1},{r:1,c:0},{r:0,c:6},{r:2,c:6},{r:2,c:2},{r:1,c:0},{r:1,c:3},{r:1,c:7},{r:5,c:1},{r:5,c:0},{r:2,c:6},{r:6,c:2},{r:1,c:4},{r:1,c:3}]},
   // 25
-  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}]},
+  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }]},
   // 26
   {theme:"bear",size:9,start:{r:4,c:0},target:{r:5,c:8},obstacles:[{r:6,c:0},{r:2,c:1},{r:3,c:1},{r:4,c:6},{r:2,c:1},{r:4,c:8},{r:6,c:6},{r:6,c:1},{r:4,c:5},{r:1,c:8},{r:8,c:7},{r:4,c:5},{r:4,c:7},{r:0,c:7},{r:7,c:4},{r:2,c:8},{r:2,c:0},{r:3,c:2},{r:1,c:2},{r:2,c:8},{r:0,c:6},{r:7,c:7}]},
   // 27
@@ -76,7 +82,7 @@ const LEVELS = [
   // 29
   {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
   // 30
-  {theme:"alien",size:9,start:{r:0,c:0},target:{r:0,c:8},obstacles:[{r:7,c:7},{r:2,c:0},{r:1,c:4},{r:2,c:7},{r:4,c:7},{r:3,c:8},{r:8,c:2},{r:8,c:0},{r:6,c:3},{r:7,c:2},{r:1,c:2},{r:6,c:4},{r:4,c:8},{r:5,c:2},{r:4,c:3},{r:3,c:2},{r:3,c:0},{r:8,c:4},{r:5,c:4},{r:2,c:3},{r:8,c:4},{r:7,c:3},{r:8,c:3},{r:6,c:7}]},
+  {theme:"alien",size:9,start:{r:0,c:0},target:{r:0,c:8},obstacles:[{r:7,c:7},{r:2,c:0},{r:1,c:4},{r:2,c:7},{r:4,c:7},{r:3,c:8},{r:8,c:2},{r:8,c:0},{r:6,c:3},{r:7,c:2},{r:1,c:2},{r:6,c:4},{r:4,c:8},{r:5,c:2},{r:4,c:3},{r:3,c:2},{r:3,c:0},{r:8,c:4},{r:5,c:4},{r:2,c:3},{r:8,c:4},{r:7,c:3},{r:8,c:3},{r:6,c:7}], enemies: [{ start: {r: 1, c: 1}, commands: ['DOWN', 'UP'] }, { start: {r: 8, c: 7}, commands: ['LEFT', 'RIGHT'] }]},
 ];
 
 export default function CodingMazeGame({ lang, onBack }) {
@@ -110,6 +116,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   });
   const [isBombMode, setIsBombMode] = useState(false);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
+  const [enemyPositions, setEnemyPositions] = useState([]);
   
   const [showMathQuiz, setShowMathQuiz] = useState(false);
   const [mathProblem, setMathProblem] = useState(null);
@@ -164,6 +171,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setIsBombMode(false);
     setDestroyedObstacles([]);
+    setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
   };
 
   const resetToStart = () => {
@@ -172,6 +180,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setPos({ ...currentLevel.start });
     setStatusMsg('');
+    setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
   };
 
   const triggerMathQuiz = () => {
@@ -233,6 +242,8 @@ export default function CodingMazeGame({ lang, onBack }) {
 
     let currentPos = { ...currentLevel.start };
     setPos(currentPos);
+    let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : [];
+    setEnemyPositions(currentEnemyPositions);
 
     for (let i = 0; i < commands.length; i++) {
       setExecutingIdx(i);
@@ -256,6 +267,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -271,6 +283,36 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
+        }, 500);
+        return;
+      }
+
+      if (currentLevel.enemies) {
+        currentEnemyPositions = currentEnemyPositions.map((ep, eIdx) => {
+          const enemyDef = currentLevel.enemies[eIdx];
+          const eCmd = enemyDef.commands[i % enemyDef.commands.length];
+          let er = ep.r, ec = ep.c;
+          if (eCmd === 'UP') er--;
+          if (eCmd === 'DOWN') er++;
+          if (eCmd === 'LEFT') ec--;
+          if (eCmd === 'RIGHT') ec++;
+          return {r: er, c: ec};
+        });
+        setEnemyPositions(currentEnemyPositions);
+      }
+
+      const hitEnemy = currentEnemyPositions.some(ep => ep.r === nextR && ep.c === nextC);
+      if (hitEnemy) {
+        audioSynth.playIncorrect();
+        setStatusMsg(lang === 'en' ? 'Oops! Caught by a snake.' : '哎呀，撞到巡逻的小蛇了。');
+        setIsPlaying(false);
+        setExecutingIdx(-1);
+        setIsShaking(true);
+        resetTimeoutRef.current = setTimeout(() => {
+          setIsShaking(false);
+          setPos({ ...currentLevel.start });
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -295,6 +337,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       resetTimeoutRef.current = setTimeout(() => {
         setIsShaking(false);
         setPos({ ...currentLevel.start });
+        setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
       }, 500);
     }
     setIsPlaying(false);
@@ -479,6 +522,23 @@ export default function CodingMazeGame({ lang, onBack }) {
         }}>
           {tTheme.hero}
         </div>
+        {/* Enemy overlays */}
+        {enemyPositions.map((ep, i) => (
+          <div key={`enemy-${i}`} style={{
+            position: 'absolute',
+            top: `calc(${gridPadding}px + ${ep.r} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
+            left: `calc(${gridPadding}px + ${ep.c} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
+            width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
+            height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: `${cellSize * 0.7}px`,
+            transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+            zIndex: 9,
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+          }}>
+            🐍
+          </div>
+        ))}
       </div>
     );
   };
@@ -503,9 +563,10 @@ export default function CodingMazeGame({ lang, onBack }) {
       justifyContent: 'center',
       width: '100%',
       height: '100%',
-      backgroundImage: `url(${forestBg})`,
+      backgroundImage: `url(${BACKGROUNDS[levelIdx % BACKGROUNDS.length]})`,
       backgroundSize: 'cover',
-      backgroundPosition: 'center'
+      backgroundPosition: 'center',
+      transition: 'background-image 0.5s ease-in-out'
     }}>
       {/* Transparent card holding all controls */}
       <div style={{
