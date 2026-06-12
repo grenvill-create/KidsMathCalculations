@@ -357,7 +357,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           shadowColor = '#fca5a5';
           borderColor = '#f87171';
         } else if (isObstacle && isDestroyed) {
-          content = <span style={{ opacity: 0.3, filter: 'grayscale(100%)' }}>💥</span>;
+          content = <span style={{ animation: 'bombExplosion 0.6s ease-out forwards', display: 'inline-block' }}>💥</span>;
         }
 
         row.push(
@@ -442,6 +442,17 @@ export default function CodingMazeGame({ lang, onBack }) {
             @keyframes twinkleScale {
               0%, 100% { transform: scale(1); opacity: 0.7; }
               50% { transform: scale(1.3); opacity: 1; }
+            }
+            @keyframes bombExplosion {
+              0% { transform: scale(0.2); opacity: 1; filter: brightness(2) drop-shadow(0 0 10px #ef4444); }
+              40% { transform: scale(1.6); opacity: 1; filter: brightness(1.5) drop-shadow(0 0 20px #ef4444); }
+              70% { transform: scale(1.1); opacity: 0.8; filter: drop-shadow(0 0 5px #ef4444); }
+              100% { transform: scale(1); opacity: 0.3; filter: grayscale(100%); }
+            }
+            @keyframes bombPulse {
+              0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); transform: scale(1); }
+              70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); transform: scale(1.05); }
+              100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
             }
           `}
         </style>
@@ -680,7 +691,8 @@ export default function CodingMazeGame({ lang, onBack }) {
                 color: bombCount === 0 ? '#1e40af' : '#334155',
                 display: 'flex', alignItems: 'center', gap: '4px',
                 borderRadius: '12px',
-                boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${bombCount === 0 ? '#60a5fa' : '#94a3b8'}`
+                boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${bombCount === 0 ? '#60a5fa' : '#94a3b8'}`,
+                animation: isBombMode ? 'bombPulse 1.5s infinite' : 'none'
              }}
              title={bombCount === 0 ? (lang === 'en' ? 'Get Bombs' : '获取炸弹') : (lang === 'en' ? 'Use Bomb' : '使用炸弹（点击后选择要炸毁的障碍物）')}
           >
