@@ -86,22 +86,43 @@ const RAW_LEVELS = [
 ];
 
 const LEVELS = RAW_LEVELS.map((lvl, idx) => {
-  // 第十关之后的关卡 (index >= 10 表示第11关及以后)
-  if (idx < 10) return lvl;
-  const newObs = [...lvl.obstacles];
-  const sr = lvl.start.r, sc = lvl.start.c;
-  const neighbors = [
-    {r: sr - 1, c: sc}, {r: sr + 1, c: sc}, {r: sr, c: sc - 1}, {r: sr, c: sc + 1}
-  ].filter(n => n.r >= 0 && n.r < lvl.size && n.c >= 0 && n.c < lvl.size);
-  
-  neighbors.forEach(n => {
-    const isTarget = (n.r === lvl.target.r && n.c === lvl.target.c);
-    const hasObs = newObs.some(o => o.r === n.r && o.c === n.c);
-    if (!isTarget && !hasObs) {
-      newObs.push({r: n.r, c: n.c});
+  let newLvl = { ...lvl, obstacles: [...lvl.obstacles] };
+
+  // 从第8关开始(index >= 7)，如果没有小蛇，自动添加一条小蛇
+  if (idx >= 7) {
+    if (!newLvl.enemies || newLvl.enemies.length === 0) {
+      let snakePos = null;
+      for (let r = 0; r < newLvl.size; r++) {
+        for (let c = 0; c < newLvl.size; c++) {
+          if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
+          if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
+          snakePos = { r, c };
+          break;
+        }
+        if (snakePos) break;
+      }
+      if (snakePos) {
+        newLvl.enemies = [{ start: snakePos, commands: ['DOWN', 'UP', 'RIGHT', 'LEFT'] }];
+      }
     }
-  });
-  return { ...lvl, obstacles: newObs };
+  }
+
+  // 第十关之后的关卡 (index >= 10 表示第11关及以后)
+  if (idx >= 10) {
+    const sr = newLvl.start.r, sc = newLvl.start.c;
+    const neighbors = [
+      {r: sr - 1, c: sc}, {r: sr + 1, c: sc}, {r: sr, c: sc - 1}, {r: sr, c: sc + 1}
+    ].filter(n => n.r >= 0 && n.r < newLvl.size && n.c >= 0 && n.c < newLvl.size);
+    
+    neighbors.forEach(n => {
+      const isTarget = (n.r === newLvl.target.r && n.c === newLvl.target.c);
+      const hasObs = newLvl.obstacles.some(o => o.r === n.r && o.c === n.c);
+      if (!isTarget && !hasObs) {
+        newLvl.obstacles.push({r: n.r, c: n.c});
+      }
+    });
+  }
+  return newLvl;
 });
 
 export default function CodingMazeGame({ lang, onBack }) {
@@ -135,6 +156,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   });
   const [isBombMode, setIsBombMode] = useState(false);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
+  const [destroyedEnemies, setDestroyedEnemies] = useState([]);
   const [enemyPositions, setEnemyPositions] = useState([]);
   
   const [showMathQuiz, setShowMathQuiz] = useState(false);
@@ -190,6 +212,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setIsBombMode(false);
     setDestroyedObstacles([]);
+    setDestroyedEnemies([]);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
   };
 
@@ -199,7 +222,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setPos({ ...currentLevel.start });
     setStatusMsg('');
-    setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
+    setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
   };
 
   const triggerMathQuiz = () => {
@@ -261,7 +284,7 @@ export default function CodingMazeGame({ lang, onBack }) {
 
     let currentPos = { ...currentLevel.start };
     setPos(currentPos);
-    let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : [];
+    let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : [];
     setEnemyPositions(currentEnemyPositions);
 
     for (let i = 0; i < commands.length; i++) {
@@ -286,7 +309,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -302,13 +325,14 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
         }, 500);
         return;
       }
 
       if (currentLevel.enemies) {
         currentEnemyPositions = currentEnemyPositions.map((ep, eIdx) => {
+          if (!ep) return null;
           const enemyDef = currentLevel.enemies[eIdx];
           const eCmd = enemyDef.commands[i % enemyDef.commands.length];
           let er = ep.r, ec = ep.c;
@@ -321,7 +345,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         setEnemyPositions(currentEnemyPositions);
       }
 
-      const hitEnemy = currentEnemyPositions.some(ep => ep.r === nextR && ep.c === nextC);
+      const hitEnemy = currentEnemyPositions.some(ep => ep && ep.r === nextR && ep.c === nextC);
       if (hitEnemy) {
         audioSynth.playIncorrect();
         setStatusMsg(lang === 'en' ? 'Oops! Caught by a snake.' : '哎呀，撞到巡逻的小蛇了。');
@@ -331,7 +355,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -356,7 +380,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       resetTimeoutRef.current = setTimeout(() => {
         setIsShaking(false);
         setPos({ ...currentLevel.start });
-        setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
+        setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
       }, 500);
     }
     setIsPlaying(false);
@@ -383,6 +407,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       setBombCount(0);
       setIsBombMode(false);
       setDestroyedObstacles([]);
+      setDestroyedEnemies([]);
     }
   };
 
@@ -412,6 +437,10 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isObstacle = currentLevel.obstacles.some(o => o.r === r && o.c === c);
         const isDestroyed = destroyedObstacles.some(o => o.r === r && o.c === c);
 
+        const enemyIdx = enemyPositions.findIndex(ep => ep && ep.r === r && ep.c === c);
+        const isEnemy = enemyIdx !== -1;
+        const isEnemyDestroyed = currentLevel.enemies?.some((e, i) => destroyedEnemies.includes(i) && e.start.r === r && e.start.c === c);
+
         if (r === currentLevel.target.r && c === currentLevel.target.c) {
           content = <span style={{ animation: 'targetPulse 1.5s infinite', display: 'inline-block' }}>{tTheme.target}</span>;
           bg = '#bbf7d0';
@@ -422,9 +451,11 @@ export default function CodingMazeGame({ lang, onBack }) {
           bg = tTheme.bgObstacle;
           shadowColor = '#fca5a5';
           borderColor = '#f87171';
-        } else if (isObstacle && isDestroyed) {
+        } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
           content = <span style={{ animation: 'bombExplosion 0.6s ease-out forwards', display: 'inline-block' }}>💥</span>;
         }
+
+        const canBomb = isBombMode && ((isObstacle && !isDestroyed) || isEnemy);
 
         row.push(
           <div key={`${r}-${c}`} style={{
@@ -437,13 +468,20 @@ export default function CodingMazeGame({ lang, onBack }) {
             fontSize: `${cellSize * 0.6}px`,
             boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
             position: 'relative',
-            cursor: (isBombMode && isObstacle && !isDestroyed) ? 'crosshair' : 'default',
-            outline: (isBombMode && isObstacle && !isDestroyed) ? '2px solid red' : 'none',
+            cursor: canBomb ? 'crosshair' : 'default',
+            outline: canBomb ? '2px solid red' : 'none',
             outlineOffset: '-2px'
           }} onClick={() => {
-            if (isBombMode && isObstacle && !isDestroyed) {
+            if (canBomb) {
               audioSynth.playBomb();
-              setDestroyedObstacles([...destroyedObstacles, { r, c }]);
+              if (isEnemy) {
+                setDestroyedEnemies([...destroyedEnemies, enemyIdx]);
+                const newEp = [...enemyPositions];
+                newEp[enemyIdx] = null;
+                setEnemyPositions(newEp);
+              } else {
+                setDestroyedObstacles([...destroyedObstacles, { r, c }]);
+              }
               const newBombs = bombCount - 1;
               setBombCount(newBombs);
               localStorage.setItem('codingMazeBombs', newBombs.toString());
@@ -542,22 +580,26 @@ export default function CodingMazeGame({ lang, onBack }) {
           {tTheme.hero}
         </div>
         {/* Enemy overlays */}
-        {enemyPositions.map((ep, i) => (
-          <div key={`enemy-${i}`} style={{
-            position: 'absolute',
-            top: `calc(${gridPadding}px + ${ep.r} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
-            left: `calc(${gridPadding}px + ${ep.c} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
-            width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
-            height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: `${cellSize * 0.7}px`,
-            transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-            zIndex: 9,
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-          }}>
-            🐍
-          </div>
-        ))}
+        {enemyPositions.map((ep, i) => {
+          if (!ep) return null;
+          return (
+            <div key={`enemy-${i}`} style={{
+              position: 'absolute',
+              top: `calc(${gridPadding}px + ${ep.r} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
+              left: `calc(${gridPadding}px + ${ep.c} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
+              width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
+              height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: `${cellSize * 0.7}px`,
+              transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+              zIndex: 9,
+              pointerEvents: 'none',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+            }}>
+              🐍
+            </div>
+          );
+        })}
       </div>
     );
   };
