@@ -461,13 +461,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           `}
         </style>
         
-        {/* Floating Nature Decorations behind the grid but inside container */}
-        <div style={{ position: 'absolute', top: '-15px', left: '-10px', fontSize: '1.5rem', animation: 'floatFloat 4s infinite ease-in-out', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>☁️</div>
-        <div style={{ position: 'absolute', bottom: '-10px', right: '-15px', fontSize: '1.6rem', animation: 'floatFloat 5s infinite ease-in-out reverse', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>🍄</div>
-        <div style={{ position: 'absolute', top: '20%', right: '-20px', fontSize: '1.2rem', animation: 'twinkleScale 3s infinite ease-in-out', zIndex: 5 }}>✨</div>
-        <div style={{ position: 'absolute', bottom: '15%', left: '-18px', fontSize: '1.2rem', animation: 'twinkleScale 4s infinite ease-in-out 1s', zIndex: 5 }}>✨</div>
-        <div style={{ position: 'absolute', top: '-25px', right: '30%', fontSize: '1.8rem', animation: 'floatFloat 6s infinite ease-in-out', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>☁️</div>
-        <div style={{ position: 'absolute', bottom: '-15px', left: '20%', fontSize: '1.4rem', animation: 'floatFloat 4.5s infinite ease-in-out reverse', zIndex: 5, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>🌱</div>
+
         {grid}
         {/* Hero overlay */}
         <div style={{
