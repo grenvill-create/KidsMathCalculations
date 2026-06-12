@@ -498,23 +498,17 @@ export default function CodingMazeGame({ lang, onBack }) {
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}>
-      {/* Main glassmorphism card holding all controls */}
+      {/* Transparent card holding all controls */}
       <div style={{
         width: '100%',
         height: '100%',
         maxWidth: '600px',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'rgba(255, 255, 255, 0.45)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderRadius: isMobile ? '16px' : '32px',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         padding: isMobile ? '8px' : '20px',
         boxSizing: 'border-box'
       }}>
-      <div className="card-shadow" style={{ 
+      <div style={{ 
         flex: '1 1 0',
         minHeight: 0,
         width: '100%', 
@@ -522,8 +516,6 @@ export default function CodingMazeGame({ lang, onBack }) {
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        background: 'rgba(255,255,255,0.88)', 
-        backdropFilter: 'blur(10px)',
         padding: isMobile ? '6px 8px' : '20px',
         boxSizing: 'border-box'
       }}>
