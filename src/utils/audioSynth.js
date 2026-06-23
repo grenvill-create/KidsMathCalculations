@@ -2,6 +2,8 @@
 
 let audioCtx = null;
 let isMuted = localStorage.getItem('kids_math_muted') === 'true';
+let activeWeatherNodes = [];
+let activeWeatherGain = null;
 
 function getAudioContext() {
   if (!audioCtx) {
@@ -171,20 +173,136 @@ export const audioSynth = {
     try {
       const ctx = getAudioContext();
       const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
+      
+      // Create noise buffer for explosion sound
+      const bufferSize = ctx.sampleRate * 0.6; // 0.6 seconds
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      // Filter noise to sound like a deep boom
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, now);
+      filter.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+
       const gain = ctx.createGain();
+      gain.gain.setValueAtTime(1.0, now); // loud start
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6); // fade out
 
-      osc.type = 'square'; // Harsh sound for explosion
-      osc.frequency.setValueAtTime(100, now);
-      osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
-
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-
-      osc.connect(gain);
+      noise.connect(filter);
+      filter.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.5);
+
+      noise.start(now);
+      noise.stop(now + 0.6);
     } catch (e) {}
+  },
+
+  stopWeatherAmbiance() {
+    try {
+      const ctx = getAudioContext();
+      if (activeWeatherGain) {
+        activeWeatherGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+      }
+      const nodesToStop = [...activeWeatherNodes];
+      activeWeatherNodes = [];
+      setTimeout(() => {
+        nodesToStop.forEach(n => {
+          try { n.stop(); } catch(e) {}
+        });
+      }, 500);
+    } catch(e) {}
+  },
+
+  startWeatherAmbiance(type) {
+    this.stopWeatherAmbiance();
+    if (isMuted || !type) return;
+    
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      activeWeatherGain = ctx.createGain();
+      activeWeatherGain.connect(ctx.destination);
+      
+      if (type === 'rain') {
+        const bufferSize = ctx.sampleRate * 2;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+        
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1000;
+        
+        activeWeatherGain.gain.setValueAtTime(0.0, now);
+        activeWeatherGain.gain.linearRampToValueAtTime(0.04, now + 1);
+        
+        noise.connect(filter);
+        filter.connect(activeWeatherGain);
+        noise.start(now);
+        activeWeatherNodes.push(noise);
+        
+      } else if (type === 'snow') {
+        const bufferSize = ctx.sampleRate * 2;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+        
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 250;
+        
+        activeWeatherGain.gain.setValueAtTime(0.0, now);
+        activeWeatherGain.gain.linearRampToValueAtTime(0.06, now + 2);
+        
+        noise.connect(filter);
+        filter.connect(activeWeatherGain);
+        noise.start(now);
+        activeWeatherNodes.push(noise);
+        
+      } else if (type === 'fog') {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = 60;
+        
+        activeWeatherGain.gain.setValueAtTime(0.0, now);
+        activeWeatherGain.gain.linearRampToValueAtTime(0.1, now + 3);
+        
+        osc.connect(activeWeatherGain);
+        osc.start(now);
+        activeWeatherNodes.push(osc);
+        
+      } else if (type === 'sun') {
+        const osc = ctx.createOscillator();
+        osc.type = 'triangle';
+        osc.frequency.value = 3500;
+        
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 3500;
+        
+        activeWeatherGain.gain.setValueAtTime(0.0, now);
+        activeWeatherGain.gain.linearRampToValueAtTime(0.01, now + 1);
+        
+        osc.connect(filter);
+        filter.connect(activeWeatherGain);
+        osc.start(now);
+        activeWeatherNodes.push(osc);
+      }
+    } catch(e) {}
   }
 };

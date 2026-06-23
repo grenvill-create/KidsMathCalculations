@@ -402,6 +402,11 @@ export default function App() {
 
   const isKeypadLocked = () => isSolved;
 
+  const goHomeFromGame = () => {
+    audioSynth.playClick();
+    setScreen('welcome');
+  };
+
   // Derive a label for the current range on the welcome screen
   const currentRangeLabel = (gameState.minNumber ?? 1) === 1 
     ? (gameState.lang === 'en' ? `Within ${gameState.maxNumber ?? 10}` : `${gameState.maxNumber ?? 10} 以内`)
@@ -415,7 +420,7 @@ export default function App() {
 
   return (
     <div id="app-viewport">
-      {/* HEADER */}
+      {/* GAMES SCREENS */}
       <div className="app-header">
         <button className="bouncy-button secondary" onClick={toggleMute} style={{ padding: '10px 14px' }}>
           {audioSynth.getMuteState() ? <VolumeX size={22} color="#e07a9e" /> : <Volume2 size={22} />}
@@ -1058,8 +1063,8 @@ export default function App() {
           )}
         </div>
       )}
-      {screen === 'bubbleBonds'  && <BubbleBondsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'tangram'      && <TangramGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'bubbleBonds'  && <BubbleBondsGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'tangram'      && <TangramGame lang={gameState.lang} onBack={goHomeFromGame} />}
       {screen === 'shape'      && <ShapeGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'compare'    && <CompareGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'clock'      && <ClockGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
@@ -1074,33 +1079,33 @@ export default function App() {
       {screen === 'color'      && <ColorGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'weekday'    && <WeekdayGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
       {screen === 'season'     && <SeasonGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
-      {screen === 'shopping'      && <ShoppingGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
-      {screen === 'placeValue'     && <PlaceValueGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'oddOneOut'      && <OddOneOutGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'multiStep'      && <MultiStepGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'sortClassify'   && <SortClassifyGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'measurement'    && <MeasurementGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'multiTable'     && <MultiplicationTableGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'fractions'      && <FractionsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'timeDiff'       && <TimeDiffGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'missingNum'     && <MissingNumberGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'mathMatch'      && <MathMatchingGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'columnMath'     && <ColumnMathGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'division'       && <DivisionIntroGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'numberLine'     && <NumberLineGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'areaPerim'      && <AreaPerimeterGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'dataCharts'     && <DataChartsGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'money'          && <MoneyGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'temperature'    && <TemperatureGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'symmetry'       && <SymmetryGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'codingMaze'     && <CodingMazeGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'block3D'        && <Block3DGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'balance'        && <BalanceScaleGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'probability'    && <ProbabilityGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'make10Pop'      && <Make10PopGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'mathLink'       && <MathLinkGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'subpop'         && <SubPopGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
-      {screen === 'waterJug'       && <WaterJugGame lang={gameState.lang} onBack={() => setScreen('welcome')} />}
+      {screen === 'shopping'       && <ShoppingGame autoAdvance={gameState.autoAdvance} lang={gameState.lang} difficultyMode={gameState.difficultyMode || 'adaptive'} />}
+      {screen === 'placeValue'     && <PlaceValueGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'oddOneOut'      && <OddOneOutGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'multiStep'      && <MultiStepGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'sortClassify'   && <SortClassifyGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'measurement'    && <MeasurementGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'multiTable'     && <MultiplicationTableGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'fractions'      && <FractionsGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'timeDiff'       && <TimeDiffGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'missingNum'     && <MissingNumberGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'mathMatch'      && <MathMatchingGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'columnMath'     && <ColumnMathGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'division'       && <DivisionIntroGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'numberLine'     && <NumberLineGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'areaPerim'      && <AreaPerimeterGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'dataCharts'     && <DataChartsGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'money'          && <MoneyGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'temperature'    && <TemperatureGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'symmetry'       && <SymmetryGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'codingMaze'     && <CodingMazeGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'block3D'        && <Block3DGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'balance'        && <BalanceScaleGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'probability'    && <ProbabilityGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'make10Pop'      && <Make10PopGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'mathLink'       && <MathLinkGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'subpop'         && <SubPopGame lang={gameState.lang} onBack={goHomeFromGame} />}
+      {screen === 'waterJug'       && <WaterJugGame lang={gameState.lang} onBack={goHomeFromGame} />}
       {/* --- EDUCATION PHILOSOPHY MODAL --- */}
       {showPhilosophy && (
         <div className="fade-in" style={{

@@ -144,13 +144,15 @@ export default function BubbleBondsGame({ lang, onBack }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0,
+    <div className="screen-wrapper fade-in" style={{
       background: theme.bg,
       display: 'flex', flexDirection: 'column',
+      alignItems: 'stretch',
       fontFamily: 'Fredoka, sans-serif',
       overflow: 'hidden',
-      transition: 'background 0.5s ease'
+      transition: 'background 0.5s ease',
+      width: '100%',
+      height: '100%'
     }}>
       <style>{`
         @keyframes floatUp {
@@ -206,7 +208,7 @@ export default function BubbleBondsGame({ lang, onBack }) {
       </div>
 
       {/* Game Area */}
-      <div ref={gameAreaRef} style={{ flex: 1, position: 'relative' }}>
+      <div ref={gameAreaRef} style={{ flex: '1 1 0', minHeight: 0, position: 'relative', overflow: 'hidden' }}>
         {bubbles.map(bubble => (
           <div
             key={bubble.id}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RefreshCw, Clock, Star, Play } from 'lucide-react';
 import { audioSynth } from '../utils/audioSynth';
 
@@ -113,8 +113,24 @@ export default function Make10PopGame({ lang, onBack }) {
   const [bubbles, setBubbles] = useState(() => generateBoard());
   const [selIds, setSelIds] = useState([]);
   const [shake, setShake] = useState(false);
+  
+  const [combo, setCombo] = useState(0);
+  const comboTimeoutRef = useRef(null);
+  const boardRef = useRef(null);
+  const [cellSize, setCellSize] = useState(65);
 
   const targetScore = round * 100;
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (boardRef.current) {
+        setCellSize(boardRef.current.clientWidth / COLS);
+      }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, [gameState]);
 
   // Timer
   useEffect(() => {
@@ -169,10 +185,16 @@ export default function Make10PopGame({ lang, onBack }) {
       // Mark as popping
       setBubbles(prev => prev.map(b => (b.id === b1.id || b.id === b2.id) ? { ...b, popping: true } : b));
 
+      // Combo logic
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      clearTimeout(comboTimeoutRef.current);
+      comboTimeoutRef.current = setTimeout(() => setCombo(0), 4000);
+
       // Update score and check win
       let won = false;
       setScore(s => {
-        const newScore = s + 10;
+        const newScore = s + (10 * newCombo);
         if (newScore >= targetScore) won = true;
         return newScore;
       });
@@ -191,6 +213,8 @@ export default function Make10PopGame({ lang, onBack }) {
       // Wrong match
       audioSynth.playIncorrect();
       setSelIds([]);
+      setCombo(0);
+      clearTimeout(comboTimeoutRef.current);
       setShake(true);
       setTimeout(() => setShake(false), 400);
     }
@@ -219,8 +243,9 @@ export default function Make10PopGame({ lang, onBack }) {
         .make10-board {
           position: relative;
           box-sizing: content-box;
-          width: ${COLS * CELL_SIZE}px;
-          height: ${ROWS * CELL_SIZE}px;
+          width: 100%;
+          max-width: 350px;
+          aspect-ratio: 5 / 6;
           background: rgba(255,255,255,0.6);
           border-radius: 16px;
           border: 4px solid #e2e8f0;
@@ -229,8 +254,6 @@ export default function Make10PopGame({ lang, onBack }) {
         }
         .bubble {
           position: absolute;
-          width: ${BUBBLE_SIZE}px;
-          height: ${BUBBLE_SIZE}px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -303,23 +326,36 @@ export default function Make10PopGame({ lang, onBack }) {
         {/* Game Area */}
         {gameState === 'playing' && (
           <>
-            <p style={{ textAlign: 'center', color: '#64748b', fontWeight: 700, margin: 0, fontSize: '0.95rem' }}>
-              {lang === 'en' ? 'Click adjacent bubbles that sum to 10!' : '点击相邻的两个气泡，让它们相加等于10！'}
-            </p>
-            
-            <div className={`make10-board ${shake ? 'shake-board' : ''}`}>
-              {bubbles.map(b => (
-                <div key={b.id}
-                     className={`bubble ${selIds.includes(b.id) ? 'selected' : ''} ${b.popping ? 'popping' : ''}`}
-                     style={{
-                       background: BUBBLE_COLORS[b.val - 1],
-                       left: b.c * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
-                       top: b.r * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
-                     }}
-                     onClick={() => handleBubbleClick(b)}>
-                  {b.val}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <p style={{ color: '#64748b', fontWeight: 700, margin: 0, fontSize: '0.95rem' }}>
+                {lang === 'en' ? 'Click adjacent bubbles that sum to 10!' : '点击相邻的两个气泡，让它们相加等于10！'}
+              </p>
+              {combo > 1 && (
+                <div className="bounce-in" style={{ background: '#f59e0b', color: 'white', padding: '4px 12px', borderRadius: '12px', fontWeight: 800, fontSize: '1rem', boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)' }}>
+                  Combo x{combo}!
                 </div>
-              ))}
+              )}
+            </div>
+            
+            <div ref={boardRef} className={`make10-board ${shake ? 'shake-board' : ''}`}>
+              {bubbles.map(b => {
+                const bSize = cellSize * 0.85;
+                const offset = (cellSize - bSize) / 2;
+                return (
+                  <div key={b.id}
+                       className={`bubble ${selIds.includes(b.id) ? 'selected' : ''} ${b.popping ? 'popping' : ''}`}
+                       style={{
+                         width: `${bSize}px`,
+                         height: `${bSize}px`,
+                         background: BUBBLE_COLORS[b.val - 1],
+                         left: b.c * cellSize + offset,
+                         top: b.r * cellSize + offset,
+                       }}
+                       onClick={() => handleBubbleClick(b)}>
+                    {b.val}
+                  </div>
+                );
+              })}
             </div>
           </>
         )}

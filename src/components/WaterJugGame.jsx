@@ -36,59 +36,90 @@ export default function WaterJugGame({ lang, onBack }) {
   const [gameState, setGameState] = useState('playing'); // playing | won
   const [moves, setMoves] = useState(0);
 
+  const [history, setHistory] = useState([]);
+  const [animatingPour, setAnimatingPour] = useState(null);
+
   useEffect(() => {
-    if (gameState === 'playing') {
+    if (gameState === 'playing' && !animatingPour) {
       if (jugA === levelInfo.target || jugB === levelInfo.target) {
         setGameState('won');
         audioSynth.playWin();
       }
     }
-  }, [jugA, jugB, levelInfo.target, gameState]);
+  }, [jugA, jugB, levelInfo.target, gameState, animatingPour]);
+
+  const saveHistory = () => {
+    setHistory(prev => [...prev, { jugA, jugB, moves }]);
+  };
+
+  const undo = () => {
+    if (gameState !== 'playing' || history.length === 0 || animatingPour) return;
+    audioSynth.playClick();
+    const last = history[history.length - 1];
+    setJugA(last.jugA);
+    setJugB(last.jugB);
+    setMoves(last.moves);
+    setHistory(history.slice(0, -1));
+  };
 
   const fillA = () => {
-    if (gameState !== 'playing' || jugA === levelInfo.maxA) return;
+    if (gameState !== 'playing' || jugA === levelInfo.maxA || animatingPour) return;
     audioSynth.playClick();
+    saveHistory();
     setJugA(levelInfo.maxA);
     setMoves(m => m + 1);
   };
 
   const fillB = () => {
-    if (gameState !== 'playing' || jugB === levelInfo.maxB) return;
+    if (gameState !== 'playing' || jugB === levelInfo.maxB || animatingPour) return;
     audioSynth.playClick();
+    saveHistory();
     setJugB(levelInfo.maxB);
     setMoves(m => m + 1);
   };
 
   const emptyA = () => {
-    if (gameState !== 'playing' || jugA === 0) return;
+    if (gameState !== 'playing' || jugA === 0 || animatingPour) return;
     audioSynth.playClick();
+    saveHistory();
     setJugA(0);
     setMoves(m => m + 1);
   };
 
   const emptyB = () => {
-    if (gameState !== 'playing' || jugB === 0) return;
+    if (gameState !== 'playing' || jugB === 0 || animatingPour) return;
     audioSynth.playClick();
+    saveHistory();
     setJugB(0);
     setMoves(m => m + 1);
   };
 
   const pourAtoB = () => {
-    if (gameState !== 'playing' || jugA === 0 || jugB === levelInfo.maxB) return;
+    if (gameState !== 'playing' || jugA === 0 || jugB === levelInfo.maxB || animatingPour) return;
     audioSynth.playCorrect(); // subtle sound for pour
+    saveHistory();
     const amount = Math.min(jugA, levelInfo.maxB - jugB);
-    setJugA(jugA - amount);
-    setJugB(jugB + amount);
-    setMoves(m => m + 1);
+    setAnimatingPour('AtoB');
+    setTimeout(() => {
+      setJugA(jugA - amount);
+      setJugB(jugB + amount);
+      setMoves(m => m + 1);
+      setAnimatingPour(null);
+    }, 600);
   };
 
   const pourBtoA = () => {
-    if (gameState !== 'playing' || jugB === 0 || jugA === levelInfo.maxA) return;
+    if (gameState !== 'playing' || jugB === 0 || jugA === levelInfo.maxA || animatingPour) return;
     audioSynth.playCorrect();
+    saveHistory();
     const amount = Math.min(jugB, levelInfo.maxA - jugA);
-    setJugB(jugB - amount);
-    setJugA(jugA + amount);
-    setMoves(m => m + 1);
+    setAnimatingPour('BtoA');
+    setTimeout(() => {
+      setJugB(jugB - amount);
+      setJugA(jugA + amount);
+      setMoves(m => m + 1);
+      setAnimatingPour(null);
+    }, 600);
   };
 
   const nextRound = () => {
@@ -102,6 +133,7 @@ export default function WaterJugGame({ lang, onBack }) {
     setJugA(0);
     setJugB(0);
     setMoves(0);
+    setHistory([]);
     setGameState('playing');
   };
 
@@ -109,6 +141,7 @@ export default function WaterJugGame({ lang, onBack }) {
     setJugA(0);
     setJugB(0);
     setMoves(0);
+    setHistory([]);
     setGameState('playing');
   };
 
@@ -168,6 +201,16 @@ export default function WaterJugGame({ lang, onBack }) {
         .btn-pour {
           background: #fdf4ff; color: #d946ef; box-shadow: 0 4px 0 #f5d0fe; width: 60px; height: 60px; border-radius: 50%;
         }
+        @keyframes pour-stream-AtoB {
+          0% { clip-path: inset(0 100% 0 0); }
+          50% { clip-path: inset(0 0 0 0); }
+          100% { clip-path: inset(0 0 0 100%); }
+        }
+        @keyframes pour-stream-BtoA {
+          0% { clip-path: inset(0 0 0 100%); }
+          50% { clip-path: inset(0 0 0 0); }
+          100% { clip-path: inset(0 100% 0 0); }
+        }
       `}</style>
 
       <div className="card-shadow" style={{
@@ -193,16 +236,30 @@ export default function WaterJugGame({ lang, onBack }) {
             </div>
           </div>
 
-          <button className="bouncy-button secondary" onClick={restartLevel} style={{ padding: '8px 12px' }}>
-            <RefreshCw size={20} />
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="bouncy-button secondary" onClick={undo} disabled={history.length === 0} style={{ padding: '8px 12px', opacity: history.length === 0 ? 0.5 : 1 }}>
+              {lang === 'en' ? 'Undo' : '撤销'}
+            </button>
+            <button className="bouncy-button secondary" onClick={restartLevel} style={{ padding: '8px 12px' }}>
+              <RefreshCw size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Game Area */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '40px', padding: '0 10px', minHeight: '260px' }}>
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '40px', padding: '0 10px', minHeight: '260px' }}>
           
+          {animatingPour && (
+            <div style={{
+               position: 'absolute', top: '40px', left: '25%', right: '25%', height: '100px',
+               borderTop: '8px solid #60a5fa', borderRadius: '50%', borderBottom: 'none', borderLeft: 'none', borderRight: 'none',
+               animation: animatingPour === 'AtoB' ? 'pour-stream-AtoB 0.6s ease-in-out forwards' : 'pour-stream-BtoA 0.6s ease-in-out forwards', 
+               pointerEvents: 'none', zIndex: 10
+            }} />
+          )}
+
           {/* Jug A Area */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', zIndex: 5 }}>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>
                {jugA}L / {levelInfo.maxA}L
             </div>
@@ -210,27 +267,27 @@ export default function WaterJugGame({ lang, onBack }) {
               <div className="water" style={{ height: `${(jugA / levelInfo.maxA) * 100}%` }} />
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
-               <button className="action-btn btn-fill" onClick={fillA} disabled={gameState !== 'playing'}>
+               <button className="action-btn btn-fill" onClick={fillA} disabled={gameState !== 'playing' || animatingPour}>
                  <Droplets size={16} /> {lang === 'en' ? 'Fill' : '装满'}
                </button>
-               <button className="action-btn btn-empty" onClick={emptyA} disabled={gameState !== 'playing'}>
+               <button className="action-btn btn-empty" onClick={emptyA} disabled={gameState !== 'playing' || animatingPour}>
                  <Trash2 size={16} /> {lang === 'en' ? 'Empty' : '倒空'}
                </button>
             </div>
           </div>
 
           {/* Pour Controls */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '45px' }}>
-             <button className="action-btn btn-pour" onClick={pourAtoB} disabled={gameState !== 'playing' || jugA === 0 || jugB === levelInfo.maxB} style={{ transform: gameState !== 'playing' || jugA === 0 || jugB === levelInfo.maxB ? 'scale(0.9) opacity(0.5)' : '' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '45px', zIndex: 5 }}>
+             <button className="action-btn btn-pour" onClick={pourAtoB} disabled={gameState !== 'playing' || jugA === 0 || jugB === levelInfo.maxB || animatingPour} style={{ transform: gameState !== 'playing' || jugA === 0 || jugB === levelInfo.maxB || animatingPour ? 'scale(0.9) opacity(0.5)' : '' }}>
                <ArrowRightCircle size={32} />
              </button>
-             <button className="action-btn btn-pour" onClick={pourBtoA} disabled={gameState !== 'playing' || jugB === 0 || jugA === levelInfo.maxA} style={{ transform: gameState !== 'playing' || jugB === 0 || jugA === levelInfo.maxA ? 'scale(0.9) opacity(0.5)' : '' }}>
+             <button className="action-btn btn-pour" onClick={pourBtoA} disabled={gameState !== 'playing' || jugB === 0 || jugA === levelInfo.maxA || animatingPour} style={{ transform: gameState !== 'playing' || jugB === 0 || jugA === levelInfo.maxA || animatingPour ? 'scale(0.9) opacity(0.5)' : '' }}>
                <ArrowLeftCircle size={32} />
              </button>
           </div>
 
           {/* Jug B Area */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', zIndex: 5 }}>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>
                {jugB}L / {levelInfo.maxB}L
             </div>
@@ -238,10 +295,10 @@ export default function WaterJugGame({ lang, onBack }) {
               <div className="water" style={{ height: `${(jugB / levelInfo.maxB) * 100}%` }} />
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
-               <button className="action-btn btn-fill" onClick={fillB} disabled={gameState !== 'playing'}>
+               <button className="action-btn btn-fill" onClick={fillB} disabled={gameState !== 'playing' || animatingPour}>
                  <Droplets size={16} /> {lang === 'en' ? 'Fill' : '装满'}
                </button>
-               <button className="action-btn btn-empty" onClick={emptyB} disabled={gameState !== 'playing'}>
+               <button className="action-btn btn-empty" onClick={emptyB} disabled={gameState !== 'playing' || animatingPour}>
                  <Trash2 size={16} /> {lang === 'en' ? 'Empty' : '倒空'}
                </button>
             </div>

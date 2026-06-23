@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RefreshCw, Clock, Star, Play, MinusCircle, ListTree } from 'lucide-react';
 import { audioSynth } from '../utils/audioSynth';
 
@@ -149,8 +149,24 @@ export default function SubPopGame({ lang, onBack }) {
   const [bubbles, setBubbles] = useState(() => generateBoard(mode, targetDiff));
   const [selIds, setSelIds] = useState([]);
   const [shake, setShake] = useState(false);
+  
+  const [combo, setCombo] = useState(0);
+  const comboTimeoutRef = useRef(null);
+  const boardRef = useRef(null);
+  const [cellSize, setCellSize] = useState(65);
 
   const goalScore = round * 100;
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (boardRef.current) {
+        setCellSize(boardRef.current.clientWidth / COLS);
+      }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, [gameState]);
 
   // Timer
   useEffect(() => {
@@ -249,8 +265,14 @@ export default function SubPopGame({ lang, onBack }) {
       setSelIds([]);
       setBubbles(prev => prev.map(b => matchedIds.includes(b.id) ? { ...b, popping: true } : b));
       
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      clearTimeout(comboTimeoutRef.current);
+      comboTimeoutRef.current = setTimeout(() => setCombo(0), 4000);
+
       let won = false;
-      const points = mode === 'target' ? 10 : 20; // More points for equation
+      const basePoints = mode === 'target' ? 10 : 20; // More points for equation
+      const points = basePoints * newCombo;
       
       setScore(s => {
         const newScore = s + points;
@@ -271,6 +293,8 @@ export default function SubPopGame({ lang, onBack }) {
   const handleMismatch = () => {
       audioSynth.playIncorrect();
       setSelIds([]);
+      setCombo(0);
+      clearTimeout(comboTimeoutRef.current);
       setShake(true);
       setTimeout(() => setShake(false), 400);
   };
@@ -308,8 +332,9 @@ export default function SubPopGame({ lang, onBack }) {
         .subpop-board {
           position: relative;
           box-sizing: content-box;
-          width: ${COLS * CELL_SIZE}px;
-          height: ${ROWS * CELL_SIZE}px;
+          width: 100%;
+          max-width: 350px;
+          aspect-ratio: 5 / 6;
           background: rgba(255,255,255,0.7);
           border-radius: 16px;
           border: 4px solid #cbd5e1;
@@ -318,8 +343,6 @@ export default function SubPopGame({ lang, onBack }) {
         }
         .bubble-sp {
           position: absolute;
-          width: ${BUBBLE_SIZE}px;
-          height: ${BUBBLE_SIZE}px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -424,26 +447,37 @@ export default function SubPopGame({ lang, onBack }) {
         {/* Game Area */}
         {gameState === 'playing' && (
           <>
-            <div style={{ textAlign: 'center', background: '#eff6ff', borderRadius: '12px', padding: '10px', color: '#1e40af', fontWeight: 800 }}>
-              {mode === 'target' ? (
-                  <>🎯 {lang === 'en' ? `Find 2 bubbles with difference of ` : `找出相差为 `} <span style={{ fontSize: '1.4rem', color: '#dc2626' }}>{targetDiff}</span> {lang === 'en' ? '' : '的两个气泡'}</>
-              ) : (
-                  <>🧮 {lang === 'en' ? `Click 3 bubbles to form A - B = C` : `连按 3 个气泡组成 被减数 - 减数 = 差`}</>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ textAlign: 'center', background: '#eff6ff', borderRadius: '12px', padding: '10px', color: '#1e40af', fontWeight: 800, flex: 1 }}>
+                {mode === 'target' ? (
+                    <>🎯 {lang === 'en' ? `Find 2 bubbles with diff ` : `找出相差为 `} <span style={{ fontSize: '1.4rem', color: '#dc2626' }}>{targetDiff}</span> {lang === 'en' ? '' : '的两个气泡'}</>
+                ) : (
+                    <>🧮 {lang === 'en' ? `Click 3 bubbles for A - B = C` : `连按 3 个气泡：被减数-减数=差`}</>
+                )}
+              </div>
+              {combo > 1 && (
+                <div className="bounce-in" style={{ marginLeft: '10px', background: '#f59e0b', color: 'white', padding: '4px 12px', borderRadius: '12px', fontWeight: 800, fontSize: '1rem', boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)' }}>
+                  Combo x{combo}!
+                </div>
               )}
             </div>
             
-            <div className={`subpop-board ${shake ? 'shake-board-sp' : ''}`}>
+            <div ref={boardRef} className={`subpop-board ${shake ? 'shake-board-sp' : ''}`}>
               {bubbles.map(b => {
                 const selIndex = selIds.indexOf(b.id);
                 const isSelected = selIndex !== -1;
                 const orderClass = isSelected ? `selected-${selIndex + 1}` : '';
+                const bSize = cellSize * 0.85;
+                const offset = (cellSize - bSize) / 2;
                 return (
                     <div key={b.id}
                         className={`bubble-sp ${isSelected ? 'selected' : ''} ${orderClass} ${b.popping ? 'popping' : ''}`}
                         style={{
+                        width: `${bSize}px`,
+                        height: `${bSize}px`,
                         background: BUBBLE_COLORS[b.val - 1],
-                        left: b.c * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
-                        top: b.r * CELL_SIZE + (CELL_SIZE - BUBBLE_SIZE) / 2,
+                        left: b.c * cellSize + offset,
+                        top: b.r * cellSize + offset,
                         }}
                         onClick={() => handleBubbleClick(b)}>
                     {b.val}

@@ -113,6 +113,58 @@ const LEVELS = [
       { id: 'dk4', shape: 'largeTriangle', color: '#4ade80', targetX: 420, targetY: 320, rotation: 180 },
       { id: 'dk5', shape: 'smallTriangle', color: '#f472b6', targetX: 515, targetY: 285, rotation: -45 },
     ]
+  },
+  {
+    id: 9,
+    nameZh: '房子',
+    nameEn: 'House',
+    emoji: '🏠',
+    pieces: [
+      { id: 'h1', shape: 'square', color: '#fca5a5', targetX: 400, targetY: 300, rotation: 0 },
+      { id: 'h2', shape: 'largeTriangle', color: '#60a5fa', targetX: 400, targetY: 150, rotation: 0 },
+      { id: 'h3', shape: 'mediumTriangle', color: '#fde047', targetX: 300, targetY: 300, rotation: -90 },
+      { id: 'h4', shape: 'smallTriangle', color: '#86efac', targetX: 470, targetY: 230, rotation: 0 },
+      { id: 'h5', shape: 'parallelogram', color: '#c4b5fd', targetX: 520, targetY: 300, rotation: 90 },
+    ]
+  },
+  {
+    id: 10,
+    nameZh: '火箭',
+    nameEn: 'Rocket',
+    emoji: '🚀',
+    pieces: [
+      { id: 'ro1', shape: 'square', color: '#a78bfa', targetX: 400, targetY: 280, rotation: 45 },
+      { id: 'ro2', shape: 'largeTriangle', color: '#fca5a5', targetX: 400, targetY: 140, rotation: 0 },
+      { id: 'ro3', shape: 'mediumTriangle', color: '#fde047', targetX: 330, targetY: 350, rotation: -45 },
+      { id: 'ro4', shape: 'mediumTriangle', color: '#6ee7b7', targetX: 470, targetY: 350, rotation: 135 },
+      { id: 'ro5', shape: 'smallTriangle', color: '#38bdf8', targetX: 400, targetY: 420, rotation: 180 },
+    ]
+  },
+  {
+    id: 11,
+    nameZh: '大树',
+    nameEn: 'Tree',
+    emoji: '🌳',
+    pieces: [
+      { id: 't1', shape: 'largeTriangle', color: '#4ade80', targetX: 400, targetY: 150, rotation: 0 },
+      { id: 't2', shape: 'mediumTriangle', color: '#86efac', targetX: 400, targetY: 250, rotation: 0 },
+      { id: 't3', shape: 'smallTriangle', color: '#bbf7d0', targetX: 400, targetY: 320, rotation: 0 },
+      { id: 't4', shape: 'square', color: '#b45309', targetX: 400, targetY: 400, rotation: 0 },
+      { id: 't5', shape: 'parallelogram', color: '#78350f', targetX: 400, targetY: 475, rotation: 90 },
+    ]
+  },
+  {
+    id: 12,
+    nameZh: '帆船',
+    nameEn: 'Boat',
+    emoji: '⛵',
+    pieces: [
+      { id: 'b1', shape: 'largeTriangle', color: '#38bdf8', targetX: 360, targetY: 200, rotation: 90 },
+      { id: 'b2', shape: 'mediumTriangle', color: '#fca5a5', targetX: 465, targetY: 270, rotation: 0 },
+      { id: 'b3', shape: 'square', color: '#fde047', targetX: 400, targetY: 380, rotation: 0 },
+      { id: 'b4', shape: 'smallTriangle', color: '#c4b5fd', targetX: 325, targetY: 380, rotation: 180 },
+      { id: 'b5', shape: 'smallTriangle', color: '#86efac', targetX: 475, targetY: 380, rotation: 90 },
+    ]
   }
 ];
 
@@ -307,8 +359,8 @@ export default function TangramGame({ lang, onBack }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0,
+    <div className="screen-wrapper fade-in" style={{
+      position: 'relative',
       background: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)',
       display: 'flex', flexDirection: 'column',
       fontFamily: 'Fredoka, sans-serif',

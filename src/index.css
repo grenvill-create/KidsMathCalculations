@@ -384,6 +384,52 @@ body::before {
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes wobbleWalk {
+  0% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-10deg) translateY(-4px); }
+  50% { transform: rotate(0deg) translateY(0); }
+  75% { transform: rotate(10deg) translateY(-4px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+@keyframes fuseBurn {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.2) rotate(10deg); filter: brightness(1.5) hue-rotate(-20deg); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 5px #fde047; transform: scale(1.05); }
+  50% { box-shadow: 0 0 20px #fde047; transform: scale(1.1); }
+}
+
+@keyframes bounceInDrop {
+  0% { transform: translateY(-50px) scale(0.9); opacity: 0; }
+  60% { transform: translateY(10px) scale(1.02); opacity: 1; }
+  80% { transform: translateY(-5px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes rainFall {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes snowFall {
+  0% { transform: translateY(-100px) translateX(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(100vh) translateX(20px); opacity: 0; }
+}
+
+@keyframes fogPan {
+  0% { transform: translateX(-5%) translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateX(5%) translateY(-2%) scale(1.05); opacity: 0.5; }
+  100% { transform: translateX(-5%) translateY(0) scale(1); opacity: 0.3; }
+}
+
+@keyframes dashFlow {
+  to { stroke-dashoffset: -25; }
+}
+
 /* Correct answer flash */
 .correct-flash {
   animation: correctFlash 0.5s ease;

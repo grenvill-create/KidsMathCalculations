@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X, ZoomIn, ZoomOut, RefreshCw, Play, RotateCcw } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X, ZoomIn, ZoomOut, RefreshCw, Play, RotateCcw, Settings } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { mathGenerator } from '../utils/mathGenerator';
 import bg1 from '../assets/bg_random_1.jpg';
 import bg2 from '../assets/bg_random_2.jpg';
 import bg3 from '../assets/bg_random_3.jpg';
@@ -125,6 +127,76 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
   return newLvl;
 });
 
+const getThemeWeather = (theme) => {
+  if (['frog', 'mouse'].includes(theme)) return 'rain';
+  if (['penguin', 'bear'].includes(theme)) return 'snow';
+  if (['alien', 'cat'].includes(theme)) return 'fog';
+  return 'sun';
+};
+
+const getThemeBackground = (theme) => {
+  if (['fox', 'dog'].includes(theme)) return '/backgrounds/bg_forest.png';
+  if (['rabbit', 'monkey'].includes(theme)) return '/backgrounds/bg_meadow.png';
+  if (['frog'].includes(theme)) return '/backgrounds/bg_pond.png';
+  if (['penguin', 'bear'].includes(theme)) return '/backgrounds/bg_ice.png';
+  if (['alien'].includes(theme)) return '/backgrounds/bg_space.png';
+  return '/backgrounds/bg_indoor.png'; // cat, mouse
+};
+
+const WeatherOverlay = ({ weather }) => {
+  if (weather === 'sun') {
+    return (
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        pointerEvents: 'none', zIndex: 0,
+        background: 'radial-gradient(circle at top left, rgba(255, 255, 200, 0.4) 0%, transparent 50%)',
+        mixBlendMode: 'screen'
+      }} />
+    );
+  }
+  if (weather === 'fog') {
+    return (
+      <div style={{
+        position: 'absolute', top: '-10%', left: '-10%', right: '-10%', bottom: '-10%',
+        pointerEvents: 'none', zIndex: 0,
+        background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.4) 100%)',
+        animation: 'fogPan 20s infinite ease-in-out',
+        mixBlendMode: 'screen',
+        filter: 'blur(10px)'
+      }} />
+    );
+  }
+  if (weather === 'snow' || weather === 'rain') {
+    const isSnow = weather === 'snow';
+    const count = isSnow ? 30 : 40;
+    const particles = [];
+    for (let i=0; i<count; i++) {
+      const left = Math.random() * 100 + '%';
+      const animDuration = isSnow ? (3 + Math.random() * 3 + 's') : (0.5 + Math.random() * 0.5 + 's');
+      const delay = Math.random() * -5 + 's';
+      particles.push(
+        <div key={i} style={{
+          position: 'absolute',
+          left,
+          top: isSnow ? '-10px' : '-20px',
+          width: isSnow ? '6px' : '2px',
+          height: isSnow ? '6px' : '15px',
+          background: isSnow ? 'white' : 'rgba(255,255,255,0.5)',
+          borderRadius: isSnow ? '50%' : '0',
+          animation: `${isSnow ? 'snowFall' : 'rainFall'} ${animDuration} linear ${delay} infinite`,
+          pointerEvents: 'none'
+        }} />
+      );
+    }
+    return (
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        {particles}
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function CodingMazeGame({ lang, onBack }) {
   const [levelIdx, setLevelIdx] = useState(() => {
     const saved = localStorage.getItem('codingMazeLevel');
@@ -145,6 +217,10 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [executingIdx, setExecutingIdx] = useState(-1);
   const [isShaking, setIsShaking] = useState(false);
   const [isJumping, setIsJumping] = useState(false);
+  const [isWalking, setIsWalking] = useState(false);
+  const [trail, setTrail] = useState([]);
+  const [pendingBombs, setPendingBombs] = useState([]);
+  const [currentWeather, setCurrentWeather] = useState(getThemeWeather(currentLevel.theme));
   const [zoomScale, setZoomScale] = useState(1.0);
   const [bombCount, setBombCount] = useState(() => {
     const saved = localStorage.getItem('codingMazeBombs');
@@ -163,11 +239,38 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [mathProblem, setMathProblem] = useState(null);
   const [mathInput, setMathInput] = useState('');
   const [isMathShaking, setIsMathShaking] = useState(false);
-
+  const [showSettings, setShowSettings] = useState(false);
+  const [showParentGate, setShowParentGate] = useState(false);
+  const [parentGateProblem, setParentGateProblem] = useState(null);
+  const [parentGateInput, setParentGateInput] = useState('');
+  const [isParentGateShaking, setIsParentGateShaking] = useState(false);
+  const [customMinInput, setCustomMinInput] = useState(1);
+  const [customMaxInput, setCustomMaxInput] = useState(20);
+  const [mathMin, setMathMin] = useState(1);
+  const [mathMax, setMathMax] = useState(20);
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
   const [mazeSize, setMazeSize] = useState(200);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+
+  const handleMouseMove = (e) => {
+    if (isMobile || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const nx = (x / rect.width) * 2 - 1;
+    const ny = (y / rect.height) * 2 - 1;
+    setTilt({ rx: -ny * 8, ry: nx * 8 });
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile) setTilt({ rx: 0, ry: 0 });
+  };
+
+  useEffect(() => {
+    setCurrentWeather(getThemeWeather(currentLevel.theme));
+  }, [currentLevel.theme]);
 
   // Pure CSS layout handles the actual dimensions.
   // We use ResizeObserver ONLY to read the final size and compute font sizes.
@@ -200,6 +303,15 @@ export default function CodingMazeGame({ lang, onBack }) {
     resetLevel();
   }, [levelIdx]);
 
+  const triggerSettings = () => {
+    audioSynth.playClick();
+    const num1 = Math.floor(Math.random() * 5) + 5; // 5-9
+    const num2 = Math.floor(Math.random() * 5) + 5; // 5-9
+    setParentGateProblem({ num1, num2, ans: num1 * num2 });
+    setParentGateInput('');
+    setShowParentGate(true);
+  };
+
   const resetLevel = () => {
     if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
     setPos({ ...currentLevel.start });
@@ -210,7 +322,10 @@ export default function CodingMazeGame({ lang, onBack }) {
     setExecutingIdx(-1);
     setIsShaking(false);
     setIsJumping(false);
+    setIsWalking(false);
     setIsBombMode(false);
+    setTrail([]);
+    setPendingBombs([]);
     setDestroyedObstacles([]);
     setDestroyedEnemies([]);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
@@ -220,6 +335,8 @@ export default function CodingMazeGame({ lang, onBack }) {
     if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
     setIsShaking(false);
     setIsJumping(false);
+    setIsWalking(false);
+    setTrail([]);
     setPos({ ...currentLevel.start });
     setStatusMsg('');
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
@@ -227,17 +344,8 @@ export default function CodingMazeGame({ lang, onBack }) {
 
   const triggerMathQuiz = () => {
     audioSynth.playClick();
-    const isAdd = Math.random() > 0.5;
-    let a, b;
-    if (isAdd) {
-      a = Math.floor(Math.random() * 11); // 0-10
-      b = Math.floor(Math.random() * (20 - a + 1)); // a+b <= 20
-      setMathProblem({ a, b, op: '+', ans: a + b });
-    } else {
-      a = Math.floor(Math.random() * 21); // 0-20
-      b = Math.floor(Math.random() * (a + 1)); // b <= a
-      setMathProblem({ a, b, op: '-', ans: a - b });
-    }
+    const q = mathGenerator.generateQuestion(4, { minNumber: mathMin, maxNumber: mathMax, operations: ['add', 'sub'], lang: lang });
+    setMathProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
     setMathInput('');
     setShowMathQuiz(true);
   };
@@ -261,7 +369,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const addCommand = (cmd) => {
     if (isPlaying || isSolved) return;
     audioSynth.playClick();
-    if (commands.length < 15) {
+    if (commands.length < 30) {
       setCommands([...commands, cmd]);
       resetToStart();
     }
@@ -284,13 +392,17 @@ export default function CodingMazeGame({ lang, onBack }) {
 
     let currentPos = { ...currentLevel.start };
     setPos(currentPos);
+    setTrail([]);
     let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : [];
     setEnemyPositions(currentEnemyPositions);
 
     for (let i = 0; i < commands.length; i++) {
       setExecutingIdx(i);
       const cmd = commands[i];
+      setIsWalking(true);
+      
       await new Promise(res => setTimeout(res, 450));
+      setIsWalking(false);
 
       let nextR = currentPos.r;
       let nextC = currentPos.c;
@@ -360,6 +472,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         return;
       }
 
+      setTrail(prev => [...prev, { ...currentPos }]);
       currentPos = { r: nextR, c: nextC };
       setPos(currentPos);
       audioSynth.playClick();
@@ -373,6 +486,12 @@ export default function CodingMazeGame({ lang, onBack }) {
       setStatusMsg(lang === 'en' ? 'Target reached!' : '到达终点啦！');
       setIsSolved(true);
       setIsJumping(true);
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff5d9e', '#ffd6e8', '#ffadd2', '#bbf7d0', '#fef08a']
+      });
     } else {
       audioSynth.playIncorrect();
       setStatusMsg(lang === 'en' ? 'Did not reach the target.' : '还没到达终点呢。');
@@ -426,6 +545,15 @@ export default function CodingMazeGame({ lang, onBack }) {
   const renderGrid = () => {
     const tTheme = THEMES[currentLevel.theme] || THEMES.fox;
     const grid = [];
+    
+    const getPathPoints = () => {
+      const allPoints = [...trail, pos];
+      return allPoints.map(p => {
+        const cx = gridPadding + p.c * (cellSize + gridGap) + cellSize / 2;
+        const cy = gridPadding + p.r * (cellSize + gridGap) + cellSize / 2;
+        return `${cx},${cy}`;
+      }).join(' ');
+    };
     for (let r = 0; r < currentLevel.size; r++) {
       const row = [];
       for (let c = 0; c < currentLevel.size; c++) {
@@ -441,7 +569,12 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isEnemy = enemyIdx !== -1;
         const isEnemyDestroyed = currentLevel.enemies?.some((e, i) => destroyedEnemies.includes(i) && e.start.r === r && e.start.c === c);
 
-        if (r === currentLevel.target.r && c === currentLevel.target.c) {
+        const isPendingBomb = pendingBombs.some(p => p.r === r && p.c === c);
+        const isFootprint = trail.some(t => t.r === r && t.c === c);
+
+        if (isPendingBomb) {
+          content = <span style={{ animation: 'fuseBurn 0.2s infinite alternate', display: 'inline-block' }}>🧨</span>;
+        } else if (r === currentLevel.target.r && c === currentLevel.target.c) {
           content = <span style={{ animation: 'targetPulse 1.5s infinite', display: 'inline-block' }}>{tTheme.target}</span>;
           bg = '#bbf7d0';
           shadowColor = '#86efac';
@@ -452,7 +585,9 @@ export default function CodingMazeGame({ lang, onBack }) {
           shadowColor = '#fca5a5';
           borderColor = '#f87171';
         } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
-          content = <span style={{ animation: 'bombExplosion 0.6s ease-out forwards', display: 'inline-block' }}>💥</span>;
+          content = null;
+        } else if (isFootprint) {
+          content = <span style={{ opacity: 0.3, fontSize: `${cellSize * 0.4}px` }}>🐾</span>;
         }
 
         const canBomb = isBombMode && ((isObstacle && !isDestroyed) || isEnemy);
@@ -472,19 +607,49 @@ export default function CodingMazeGame({ lang, onBack }) {
             outline: canBomb ? '2px solid red' : 'none',
             outlineOffset: '-2px'
           }} onClick={() => {
-            if (canBomb) {
-              audioSynth.playBomb();
-              if (isEnemy) {
-                setDestroyedEnemies([...destroyedEnemies, enemyIdx]);
-                const newEp = [...enemyPositions];
-                newEp[enemyIdx] = null;
-                setEnemyPositions(newEp);
-              } else {
-                setDestroyedObstacles([...destroyedObstacles, { r, c }]);
-              }
-              const newBombs = bombCount - 1;
-              setBombCount(newBombs);
-              localStorage.setItem('codingMazeBombs', newBombs.toString());
+            if (canBomb && !isPendingBomb) {
+              setPendingBombs([...pendingBombs, {r, c}]);
+              audioSynth.playClick();
+              setTimeout(() => {
+                audioSynth.playBomb();
+                setIsShaking(true);
+                setTimeout(() => setIsShaking(false), 300);
+                
+                if (containerRef.current) {
+                  const rect = containerRef.current.getBoundingClientRect();
+                  const cellW = rect.width / currentLevel.size;
+                  const cellH = rect.height / currentLevel.size;
+                  const absX = rect.left + c * cellW + cellW / 2;
+                  const absY = rect.top + r * cellH + cellH / 2;
+                  
+                  confetti({
+                    particleCount: 80,
+                    spread: 100,
+                    startVelocity: 30,
+                    origin: {
+                      x: absX / window.innerWidth,
+                      y: absY / window.innerHeight
+                    },
+                    colors: ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
+                    ticks: 100,
+                    gravity: 1.2
+                  });
+                }
+                
+                setPendingBombs(prev => prev.filter(p => p.r !== r || p.c !== c));
+                
+                if (isEnemy) {
+                  setDestroyedEnemies(prev => [...prev, enemyIdx]);
+                  const newEp = [...enemyPositions];
+                  newEp[enemyIdx] = null;
+                  setEnemyPositions(newEp);
+                } else {
+                  setDestroyedObstacles(prev => [...prev, { r, c }]);
+                }
+                const newBombs = bombCount - 1;
+                setBombCount(newBombs);
+                localStorage.setItem('codingMazeBombs', newBombs.toString());
+              }, 500);
               setIsBombMode(false);
             }
           }}>
@@ -499,7 +664,8 @@ export default function CodingMazeGame({ lang, onBack }) {
       );
     }
     return (
-      <div className="maze-grid-container" style={{
+      <div className="maze-grid-container" key={levelIdx} style={{
+        animation: 'bounceInDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         position: 'absolute',
         top: 0, left: 0, right: 0, bottom: 0,
         display: 'flex',
@@ -563,6 +729,29 @@ export default function CodingMazeGame({ lang, onBack }) {
         
 
         {grid}
+        {trail.length > 0 && (
+          <svg style={{
+            position: 'absolute',
+            top: 0, left: 0,
+            width: '100%', height: '100%',
+            pointerEvents: 'none',
+            zIndex: 5
+          }}>
+            <polyline 
+              points={getPathPoints()}
+              fill="none"
+              stroke="#fef08a"
+              strokeWidth={isMobile ? "4" : "6"}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                filter: 'drop-shadow(0 0 8px #fde047)',
+                strokeDasharray: '10, 15',
+                animation: 'dashFlow 1s linear infinite'
+              }}
+            />
+          </svg>
+        )}
         {/* Hero overlay */}
         <div style={{
           position: 'absolute',
@@ -573,7 +762,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: `${cellSize * 0.7}px`,
           transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-          animation: isShaking ? 'heroShake 0.4s' : (isJumping ? 'heroJump 0.5s infinite' : 'none'),
+          animation: isShaking ? 'heroShake 0.4s' : (isJumping ? 'heroJump 0.5s infinite' : (isWalking ? 'wobbleWalk 0.4s infinite' : 'none')),
           zIndex: 10,
           filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.25))'
         }}>
@@ -624,11 +813,13 @@ export default function CodingMazeGame({ lang, onBack }) {
       justifyContent: 'center',
       width: '100%',
       height: '100%',
-      backgroundImage: `url(${BACKGROUNDS[levelIdx % BACKGROUNDS.length]})`,
+      backgroundImage: `url(${getThemeBackground(currentLevel.theme)})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       transition: 'background-image 0.5s ease-in-out'
     }}>
+      <WeatherOverlay weather={currentWeather} />
+      
       {/* Transparent card holding all controls */}
       <div style={{
         width: '100%',
@@ -665,6 +856,9 @@ export default function CodingMazeGame({ lang, onBack }) {
             {lang === 'en' ? `Maze (${levelIdx + 1}/${LEVELS.length})` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`}
           </h2>
           <div style={{ display: 'flex', gap: isMobile ? '2px' : '6px' }}>
+            <button className="bouncy-button secondary" onClick={triggerSettings} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title={lang === 'en' ? 'Settings' : '设置'}>
+              <Settings size={isMobile ? 14 : 18} />
+            </button>
             <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title="缩小">
               <ZoomOut size={isMobile ? 14 : 18} />
             </button>
@@ -678,14 +872,18 @@ export default function CodingMazeGame({ lang, onBack }) {
         </div>
 
         {/* Maze Container (Flex area that takes remaining vertical space) */}
-        <div style={{ 
-          flex: '1 1 0',
+        <div 
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+          flex: '1 1 auto',
           minHeight: 0,
           width: '100%',
-          display: 'flex', 
-          justifyContent: 'center', 
+          display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: isMobile ? '3px' : '10px'
+          marginBottom: isMobile ? '3px' : '10px',
+          perspective: '1000px'
         }}>
           {/* Inner container forced to be a square, sizing itself purely by CSS constraints */}
           <div ref={containerRef} style={{
@@ -693,9 +891,10 @@ export default function CodingMazeGame({ lang, onBack }) {
              maxWidth: '100%',
              aspectRatio: '1 / 1',
              position: 'relative',
-             transform: `scale(${zoomScale})`,
+             transform: `scale(${zoomScale}) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
              transformOrigin: 'center center',
-             transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+             transition: tilt.rx === 0 && tilt.ry === 0 ? 'transform 0.5s ease-out' : 'transform 0.1s ease-out',
+             transformStyle: 'preserve-3d'
           }}>
             {renderGrid()}
           </div>
@@ -735,7 +934,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               cursor: isPlaying || isSolved ? 'default' : 'pointer', 
               boxShadow: `0 ${isMobile ? 2 : 3}px 0 #1e40af`,
               position: 'relative',
-              animation: idx === executingIdx ? 'cmdActive 0.5s' : 'none',
+              animation: idx === executingIdx ? 'glowPulse 0.5s infinite' : 'none',
               zIndex: idx === executingIdx ? 10 : 1,
               flexShrink: 0
             }}>
@@ -889,6 +1088,133 @@ export default function CodingMazeGame({ lang, onBack }) {
             >
               {lang === 'en' ? 'Cancel' : '放弃挑战'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div className="bounce-in card-shadow" style={{
+            background: 'white', borderRadius: '24px', padding: '24px',
+            width: '90%', maxWidth: '340px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ margin: '0 0 20px 0', color: '#334155', textAlign: 'center' }}>
+              {lang === 'en' ? 'Bomb Math Difficulty' : '获取炸弹难度设置'}
+            </h3>
+            <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '10px' }}>
+              {lang === 'en' ? 'Numerical range (e.g. 10 to 20):' : '计算数值范围 (例如 10 到 20)：'}
+            </p>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
+              <input 
+                type="number" 
+                value={customMinInput}
+                onChange={e => setCustomMinInput(e.target.value)}
+                style={{
+                  flex: 1, padding: '12px', fontSize: '1.2rem', borderRadius: '12px',
+                  border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
+                }}
+                placeholder="10"
+              />
+              <span style={{ fontSize: '1.2rem', color: '#64748b', fontWeight: 'bold' }}>-</span>
+              <input 
+                type="number" 
+                value={customMaxInput}
+                onChange={e => setCustomMaxInput(e.target.value)}
+                style={{
+                  flex: 1, padding: '12px', fontSize: '1.2rem', borderRadius: '12px',
+                  border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
+                }}
+                placeholder="20"
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                onClick={() => { audioSynth.playClick(); setShowSettings(false); }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#e2e8f0', color: '#475569', fontWeight: 'bold' }}
+              >
+                {lang === 'en' ? 'Cancel' : '取消'}
+              </button>
+              <button 
+                onClick={() => {
+                  audioSynth.playClick();
+                  let vMin = parseInt(customMinInput);
+                  let vMax = parseInt(customMaxInput);
+                  if (isNaN(vMin) || vMin < 1) vMin = 1;
+                  if (isNaN(vMax) || vMax < vMin) vMax = vMin + 5;
+                  if (vMax > 1000) vMax = 1000;
+                  setMathMin(vMin);
+                  setMathMax(vMax);
+                  setCustomMinInput(vMin);
+                  setCustomMaxInput(vMax);
+                  setShowSettings(false);
+                }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#3b82f6', color: 'white', fontWeight: 'bold' }}
+              >
+                {lang === 'en' ? 'Save' : '保存'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Parent Gate Modal */}
+      {showParentGate && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
+        }}>
+          <div className={`bounce-in card-shadow ${isParentGateShaking ? 'shake' : ''}`} style={{
+            background: 'white', borderRadius: '24px', padding: '24px',
+            width: '90%', maxWidth: '340px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#dc2626', textAlign: 'center' }}>
+              {lang === 'en' ? 'Parental Gate' : '家长锁'}
+            </h3>
+            <p style={{ fontSize: '0.95rem', color: '#64748b', marginBottom: '20px', textAlign: 'center' }}>
+              {lang === 'en' ? 'Please solve this to continue:' : '请完成乘法计算以继续：'}
+            </p>
+            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1e293b', textAlign: 'center', marginBottom: '20px' }}>
+              {parentGateProblem?.num1} × {parentGateProblem?.num2} = ?
+            </div>
+            <input 
+              type="number" 
+              autoFocus
+              value={parentGateInput}
+              onChange={e => setParentGateInput(e.target.value)}
+              style={{
+                width: '100%', padding: '12px', fontSize: '1.2rem', borderRadius: '12px',
+                border: '2px solid #cbd5e1', marginBottom: '20px', textAlign: 'center'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                onClick={() => { audioSynth.playClick(); setShowParentGate(false); }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#e2e8f0', color: '#475569', fontWeight: 'bold' }}
+              >
+                {lang === 'en' ? 'Cancel' : '取消'}
+              </button>
+              <button 
+                onClick={() => {
+                  if (parseInt(parentGateInput, 10) === parentGateProblem?.ans) {
+                    audioSynth.playCorrect();
+                    setShowParentGate(false);
+                    setShowSettings(true);
+                  } else {
+                    audioSynth.playIncorrect();
+                    setIsParentGateShaking(true);
+                    setParentGateInput('');
+                    setTimeout(() => setIsParentGateShaking(false), 500);
+                  }
+                }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#dc2626', color: 'white', fontWeight: 'bold' }}
+              >
+                {lang === 'en' ? 'Verify' : '验证'}
+              </button>
+            </div>
           </div>
         </div>
       )}
