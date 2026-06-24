@@ -574,10 +574,19 @@ export default function CodingMazeGame({ lang, onBack }) {
 
           const eCmd = enemyDef.commands[i % enemyDef.commands.length];
           let er = ep.r, ec = ep.c;
-          if (eCmd === 'UP') er--;
-          if (eCmd === 'DOWN') er++;
-          if (eCmd === 'LEFT') ec--;
-          if (eCmd === 'RIGHT') ec++;
+          let steps = enemyDef.type === 'rhino' ? 2 : 1;
+          for (let s = 0; s < steps; s++) {
+            let next_r = er;
+            let next_c = ec;
+            if (eCmd === 'UP') next_r--;
+            if (eCmd === 'DOWN') next_r++;
+            if (eCmd === 'LEFT') next_c--;
+            if (eCmd === 'RIGHT') next_c++;
+            if (next_r >= 0 && next_r < currentLevel.size && next_c >= 0 && next_c < currentLevel.size) {
+                er = next_r;
+                ec = next_c;
+            }
+          }
           return {r: er, c: ec};
         });
         setEnemyPositions(currentEnemyPositions);
@@ -831,6 +840,12 @@ export default function CodingMazeGame({ lang, onBack }) {
                     let dmg = 1;
                     if (usedBomb === 'freeze') dmg = 2;
                     if (usedBomb === 'super') dmg = 3;
+                    
+                    const eType = currentLevel.enemies[enemyIdx].type;
+                    if (eType === 'turtle' && usedBomb !== 'super') {
+                      dmg = 0; // Immune to normal/freeze bombs
+                    }
+                    
                     next[enemyIdx] -= dmg;
                     return next;
                   });
@@ -840,7 +855,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               }, 500);
             } else if (isEnemy && activeBombType === null) {
               const eType = currentLevel.enemies[enemyIdx].type;
-              if (eType === 'tiger' || eType === 'elephant' || eType === 'spider') {
+              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake'].includes(eType)) {
                 audioSynth.playClick();
                 setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
               }
@@ -924,6 +939,20 @@ export default function CodingMazeGame({ lang, onBack }) {
               50% { transform: rotate(180deg) scale(1.3); }
               100% { transform: rotate(360deg) scale(1); }
             }
+            @keyframes idleBreathing {
+              0% { transform: scale(1, 1); }
+              100% { transform: scale(1.05, 0.95); }
+            }
+            @keyframes hoverWobble {
+              0% { transform: translateY(0) rotate(-2deg); }
+              50% { transform: translateY(-5px) rotate(2deg); }
+              100% { transform: translateY(0) rotate(-2deg); }
+            }
+            @keyframes shakeAngry {
+              0%, 100% { transform: translateX(0); }
+              25% { transform: translateX(-2px) rotate(-2deg); }
+              75% { transform: translateX(2px) rotate(2deg); }
+            }
             @keyframes dustCloud {
               0% { transform: scale(0.5); opacity: 0.6; }
               100% { transform: scale(1.8); opacity: 0; }
@@ -1003,7 +1032,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           if (enemyHealths[i] <= 0) return null;
           const eType = currentLevel.enemies[i]?.type || 'snake';
           const emoji = eType === 'tiger' ? '🐯' : '🐍';
-          const maxHealth = eType === 'tiger' ? 2 : 1;
+          const maxHealth = eType === 'elephant' ? 3 : (eType === 'tiger' || eType === 'rhino' ? 2 : 1);
           const curHealth = enemyHealths[i];
           
           return (
@@ -1017,17 +1046,22 @@ export default function CodingMazeGame({ lang, onBack }) {
               fontSize: `${cellSize * 0.7}px`,
               transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
               zIndex: 9,
-              pointerEvents: 'none',
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+              pointerEvents: 'none'
             }}>
-              {eType === 'tiger' || eType === 'elephant' || eType === 'spider' ? (
+              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake'].includes(eType) ? (
                 <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
-                  width: eType === 'elephant' ? '120%' : '90%', 
-                  height: eType === 'elephant' ? '120%' : '90%', 
+                  width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '90%', 
+                  height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '90%', 
                   objectFit: 'contain',
-                  animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 'none'
+                  animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
+                             (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
+                              eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
+                              eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
+                              eType === 'snake' ? 'hoverWobble 1s infinite' :
+                              'idleBreathing 1.5s infinite alternate'),
+                  filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
                 }} />
-              ) : '🐍'}
+              ) : '🐯'}
               {maxHealth > 1 && (
                 <div style={{
                   position: 'absolute', bottom: '4%', left: 0, right: 0,
