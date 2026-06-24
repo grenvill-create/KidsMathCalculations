@@ -299,6 +299,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [activeExplosion, setActiveExplosion] = useState(null);
   const [showShop, setShowShop] = useState(false);
   const [shopTarget, setShopTarget] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [spiderWebs, setSpiderWebs] = useState([]);
   const [webStuckPrompt, setWebStuckPrompt] = useState(null);
   const [webStruggle, setWebStruggle] = useState(false);
@@ -768,7 +769,7 @@ export default function CodingMazeGame({ lang, onBack }) {
             fontSize: `${cellSize * 0.6}px`,
             boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
             position: 'relative',
-            cursor: canBomb ? 'crosshair' : 'default',
+            cursor: canBomb ? 'crosshair' : (isEnemy && activeBombType === null ? 'pointer' : 'default'),
             outline: canBomb ? '2px solid red' : 'none',
             outlineOffset: '-2px'
           }} onClick={() => {
@@ -831,6 +832,12 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setDestroyedObstacles(prev => [...prev, { r, c }]);
                 }
               }, 500);
+            } else if (isEnemy && activeBombType === null) {
+              const eType = currentLevel.enemies[enemyIdx].type;
+              if (eType === 'tiger' || eType === 'elephant' || eType === 'spider') {
+                audioSynth.playClick();
+                setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
+              }
             }
           }}>
             {content}
@@ -1516,6 +1523,24 @@ export default function CodingMazeGame({ lang, onBack }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000,
+          cursor: 'zoom-out'
+        }} onClick={() => {
+           audioSynth.playClick();
+           setPreviewImage(null);
+        }}>
+          <img src={previewImage} alt="Preview" style={{
+            maxWidth: '90%', maxHeight: '90%',
+            objectFit: 'contain',
+            animation: 'bounceInDrop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          }} />
         </div>
       )}
 
