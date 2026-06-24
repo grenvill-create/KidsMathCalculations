@@ -191,12 +191,13 @@ const getThemeWeather = (theme) => {
 };
 
 const getThemeBackground = (theme) => {
-  if (['fox', 'dog'].includes(theme)) return '/backgrounds/bg_forest.png';
-  if (['rabbit', 'monkey'].includes(theme)) return '/backgrounds/bg_meadow.png';
-  if (['frog'].includes(theme)) return '/backgrounds/bg_pond.png';
-  if (['penguin', 'bear'].includes(theme)) return '/backgrounds/bg_ice.png';
-  if (['alien'].includes(theme)) return '/backgrounds/bg_space.png';
-  return '/backgrounds/bg_indoor.png'; // cat, mouse
+  const base = import.meta.env.BASE_URL;
+  if (['fox', 'dog'].includes(theme)) return `${base}backgrounds/bg_forest.png`;
+  if (['rabbit', 'monkey'].includes(theme)) return `${base}backgrounds/bg_meadow.png`;
+  if (['frog'].includes(theme)) return `${base}backgrounds/bg_pond.png`;
+  if (['penguin', 'bear'].includes(theme)) return `${base}backgrounds/bg_ice.png`;
+  if (['alien'].includes(theme)) return `${base}backgrounds/bg_space.png`;
+  return `${base}backgrounds/bg_indoor.png`; // cat, mouse
 };
 
 const WeatherOverlay = ({ weather }) => {
@@ -745,7 +746,7 @@ export default function CodingMazeGame({ lang, onBack }) {
             {content}
             {activeExplosion && activeExplosion.r === r && activeExplosion.c === c && (
               <img 
-                src={`/expl_${activeExplosion.type}.png`} 
+                src={`${import.meta.env.BASE_URL}expl_${activeExplosion.type}.png`} 
                 alt="explosion"
                 style={{
                   position: 'absolute', top: '50%', left: '50%',
@@ -901,7 +902,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
             }}>
               {eType === 'tiger' ? (
-                <img src="/tiger_3d.png" style={{
+                <img src={`${import.meta.env.BASE_URL}tiger_3d.png`} style={{
                   width: '90%', height: '90%', objectFit: 'contain',
                   animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 'none'
                 }} />
