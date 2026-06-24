@@ -17,16 +17,16 @@ import { audioSynth } from '../utils/audioSynth';
 const BACKGROUNDS = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8, bg9, bg10];
 
 const THEMES = {
-  fox: { hero: '🦊', target: '⭐', obstacle: '🌲', bgFloor: '#f8fafc', bgAlt: '#e2e8f0', bgObstacle: '#fecdd3' },
-  rabbit: { hero: '🐰', target: '🥕', obstacle: '🪨', bgFloor: '#fffbeb', bgAlt: '#fef3c7', bgObstacle: '#d6d3d1' },
-  dog: { hero: '🐶', target: '🦴', obstacle: '🌵', bgFloor: '#f0fdf4', bgAlt: '#dcfce7', bgObstacle: '#fef08a' },
-  cat: { hero: '🐱', target: '🐟', obstacle: '📦', bgFloor: '#e0e7ff', bgAlt: '#c7d2fe', bgObstacle: '#fed7aa' },
-  monkey: { hero: '🐵', target: '🍌', obstacle: '🌴', bgFloor: '#fdf4ff', bgAlt: '#fae8ff', bgObstacle: '#bbf7d0' },
-  bear: { hero: '🐻', target: '🍯', obstacle: '🐝', bgFloor: '#ffedd5', bgAlt: '#ffedd5', bgObstacle: '#fde047' },
-  mouse: { hero: '🐭', target: '🧀', obstacle: '🪤', bgFloor: '#f1f5f9', bgAlt: '#e2e8f0', bgObstacle: '#cbd5e1' },
-  penguin: { hero: '🐧', target: '🐟', obstacle: '🧊', bgFloor: '#f0f9ff', bgAlt: '#e0f2fe', bgObstacle: '#bae6fd' },
-  frog: { hero: '🐸', target: '🪰', obstacle: '🍄', bgFloor: '#ecfdf5', bgAlt: '#d1fae5', bgObstacle: '#fbcfe8' },
-  alien: { hero: '👽', target: '🛸', obstacle: '☄️', bgFloor: '#1e293b', bgAlt: '#334155', bgObstacle: '#ef4444' }
+  fox: { hero: '🦊', target: '⭐', obstacles: ['🌲', '🌳', '🍄', '🪵', '⛰️'], bgFloor: '#f8fafc', bgAlt: '#e2e8f0', bgObstacle: '#fecdd3' },
+  rabbit: { hero: '🐰', target: '🥕', obstacles: ['🪨', '⛰️', '🍄', '🪵', '🏡'], bgFloor: '#fffbeb', bgAlt: '#fef3c7', bgObstacle: '#d6d3d1' },
+  dog: { hero: '🐶', target: '🦴', obstacles: ['🌵', '🧱', '🚗', '🗑️', '🪨'], bgFloor: '#f0fdf4', bgAlt: '#dcfce7', bgObstacle: '#fef08a' },
+  cat: { hero: '🐱', target: '🐟', obstacles: ['📦', '🧶', '🪑', '🪴', '📺'], bgFloor: '#e0e7ff', bgAlt: '#c7d2fe', bgObstacle: '#fed7aa' },
+  monkey: { hero: '🐵', target: '🍌', obstacles: ['🌴', '🥥', '⛰️', '🗿', '🎋'], bgFloor: '#fdf4ff', bgAlt: '#fae8ff', bgObstacle: '#bbf7d0' },
+  bear: { hero: '🐻', target: '🍯', obstacles: ['🐝', '⛰️', '🌲', '🪵', '🏕️'], bgFloor: '#ffedd5', bgAlt: '#ffedd5', bgObstacle: '#fde047' },
+  mouse: { hero: '🐭', target: '🧀', obstacles: ['🪤', '🧹', '📦', '🧱', '🪨'], bgFloor: '#f1f5f9', bgAlt: '#e2e8f0', bgObstacle: '#cbd5e1' },
+  penguin: { hero: '🐧', target: '🐟', obstacles: ['🧊', '⛄', '🏔️', '❄️', '🌲'], bgFloor: '#f0f9ff', bgAlt: '#e0f2fe', bgObstacle: '#bae6fd' },
+  frog: { hero: '🐸', target: '🪰', obstacles: ['🍄', '💧', '🪷', '🌾', '🪨'], bgFloor: '#ecfdf5', bgAlt: '#d1fae5', bgObstacle: '#fbcfe8' },
+  alien: { hero: '👽', target: '🛸', obstacles: ['☄️', '🛰️', '🪐', '🌋', '🪨'], bgFloor: '#1e293b', bgAlt: '#334155', bgObstacle: '#ef4444' }
 };
 
 const RAW_LEVELS = [
@@ -797,7 +797,8 @@ export default function CodingMazeGame({ lang, onBack }) {
           shadowColor = '#86efac';
           borderColor = '#4ade80';
         } else if (isObstacle && !isDestroyed) {
-          content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center' }}>{tTheme.obstacle}</span>;
+          const obsEmoji = tTheme.obstacles[(r * 13 + c * 7) % tTheme.obstacles.length];
+          content = <span style={{ animation: 'obstacleSway 3s infinite ease-in-out', display: 'inline-block', transformOrigin: 'bottom center' }}>{obsEmoji}</span>;
           bg = tTheme.bgObstacle;
           shadowColor = '#fca5a5';
           borderColor = '#f87171';
