@@ -1267,18 +1267,21 @@ export default function CodingMazeGame({ lang, onBack }) {
             {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0) && (
               <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
                 {inventory.normal > 0 && (
-                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none' }}>
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     💣 x{inventory.normal}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'normal' ? '#b91c1c' : '#ef4444', fontWeight: 'bold' }}>-1❤️</span>
                   </button>
                 )}
                 {inventory.freeze > 0 && (
-                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none' }}>
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     ❄️ x{inventory.freeze}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'freeze' ? '#1d4ed8' : '#3b82f6', fontWeight: 'bold' }}>-2❤️</span>
                   </button>
                 )}
                 {inventory.super > 0 && (
-                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none' }}>
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     🌟 x{inventory.super}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'super' ? '#a16207' : '#eab308', fontWeight: 'bold' }}>-3❤️</span>
                   </button>
                 )}
               </div>
@@ -1320,15 +1323,24 @@ export default function CodingMazeGame({ lang, onBack }) {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
               <button onClick={() => triggerMathQuiz('normal', 1)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #94a3b8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>💣 <span>{lang === 'en' ? 'Normal Bomb x2' : '普通炸弹 x2'}</span></div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>💣 <span>{lang === 'en' ? 'Normal Bomb x2' : '普通炸弹 x2'}</span></div>
+                  <div style={{ fontSize: '0.8rem', color: '#dc2626', background: '#fee2e2', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -1❤️' : '威力: -1❤️'}</div>
+                </div>
                 <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{lang === 'en' ? '1 Question' : '需答对 1 题'}</div>
               </button>
               <button onClick={() => triggerMathQuiz('freeze', 2)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #93c5fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#eff6ff' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>❄️ <span style={{color: '#2563eb'}}>{lang === 'en' ? 'Freeze Bomb x1 (2 DMG)' : '冰冻弹 x1 (2点伤害)'}</span></div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>❄️ <span style={{color: '#2563eb'}}>{lang === 'en' ? 'Freeze Bomb x1' : '冰冻弹 x1'}</span></div>
+                  <div style={{ fontSize: '0.8rem', color: '#1d4ed8', background: '#dbeafe', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -2❤️❤️' : '威力: -2❤️❤️'}</div>
+                </div>
                 <div style={{ fontSize: '0.85rem', color: '#2563eb' }}>{lang === 'en' ? '2 Questions' : '需连答 2 题'}</div>
               </button>
               <button onClick={() => triggerMathQuiz('super', 3)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #fde047', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fefce8' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🌟 <span style={{color: '#ca8a04'}}>{lang === 'en' ? 'Super Bomb x1 (3 DMG)' : '穿甲弹 x1 (3点伤害)'}</span></div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🌟 <span style={{color: '#ca8a04'}}>{lang === 'en' ? 'Super Bomb x1' : '穿甲弹 x1'}</span></div>
+                  <div style={{ fontSize: '0.8rem', color: '#b45309', background: '#fef3c7', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -3❤️❤️❤️' : '威力: -3❤️❤️❤️'}</div>
+                </div>
                 <div style={{ fontSize: '0.85rem', color: '#ca8a04' }}>{lang === 'en' ? '3 Questions' : '需连答 3 题'}</div>
               </button>
             </div>
