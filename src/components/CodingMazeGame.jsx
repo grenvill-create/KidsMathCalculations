@@ -7,9 +7,14 @@ import bg2 from '../assets/bg_random_2.jpg';
 import bg3 from '../assets/bg_random_3.jpg';
 import bg4 from '../assets/bg_random_4.jpg';
 import bg5 from '../assets/bg_random_5.jpg';
+import bg6 from '../assets/bg_random_6.png';
+import bg7 from '../assets/bg_random_7.png';
+import bg8 from '../assets/bg_random_8.png';
+import bg9 from '../assets/bg_random_9.png';
+import bg10 from '../assets/bg_random_10.png';
 import { audioSynth } from '../utils/audioSynth';
 
-const BACKGROUNDS = [bg1, bg2, bg3, bg4, bg5];
+const BACKGROUNDS = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8, bg9, bg10];
 
 const THEMES = {
   fox: { hero: '🦊', target: '⭐', obstacle: '🌲', bgFloor: '#f8fafc', bgAlt: '#e2e8f0', bgObstacle: '#fecdd3' },
