@@ -802,7 +802,10 @@ export default function CodingMazeGame({ lang, onBack }) {
           content = <img src={`${import.meta.env.BASE_URL}spider_web.png`} style={{ width: '80%', height: '80%', opacity: 0.8 }} alt="web" />;
         } else if (isFootprint) {
           content = <div style={{ width: '40%', height: '40%', background: 'rgba(0,0,0,0.1)', borderRadius: '50%', animation: 'dustCloud 1s forwards' }}></div>;
-        } else if (!isEnemy && !(r === currentLevel.start.r && c === currentLevel.start.c)) {
+        }
+
+        let plannedArrowNode = null;
+        if (!isEnemy && !(r === currentLevel.start.r && c === currentLevel.start.c)) {
           const plannedSteps = plannedPath.filter(p => p.r === r && p.c === c);
           if (plannedSteps.length > 0) {
             const lastStep = plannedSteps[plannedSteps.length - 1];
@@ -811,7 +814,13 @@ export default function CodingMazeGame({ lang, onBack }) {
             if (lastStep.cmd === 'DOWN') arrow = '⬇️';
             if (lastStep.cmd === 'LEFT') arrow = '⬅️';
             if (lastStep.cmd === 'RIGHT') arrow = '➡️';
-            content = <div style={{ opacity: 0.35, fontSize: isMobile ? '1.5rem' : '2rem', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.2))' }}>{arrow}</div>;
+            plannedArrowNode = <div style={{ 
+              position: 'absolute', inset: 0, 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              opacity: 0.35, fontSize: isMobile ? '1.5rem' : '2rem', 
+              filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.2))',
+              pointerEvents: 'none', zIndex: 5 
+            }}>{arrow}</div>;
           }
         }
 
@@ -906,6 +915,7 @@ export default function CodingMazeGame({ lang, onBack }) {
             }
           }}>
             {content}
+            {plannedArrowNode}
             {activeExplosion && activeExplosion.r === r && activeExplosion.c === c && (
               <img 
                 src={`${import.meta.env.BASE_URL}expl_${activeExplosion.type}.png`} 
@@ -1181,29 +1191,29 @@ export default function CodingMazeGame({ lang, onBack }) {
         
         {/* Header */}
         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', gap: isMobile ? '2px' : '6px' }}>
-            <button className="bouncy-button secondary" onClick={onBack} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }}>
-              <ArrowLeft size={isMobile ? 16 : 20} />
+          <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
+            <button className="bouncy-button secondary" onClick={onBack} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+              <ArrowLeft size={isMobile ? 18 : 22} />
             </button>
-            <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ padding: isMobile ? '5px 7px' : '8px 12px' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
-              <RotateCcw size={isMobile ? 16 : 20} />
+            <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
+              <RotateCcw size={isMobile ? 18 : 22} />
             </button>
           </div>
-          <h2 style={{ color: '#c0487a', margin: 0, fontSize: isMobile ? '0.9rem' : '1.4rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {lang === 'en' ? `Maze (${levelIdx + 1}/${LEVELS.length})` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`}
+          <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : '1.4rem', whiteSpace: 'nowrap', textAlign: 'center', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {lang === 'en' ? (isMobile ? `${levelIdx + 1}/${LEVELS.length}` : `Maze (${levelIdx + 1}/${LEVELS.length})`) : (isMobile ? `第${levelIdx + 1}关` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`)}
           </h2>
-          <div style={{ display: 'flex', gap: isMobile ? '2px' : '6px' }}>
-            <button className="bouncy-button secondary" onClick={triggerSettings} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title={lang === 'en' ? 'Settings' : '设置'}>
-              <Settings size={isMobile ? 14 : 18} />
+          <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
+            <button className="bouncy-button secondary" onClick={triggerSettings} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Settings' : '设置'}>
+              <Settings size={isMobile ? 18 : 22} />
             </button>
-            <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title="缩小">
-              <ZoomOut size={isMobile ? 14 : 18} />
+            <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="缩小">
+              <ZoomOut size={isMobile ? 18 : 22} />
             </button>
-            <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ padding: isMobile ? '4px 6px' : '6px 10px' }} title="放大">
-              <ZoomIn size={isMobile ? 14 : 18} />
+            <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="放大">
+              <ZoomIn size={isMobile ? 18 : 22} />
             </button>
-            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ padding: isMobile ? '4px 6px' : '8px 12px', marginLeft: isMobile ? '0' : '4px' }}>
-              <RefreshCw size={isMobile ? 16 : 20} />
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+              <RefreshCw size={isMobile ? 18 : 22} />
             </button>
           </div>
         </div>
@@ -1455,9 +1465,17 @@ export default function CodingMazeGame({ lang, onBack }) {
             <h3 style={{ margin: '0 0 10px 0', color: '#1e40af', fontSize: '1.4rem' }}>
               {lang === 'en' ? 'Math Challenge' : '算术挑战'}
             </h3>
-            <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '0.95rem', fontWeight: 'bold' }}>
-              {lang === 'en' ? `Challenge (${shopTarget?.answered + 1}/${shopTarget?.needed})` : `算术挑战 (${shopTarget?.answered + 1}/${shopTarget?.needed})`}
-            </p>
+            {shopTarget ? (
+              <p style={{ margin: '0 0 20px 0', color: '#1e40af', fontSize: '1rem', fontWeight: 'bold', background: '#e0f2fe', padding: '6px 12px', borderRadius: '20px', display: 'inline-block' }}>
+                {lang === 'en' 
+                  ? `Question ${shopTarget.answered + 1} of ${shopTarget.needed}` 
+                  : `第 ${shopTarget.answered + 1} 题，共 ${shopTarget.needed} 题`}
+              </p>
+            ) : (
+              <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '1rem', fontWeight: 'bold' }}>
+                {lang === 'en' ? 'Solve the problem to escape!' : '答对题目即可脱身！'}
+              </p>
+            )}
             
             <div style={{ fontSize: '2.8rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '25px', letterSpacing: '3px' }}>
               {mathProblem.a} {mathProblem.op} {mathProblem.b} = ?
