@@ -741,6 +741,29 @@ export default function CodingMazeGame({ lang, onBack }) {
         return `${cx},${cy}`;
       }).join(' ');
     };
+
+    const plannedPath = [];
+    if (!isPlaying && commands.length > 0 && pos.r === currentLevel.start.r && pos.c === currentLevel.start.c) {
+      let pr = pos.r;
+      let pc = pos.c;
+      for (let cmd of commands) {
+        let nr = pr, nc = pc;
+        if (cmd === 'UP') nr--;
+        if (cmd === 'DOWN') nr++;
+        if (cmd === 'LEFT') nc--;
+        if (cmd === 'RIGHT') nc++;
+        
+        if (nr < 0 || nr >= currentLevel.size || nc < 0 || nc >= currentLevel.size) break;
+        
+        const hitObstacle = currentLevel.obstacles.some(o => o.r === nr && o.c === nc);
+        const isDestroyed = destroyedObstacles.some(o => o.r === nr && o.c === nc);
+        if (hitObstacle && !isDestroyed) break;
+        
+        pr = nr; pc = nc;
+        plannedPath.push({r: pr, c: pc, cmd});
+      }
+    }
+
     for (let r = 0; r < currentLevel.size; r++) {
       const row = [];
       for (let c = 0; c < currentLevel.size; c++) {
@@ -779,6 +802,17 @@ export default function CodingMazeGame({ lang, onBack }) {
           content = <img src={`${import.meta.env.BASE_URL}spider_web.png`} style={{ width: '80%', height: '80%', opacity: 0.8 }} alt="web" />;
         } else if (isFootprint) {
           content = <div style={{ width: '40%', height: '40%', background: 'rgba(0,0,0,0.1)', borderRadius: '50%', animation: 'dustCloud 1s forwards' }}></div>;
+        } else if (!isEnemy && !(r === currentLevel.start.r && c === currentLevel.start.c)) {
+          const plannedSteps = plannedPath.filter(p => p.r === r && p.c === c);
+          if (plannedSteps.length > 0) {
+            const lastStep = plannedSteps[plannedSteps.length - 1];
+            let arrow = '';
+            if (lastStep.cmd === 'UP') arrow = '⬆️';
+            if (lastStep.cmd === 'DOWN') arrow = '⬇️';
+            if (lastStep.cmd === 'LEFT') arrow = '⬅️';
+            if (lastStep.cmd === 'RIGHT') arrow = '➡️';
+            content = <div style={{ opacity: 0.35, fontSize: isMobile ? '1.5rem' : '2rem', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.2))' }}>{arrow}</div>;
+          }
         }
 
         const canBomb = activeBombType !== null && ((isObstacle && !isDestroyed) || isEnemy);
