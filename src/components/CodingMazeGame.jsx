@@ -287,6 +287,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [isSolved, setIsSolved] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
   const [executingIdx, setExecutingIdx] = useState(-1);
+  const [caughtBy, setCaughtBy] = useState(null);
   const [isShaking, setIsShaking] = useState(false);
   const [isJumping, setIsJumping] = useState(false);
   const [isWalking, setIsWalking] = useState(false);
@@ -604,6 +605,15 @@ export default function CodingMazeGame({ lang, onBack }) {
         setIsPlaying(false);
         setExecutingIdx(-1);
         setIsShaking(true);
+        
+        let caughtType = 'snake';
+        currentEnemyPositions.forEach((ep, eIdx) => {
+            if (ep && ep.r === nextR && ep.c === nextC) {
+                caughtType = currentLevel.enemies[eIdx].type;
+            }
+        });
+        setCaughtBy(caughtType);
+        
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
@@ -1593,6 +1603,37 @@ export default function CodingMazeGame({ lang, onBack }) {
             objectFit: 'contain',
             animation: 'bounceInDrop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
           }} />
+        </div>
+      )}
+
+      {/* Caught By Modal */}
+      {caughtBy && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(239,68,68,0.3)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
+          cursor: 'pointer'
+        }} onClick={() => {
+           audioSynth.playClick();
+           setCaughtBy(null);
+           setPos({ ...currentLevel.start });
+           setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+        }}>
+          <div className="bounce-in" style={{
+            background: 'white', padding: isMobile ? '30px' : '40px', borderRadius: '30px',
+            textAlign: 'center', boxShadow: '0 20px 50px rgba(220,38,38,0.4)',
+            border: '6px solid #ef4444', display: 'flex', flexDirection: 'column', alignItems: 'center'
+          }}>
+            <h2 style={{ color: '#dc2626', margin: '0 0 20px 0', fontSize: '2rem' }}>
+              {lang === 'en' ? 'Oops! Caught!' : '哎呀！被抓住了！'}
+            </h2>
+            <img src={`${import.meta.env.BASE_URL}${caughtBy}_3d.png`} style={{
+              width: '160px', height: '160px', objectFit: 'contain', animation: 'shakeAngry 0.6s infinite',
+              filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.3))', marginBottom: '25px'
+            }} />
+            <p style={{ margin: 0, fontSize: '1.2rem', color: '#475569', fontWeight: 'bold' }}>
+              {lang === 'en' ? 'Tap to try again' : '点击屏幕重新开始'}
+            </p>
+          </div>
         </div>
       )}
 
