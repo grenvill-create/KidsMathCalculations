@@ -748,7 +748,9 @@ export default function CodingMazeGame({ lang, onBack }) {
                 src={`/expl_${activeExplosion.type}.png`} 
                 alt="explosion"
                 style={{
-                  position: 'absolute', width: '250%', height: '250%', zIndex: 20,
+                  position: 'absolute', top: '50%', left: '50%',
+                  width: '280%', height: '280%', zIndex: 999,
+                  objectFit: 'contain',
                   pointerEvents: 'none',
                   animation: 'magicExplosion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                   color: activeExplosion.type === 'freeze' ? '#93c5fd' : activeExplosion.type === 'super' ? '#fde047' : '#fca5a5'
@@ -815,10 +817,10 @@ export default function CodingMazeGame({ lang, onBack }) {
               50% { transform: scale(1.3); opacity: 1; }
             }
             @keyframes magicExplosion {
-              0% { transform: scale(0.1) rotate(-20deg); opacity: 0.5; filter: brightness(2) drop-shadow(0 0 10px white); }
-              40% { transform: scale(1.2) rotate(15deg); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 25px currentColor); }
-              70% { transform: scale(0.9) rotate(-5deg); opacity: 0.9; filter: drop-shadow(0 0 15px currentColor); }
-              100% { transform: scale(1.4) rotate(5deg); opacity: 0; filter: blur(4px); }
+              0% { transform: translate(-50%, -50%) scale(0.1) rotate(-20deg); opacity: 0.5; filter: brightness(2) drop-shadow(0 0 10px white); }
+              40% { transform: translate(-50%, -50%) scale(1.2) rotate(15deg); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 25px currentColor); }
+              70% { transform: translate(-50%, -50%) scale(0.9) rotate(-5deg); opacity: 0.9; filter: drop-shadow(0 0 15px currentColor); }
+              100% { transform: translate(-50%, -50%) scale(1.4) rotate(5deg); opacity: 0; filter: blur(4px); }
             }
             @keyframes bombExplosion {
               0% { transform: scale(0.2); opacity: 1; filter: brightness(2) drop-shadow(0 0 10px #ef4444); }
