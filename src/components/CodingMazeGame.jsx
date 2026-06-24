@@ -109,28 +109,28 @@ const RAW_LEVELS = [
 const LEVELS = RAW_LEVELS.map((lvl, idx) => {
   let newLvl = { ...lvl, obstacles: [...lvl.obstacles] };
 
-  // 从第8关开始(index >= 7)，如果没有小蛇，自动添加一条小蛇
-  if (idx >= 7) {
+  // 从第3关开始(index >= 2)，如果没有敌人，自动添加一个
+  if (idx >= 2) {
     if (!newLvl.enemies || newLvl.enemies.length === 0) {
-      let snakePos = null;
+      let firstEnemyPos = null;
       for (let r = 0; r < newLvl.size; r++) {
         for (let c = 0; c < newLvl.size; c++) {
           if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
           if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
-          snakePos = { r, c };
+          firstEnemyPos = { r, c };
           break;
         }
-        if (snakePos) break;
+        if (firstEnemyPos) break;
       }
-      if (snakePos) {
-        const eType = idx >= 9 ? 'tiger' : 'snake'; // 从第10关起刷老虎
-        newLvl.enemies = [{ type: eType, start: snakePos, commands: ['DOWN', 'UP', 'RIGHT', 'LEFT'] }];
+      if (firstEnemyPos) {
+        const eType = idx >= 4 ? 'tiger' : 'snake'; // 从第5关起出现老虎
+        newLvl.enemies = [{ type: eType, start: firstEnemyPos, commands: ['DOWN', 'UP', 'RIGHT', 'LEFT'] }];
       }
     }
   }
 
-  // 第十关之后的关卡 (index >= 10 表示第11关及以后)
-  if (idx >= 10) {
+  // 第6关之后的关卡 (index >= 5 表示第6关及以后)，开始增加起点的障碍包围
+  if (idx >= 5) {
     const sr = newLvl.start.r, sc = newLvl.start.c;
     const neighbors = [
       {r: sr - 1, c: sc}, {r: sr + 1, c: sc}, {r: sr, c: sc - 1}, {r: sr, c: sc + 1}
@@ -145,9 +145,8 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
     });
   }
 
-  // 第十五关之后的关卡 (index >= 14)，大幅增加难度：包围终点 + 增加额外老虎
-  if (idx >= 14) {
-    // 1. 包围终点 (Target)
+  // 第10关之后的关卡 (index >= 9)，大幅增加难度：包围终点
+  if (idx >= 9) {
     const tr = newLvl.target.r, tc = newLvl.target.c;
     const targetNeighbors = [
       {r: tr - 1, c: tc}, {r: tr + 1, c: tc}, {r: tr, c: tc - 1}, {r: tr, c: tc + 1}
@@ -160,32 +159,39 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         newLvl.obstacles.push({r: n.r, c: n.c});
       }
     });
+  }
 
-    // 2. 随机在空地上生成额外的敌人
+  // 第4关及以后 (index >= 3)，开始随机生成各种动物，每隔几关增加一只
+  if (idx >= 3) {
     if (!newLvl.enemies) newLvl.enemies = [];
-    let extraEnemyPos = null;
-    for (let r = newLvl.size - 1; r >= 0; r--) {
-      for (let c = newLvl.size - 1; c >= 0; c--) {
+    const extraEnemyCount = Math.min(3, Math.floor((idx - 1) / 4)); // 第5关有1只，第9关有2只，第13关有3只...
+    
+    for (let i = 0; i < extraEnemyCount; i++) {
+      let extraEnemyPos = null;
+      // 随机寻找空地
+      for (let attempt = 0; attempt < 50; attempt++) {
+        let r = Math.floor(Math.random() * newLvl.size);
+        let c = Math.floor(Math.random() * newLvl.size);
         if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
         if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
         if (newLvl.enemies.some(e => e.start.r === r && e.start.c === c)) continue;
         extraEnemyPos = { r, c };
         break;
       }
-      if (extraEnemyPos) break;
-    }
-    if (extraEnemyPos) {
-      let eType = 'tiger';
-      if (idx >= 24) {
-        // level 25+: mix of elephants, spiders, tigers
-        const r = Math.random();
-        if (r < 0.3) eType = 'elephant';
-        else if (r < 0.6) eType = 'spider';
-      } else if (idx >= 14) {
-        // level 15-24: mix of spiders, tigers
-        if (Math.random() < 0.5) eType = 'spider';
+      
+      if (extraEnemyPos) {
+        let eType = 'tiger';
+        if (idx >= 14) {
+          // level 15+: 混合大象、蜘蛛、老虎
+          const r = Math.random();
+          if (r < 0.25) eType = 'elephant';
+          else if (r < 0.6) eType = 'spider';
+        } else if (idx >= 4) {
+          // level 5-14: 混合蜘蛛、老虎
+          if (Math.random() < 0.4) eType = 'spider';
+        }
+        newLvl.enemies.push({ type: eType, start: extraEnemyPos, commands: ['UP', 'DOWN', 'LEFT', 'RIGHT'] });
       }
-      newLvl.enemies.push({ type: eType, start: extraEnemyPos, commands: ['UP', 'DOWN', 'LEFT', 'RIGHT'] });
     }
   }
 
