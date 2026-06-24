@@ -805,7 +805,8 @@ export default function CodingMazeGame({ lang, onBack }) {
         }
 
         let plannedArrowNode = null;
-        if (!isEnemy && !(r === currentLevel.start.r && c === currentLevel.start.c)) {
+        // 暂时隐藏步伐显示功能，为了让小朋友多数数
+        if (false && !isEnemy && !(r === currentLevel.start.r && c === currentLevel.start.c)) {
           const plannedSteps = plannedPath.filter(p => p.r === r && p.c === c);
           if (plannedSteps.length > 0) {
             const lastStep = plannedSteps[plannedSteps.length - 1];
