@@ -161,22 +161,31 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
       }
     });
 
-    // 2. 随机在空地上生成一只额外的老虎
+    // 2. 随机在空地上生成额外的敌人
     if (!newLvl.enemies) newLvl.enemies = [];
-    let extraTigerPos = null;
-    // 从右下角往前找，避免挤在起点附近
+    let extraEnemyPos = null;
     for (let r = newLvl.size - 1; r >= 0; r--) {
       for (let c = newLvl.size - 1; c >= 0; c--) {
         if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
         if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
         if (newLvl.enemies.some(e => e.start.r === r && e.start.c === c)) continue;
-        extraTigerPos = { r, c };
+        extraEnemyPos = { r, c };
         break;
       }
-      if (extraTigerPos) break;
+      if (extraEnemyPos) break;
     }
-    if (extraTigerPos) {
-      newLvl.enemies.push({ type: 'tiger', start: extraTigerPos, commands: ['UP', 'DOWN', 'LEFT', 'RIGHT'] });
+    if (extraEnemyPos) {
+      let eType = 'tiger';
+      if (idx >= 24) {
+        // level 25+: mix of elephants, spiders, tigers
+        const r = Math.random();
+        if (r < 0.3) eType = 'elephant';
+        else if (r < 0.6) eType = 'spider';
+      } else if (idx >= 14) {
+        // level 15-24: mix of spiders, tigers
+        if (Math.random() < 0.5) eType = 'spider';
+      }
+      newLvl.enemies.push({ type: eType, start: extraEnemyPos, commands: ['UP', 'DOWN', 'LEFT', 'RIGHT'] });
     }
   }
 
@@ -290,6 +299,9 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [activeExplosion, setActiveExplosion] = useState(null);
   const [showShop, setShowShop] = useState(false);
   const [shopTarget, setShopTarget] = useState(null);
+  const [spiderWebs, setSpiderWebs] = useState([]);
+  const [webStuckPrompt, setWebStuckPrompt] = useState(null);
+  const [webStruggle, setWebStruggle] = useState(false);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
   const [enemyHealths, setEnemyHealths] = useState([]);
   const [enemyPositions, setEnemyPositions] = useState([]);
@@ -386,7 +398,11 @@ export default function CodingMazeGame({ lang, onBack }) {
     setTrail([]);
     setPendingBombs([]);
     setDestroyedObstacles([]);
-    setEnemyHealths(currentLevel.enemies ? currentLevel.enemies.map(e => e.type === 'tiger' ? 2 : 1) : []);
+    setEnemyHealths(currentLevel.enemies ? currentLevel.enemies.map(e => {
+      if (e.type === 'elephant') return 3;
+      if (e.type === 'tiger') return 2;
+      return 1;
+    }) : []);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
   };
 
@@ -396,6 +412,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setIsWalking(false);
     setTrail([]);
+    setSpiderWebs([]);
     setPos({ ...currentLevel.start });
     setStatusMsg('');
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
@@ -419,6 +436,14 @@ export default function CodingMazeGame({ lang, onBack }) {
     e.preventDefault();
     if (parseInt(mathInput, 10) === mathProblem.ans) {
       audioSynth.playCorrect();
+      
+      if (webStuckPrompt) {
+        webStuckPrompt.resolve(true);
+        setWebStuckPrompt(null);
+        setShowMathQuiz(false);
+        return;
+      }
+
       const newAnswered = shopTarget.answered + 1;
       if (newAnswered >= shopTarget.needed) {
         const newInv = { ...inventory };
@@ -438,6 +463,12 @@ export default function CodingMazeGame({ lang, onBack }) {
       setIsMathShaking(true);
       setMathInput('');
       setTimeout(() => setIsMathShaking(false), 500);
+      
+      if (webStuckPrompt) {
+        webStuckPrompt.resolve(false);
+        setWebStuckPrompt(null);
+        setShowMathQuiz(false);
+      }
     }
   };
 
@@ -468,6 +499,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     let currentPos = { ...currentLevel.start };
     setPos(currentPos);
     setTrail([]);
+    let currentWebs = [...spiderWebs];
     let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : [];
     setEnemyPositions(currentEnemyPositions);
 
@@ -518,9 +550,21 @@ export default function CodingMazeGame({ lang, onBack }) {
       }
 
       if (currentLevel.enemies) {
+        let anyElephantMoved = false;
         currentEnemyPositions = currentEnemyPositions.map((ep, eIdx) => {
           if (!ep) return null;
           const enemyDef = currentLevel.enemies[eIdx];
+          
+          if (enemyDef.type === 'spider') {
+            if (!currentWebs.some(w => w.r === ep.r && w.c === ep.c)) {
+              currentWebs.push({r: ep.r, c: ep.c});
+              setSpiderWebs([...currentWebs]);
+            }
+          }
+          if (enemyDef.type === 'elephant') {
+            anyElephantMoved = true;
+          }
+
           const eCmd = enemyDef.commands[i % enemyDef.commands.length];
           let er = ep.r, ec = ep.c;
           if (eCmd === 'UP') er--;
@@ -530,12 +574,17 @@ export default function CodingMazeGame({ lang, onBack }) {
           return {r: er, c: ec};
         });
         setEnemyPositions(currentEnemyPositions);
+        
+        if (anyElephantMoved) {
+           setIsShaking(true);
+           setTimeout(() => setIsShaking(false), 200); // short stomp shake
+        }
       }
 
       const hitEnemy = currentEnemyPositions.some(ep => ep && ep.r === nextR && ep.c === nextC);
       if (hitEnemy) {
         audioSynth.playIncorrect();
-        setStatusMsg(lang === 'en' ? 'Oops! Caught by a snake.' : '哎呀，撞到巡逻的小蛇了。');
+        setStatusMsg(lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。');
         setIsPlaying(false);
         setExecutingIdx(-1);
         setIsShaking(true);
@@ -543,8 +592,45 @@ export default function CodingMazeGame({ lang, onBack }) {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
           setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+          setSpiderWebs([]);
         }, 500);
         return;
+      }
+      
+      const hitWeb = currentWebs.some(w => w.r === nextR && w.c === nextC);
+      if (hitWeb) {
+         audioSynth.playIncorrect();
+         setStatusMsg(lang === 'en' ? 'Stuck in a spider web!' : '被蜘蛛网粘住了！');
+         setWebStruggle(true);
+         
+         const q = mathGenerator.generateQuestion(4, { minNumber: mathMin, maxNumber: mathMax, operations: ['add', 'sub'], lang: lang });
+         setMathProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
+         setMathInput('');
+         setShowMathQuiz(true);
+         
+         const solved = await new Promise(resolve => {
+           setWebStuckPrompt({ resolve });
+         });
+         
+         setWebStruggle(false);
+         if (!solved) {
+           audioSynth.playIncorrect();
+           setStatusMsg(lang === 'en' ? 'Failed to escape!' : '没能挣脱蛛网...');
+           setIsPlaying(false);
+           setExecutingIdx(-1);
+           setIsShaking(true);
+           resetTimeoutRef.current = setTimeout(() => {
+             setIsShaking(false);
+             setPos({ ...currentLevel.start });
+             setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+             setSpiderWebs([]);
+           }, 500);
+           return;
+         } else {
+           currentWebs = currentWebs.filter(w => w.r !== nextR || w.c !== nextC);
+           setSpiderWebs([...currentWebs]);
+           setStatusMsg(lang === 'en' ? 'Escaped the web!' : '成功挣脱！');
+         }
       }
 
       setTrail(prev => [...prev, { ...currentPos }]);
@@ -647,6 +733,8 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isPendingBomb = pendingBombs.some(p => p.r === r && p.c === c);
         const isFootprint = trail.some(t => t.r === r && t.c === c);
 
+        const isWeb = spiderWebs.some(w => w.r === r && w.c === c);
+
         if (isPendingBomb) {
           content = <span style={{ animation: 'fuseBurn 0.2s infinite alternate', display: 'inline-block' }}>🧨</span>;
         } else if (r === currentLevel.target.r && c === currentLevel.target.c) {
@@ -661,8 +749,10 @@ export default function CodingMazeGame({ lang, onBack }) {
           borderColor = '#f87171';
         } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
           content = null;
+        } else if (isWeb) {
+          content = <img src={`${import.meta.env.BASE_URL}spider_web.png`} style={{ width: '80%', height: '80%', opacity: 0.8 }} alt="web" />;
         } else if (isFootprint) {
-          content = <span style={{ opacity: 0.3, fontSize: `${cellSize * 0.4}px` }}>🐾</span>;
+          content = <div style={{ width: '40%', height: '40%', background: 'rgba(0,0,0,0.1)', borderRadius: '50%', animation: 'dustCloud 1s forwards' }}></div>;
         }
 
         const canBomb = activeBombType !== null && ((isObstacle && !isDestroyed) || isEnemy);
@@ -809,6 +899,22 @@ export default function CodingMazeGame({ lang, onBack }) {
               0%, 100% { transform: rotate(0deg); }
               50% { transform: rotate(4deg); }
             }
+            @keyframes webStruggle {
+              0%, 100% { transform: translateX(0) rotate(0deg); }
+              20% { transform: translateX(-5px) rotate(-12deg); }
+              40% { transform: translateX(5px) rotate(12deg); }
+              60% { transform: translateX(-5px) rotate(-12deg); }
+              80% { transform: translateX(5px) rotate(12deg); }
+            }
+            @keyframes victorySpin {
+              0% { transform: rotate(0deg) scale(1); }
+              50% { transform: rotate(180deg) scale(1.3); }
+              100% { transform: rotate(360deg) scale(1); }
+            }
+            @keyframes dustCloud {
+              0% { transform: scale(0.5); opacity: 0.6; }
+              100% { transform: scale(1.8); opacity: 0; }
+            }
             @keyframes floatFloat {
               0%, 100% { transform: translateY(0) rotate(0deg); }
               50% { transform: translateY(-8px) rotate(3deg); }
@@ -872,7 +978,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: `${cellSize * 0.7}px`,
           transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-          animation: isShaking ? 'heroShake 0.4s' : (isJumping ? 'heroJump 0.5s infinite' : (isWalking ? 'wobbleWalk 0.4s infinite' : 'none')),
+          animation: webStruggle ? 'webStruggle 0.3s infinite' : (isShaking ? 'heroShake 0.4s' : (isSolved ? 'victorySpin 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' : (isJumping ? 'heroJump 0.5s infinite' : (isWalking ? 'wobbleWalk 0.4s infinite' : 'none')))),
           zIndex: 10,
           filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.25))'
         }}>
@@ -901,32 +1007,29 @@ export default function CodingMazeGame({ lang, onBack }) {
               pointerEvents: 'none',
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
             }}>
-              {eType === 'tiger' ? (
-                <img src={`${import.meta.env.BASE_URL}tiger_3d.png`} style={{
-                  width: '90%', height: '90%', objectFit: 'contain',
+              {eType === 'tiger' || eType === 'elephant' || eType === 'spider' ? (
+                <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
+                  width: eType === 'elephant' ? '120%' : '90%', 
+                  height: eType === 'elephant' ? '120%' : '90%', 
+                  objectFit: 'contain',
                   animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 'none'
                 }} />
               ) : '🐍'}
-              {curHealth > 0 && curHealth < maxHealth && (
+              {maxHealth > 1 && (
                 <div style={{
-                  position: 'absolute', top: '5%', right: '5%', 
-                  background: '#ef4444', color: 'white', 
-                  borderRadius: '10px', fontSize: '0.4em', 
-                  padding: '2px 4px', fontWeight: 'bold',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+                  position: 'absolute', bottom: '4%', left: 0, right: 0,
+                  display: 'flex', justifyContent: 'center', gap: '3px'
                 }}>
-                  {curHealth}/{maxHealth}
-                </div>
-              )}
-              {curHealth === 2 && (
-                 <div style={{
-                  position: 'absolute', top: '5%', right: '5%', 
-                  background: '#f97316', color: 'white', 
-                  borderRadius: '10px', fontSize: '0.4em', 
-                  padding: '2px 4px', fontWeight: 'bold',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
-                }}>
-                  ♥2
+                  {Array.from({ length: maxHealth }).map((_, i) => (
+                    <div key={i} style={{
+                      width: isMobile ? '6px' : '8px', 
+                      height: isMobile ? '6px' : '8px', 
+                      borderRadius: '50%',
+                      background: i < curHealth ? '#ef4444' : 'rgba(0,0,0,0.3)',
+                      boxShadow: i < curHealth ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
+                      transition: 'background 0.3s'
+                    }} />
+                  ))}
                 </div>
               )}
             </div>
