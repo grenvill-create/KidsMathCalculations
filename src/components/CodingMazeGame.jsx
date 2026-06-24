@@ -54,7 +54,7 @@ const RAW_LEVELS = [
   // 14
   { theme: 'bear', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 3 }, { r: 3, c: 3 }, { r: 1, c: 3 }, { r: 4, c: 1 }, { r: 4, c: 5 }, { r: 2, c: 1 }, { r: 2, c: 5 }] },
   // 15
-  { theme: 'alien', size: 7, start: { r: 3, c: 0 }, target: { r: 3, c: 6 }, obstacles: [{ r: 3, c: 3 }, { r: 2, c: 3 }, { r: 4, c: 3 }, { r: 1, c: 2 }, { r: 5, c: 2 }, { r: 1, c: 4 }, { r: 5, c: 4 }], enemies: [{ start: {r: 1, c: 3}, commands: ['DOWN', 'UP'] }, { start: {r: 5, c: 3}, commands: ['UP', 'DOWN'] }] },
+  { theme: 'alien', size: 7, start: { r: 3, c: 0 }, target: { r: 3, c: 6 }, obstacles: [{ r: 3, c: 3 }, { r: 2, c: 3 }, { r: 4, c: 3 }, { r: 1, c: 2 }, { r: 5, c: 2 }, { r: 1, c: 4 }, { r: 5, c: 4 }], enemies: [{ type: 'snake', start: {r: 1, c: 3}, commands: ['DOWN', 'UP'] }, { type: 'snake', start: {r: 5, c: 3}, commands: ['UP', 'DOWN'] }] },
   // 16 (Fixed: Removed {r:2, c:3})
   { theme: 'rabbit', size: 6, start: { r: 0, c: 3 }, target: { r: 5, c: 3 }, obstacles: [{ r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }] },
   // 17
@@ -64,7 +64,7 @@ const RAW_LEVELS = [
   // 19
   { theme: 'fox', size: 7, start: { r: 6, c: 3 }, target: { r: 0, c: 3 }, obstacles: [{ r: 5, c: 2 }, { r: 5, c: 3 }, { r: 5, c: 4 }, { r: 3, c: 0 }, { r: 3, c: 1 }, { r: 3, c: 2 }, { r: 3, c: 4 }, { r: 3, c: 5 }, { r: 3, c: 6 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }] },
   // 20 (Fixed: Removed {r:3, c:4})
-  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }], enemies: [{ start: {r: 1, c: 1}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }] },
+  { theme: 'mouse', size: 7, start: { r: 3, c: 3 }, target: { r: 0, c: 6 }, obstacles: [{ r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }, { r: 3, c: 2 }, { r: 4, c: 2 }, { r: 4, c: 3 }, { r: 4, c: 4 }, { r: 0, c: 0 }, { r: 6, c: 6 }], enemies: [{ type: 'tiger', start: {r: 1, c: 1}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }] },
   // 21
   {theme:"fox",size:8,start:{r:5,c:0},target:{r:3,c:7},obstacles:[{r:7,c:4},{r:5,c:4},{r:6,c:5},{r:7,c:1},{r:7,c:6},{r:0,c:3},{r:6,c:7},{r:0,c:0},{r:2,c:0},{r:7,c:7},{r:4,c:6},{r:0,c:4},{r:4,c:6},{r:7,c:6},{r:1,c:1},{r:0,c:4},{r:2,c:1},{r:4,c:6},{r:2,c:6},{r:1,c:6},{r:5,c:3}]},
   // 22
@@ -74,7 +74,7 @@ const RAW_LEVELS = [
   // 24
   {theme:"cat",size:8,start:{r:2,c:0},target:{r:5,c:7},obstacles:[{r:7,c:6},{r:5,c:1},{r:3,c:4},{r:7,c:1},{r:1,c:0},{r:0,c:6},{r:2,c:6},{r:2,c:2},{r:1,c:0},{r:1,c:3},{r:1,c:7},{r:5,c:1},{r:5,c:0},{r:2,c:6},{r:6,c:2},{r:1,c:4},{r:1,c:3}]},
   // 25
-  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }]},
+  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ type: 'tiger', start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }]},
   // 26
   {theme:"bear",size:9,start:{r:4,c:0},target:{r:5,c:8},obstacles:[{r:6,c:0},{r:2,c:1},{r:3,c:1},{r:4,c:6},{r:2,c:1},{r:4,c:8},{r:6,c:6},{r:6,c:1},{r:4,c:5},{r:1,c:8},{r:8,c:7},{r:4,c:5},{r:4,c:7},{r:0,c:7},{r:7,c:4},{r:2,c:8},{r:2,c:0},{r:3,c:2},{r:1,c:2},{r:2,c:8},{r:0,c:6},{r:7,c:7}]},
   // 27
@@ -84,7 +84,26 @@ const RAW_LEVELS = [
   // 29
   {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
   // 30
-  {theme:"alien",size:9,start:{r:0,c:0},target:{r:0,c:8},obstacles:[{r:7,c:7},{r:2,c:0},{r:1,c:4},{r:2,c:7},{r:4,c:7},{r:3,c:8},{r:8,c:2},{r:8,c:0},{r:6,c:3},{r:7,c:2},{r:1,c:2},{r:6,c:4},{r:4,c:8},{r:5,c:2},{r:4,c:3},{r:3,c:2},{r:3,c:0},{r:8,c:4},{r:5,c:4},{r:2,c:3},{r:8,c:4},{r:7,c:3},{r:8,c:3},{r:6,c:7}], enemies: [{ start: {r: 1, c: 1}, commands: ['DOWN', 'UP'] }, { start: {r: 8, c: 7}, commands: ['LEFT', 'RIGHT'] }]},
+  // 31
+  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'tiger', start: {r:7, c:2}, commands: ['UP', 'DOWN'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }] },
+  // 32
+  { theme: 'rabbit', size: 10, start: {r:0, c:0}, target: {r:9, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:7,c:0},{r:7,c:1},{r:7,c:2},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6},{r:7,c:7},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:2,c:7},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:9,c:5},{r:9,c:6}], enemies: [{ type: 'tiger', start: {r:8, c:3}, commands: ['RIGHT', 'LEFT'] }, { type: 'snake', start: {r:1, c:6}, commands: ['DOWN', 'DOWN', 'UP', 'UP'] }] },
+  // 33
+  { theme: 'dog', size: 10, start: {r:9, c:9}, target: {r:0, c:0}, obstacles: [{r:8,c:9},{r:8,c:8},{r:8,c:7},{r:8,c:6},{r:6,c:9},{r:6,c:8},{r:6,c:7},{r:6,c:6},{r:4,c:9},{r:4,c:8},{r:4,c:7},{r:4,c:6},{r:2,c:9},{r:2,c:8},{r:2,c:7},{r:2,c:6},{r:9,c:4},{r:8,c:4},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:4,c:4},{r:3,c:4},{r:2,c:4},{r:1,c:4},{r:9,c:2},{r:8,c:2},{r:7,c:2},{r:6,c:2},{r:5,c:2},{r:4,c:2},{r:3,c:2},{r:2,c:2},{r:1,c:2}], enemies: [{ type: 'tiger', start: {r:7, c:5}, commands: ['UP', 'DOWN'] }, { type: 'tiger', start: {r:3, c:3}, commands: ['DOWN', 'UP'] }] },
+  // 34
+  { theme: 'cat', size: 10, start: {r:0, c:5}, target: {r:9, c:5}, obstacles: [{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:2,c:6},{r:2,c:7},{r:2,c:8},{r:2,c:9},{r:5,c:0},{r:5,c:1},{r:5,c:2},{r:5,c:3},{r:5,c:4},{r:5,c:6},{r:5,c:7},{r:5,c:8},{r:5,c:9},{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:8,c:3},{r:8,c:4},{r:8,c:6},{r:8,c:7},{r:8,c:8},{r:8,c:9}], enemies: [{ type: 'tiger', start: {r:3, c:5}, commands: ['LEFT', 'RIGHT'] }, { type: 'tiger', start: {r:6, c:5}, commands: ['RIGHT', 'LEFT'] }] },
+  // 35
+  { theme: 'monkey', size: 10, start: {r:5, c:0}, target: {r:5, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:6,c:2},{r:7,c:2},{r:8,c:2},{r:9,c:2},{r:0,c:5},{r:1,c:5},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:6,c:5},{r:7,c:5},{r:8,c:5},{r:9,c:5},{r:0,c:8},{r:1,c:8},{r:2,c:8},{r:3,c:8},{r:4,c:8},{r:6,c:8},{r:7,c:8},{r:8,c:8},{r:9,c:8}], enemies: [{ type: 'tiger', start: {r:5, c:3}, commands: ['UP', 'DOWN'] }, { type: 'tiger', start: {r:5, c:6}, commands: ['DOWN', 'UP'] }, { type: 'tiger', start: {r:1, c:7}, commands: ['LEFT', 'RIGHT'] }] },
+  // 36
+  { theme: 'bear', size: 10, start: {r:0, c:0}, target: {r:9, c:0}, obstacles: [{r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},{r:1,c:5},{r:1,c:6},{r:1,c:7},{r:1,c:8},{r:3,c:1},{r:3,c:2},{r:3,c:3},{r:3,c:4},{r:3,c:5},{r:3,c:6},{r:3,c:7},{r:3,c:8},{r:3,c:9},{r:5,c:0},{r:5,c:1},{r:5,c:2},{r:5,c:3},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:5,c:7},{r:5,c:8},{r:7,c:1},{r:7,c:2},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6},{r:7,c:7},{r:7,c:8},{r:7,c:9}], enemies: [{ type: 'tiger', start: {r:2, c:0}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }, { type: 'tiger', start: {r:4, c:9}, commands: ['LEFT', 'LEFT', 'RIGHT', 'RIGHT'] }, { type: 'tiger', start: {r:6, c:0}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }] },
+  // 37
+  { theme: 'mouse', size: 10, start: {r:4, c:4}, target: {r:0, c:9}, obstacles: [{r:3,c:3},{r:3,c:4},{r:3,c:5},{r:5,c:3},{r:5,c:4},{r:5,c:5},{r:4,c:3},{r:4,c:5},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},{r:1,c:5},{r:1,c:6},{r:1,c:7},{r:1,c:8},{r:8,c:1},{r:8,c:2},{r:8,c:3},{r:8,c:4},{r:8,c:5},{r:8,c:6},{r:8,c:7},{r:8,c:8},{r:2,c:1},{r:3,c:1},{r:4,c:1},{r:5,c:1},{r:6,c:1},{r:7,c:1},{r:2,c:8},{r:3,c:8},{r:4,c:8},{r:5,c:8},{r:6,c:8},{r:7,c:8}], enemies: [{ type: 'tiger', start: {r:2, c:4}, commands: ['RIGHT', 'LEFT'] }, { type: 'tiger', start: {r:6, c:4}, commands: ['LEFT', 'RIGHT'] }, { type: 'tiger', start: {r:4, c:2}, commands: ['UP', 'DOWN'] }] },
+  // 38
+  { theme: 'penguin', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:7,c:1},{r:6,c:2},{r:5,c:3},{r:4,c:4},{r:3,c:5},{r:2,c:6},{r:1,c:7},{r:0,c:8},{r:9,c:1},{r:8,c:2},{r:7,c:3},{r:6,c:4},{r:5,c:5},{r:4,c:6},{r:3,c:7},{r:2,c:8},{r:1,c:9}], enemies: [{ type: 'tiger', start: {r:9, c:9}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }, { type: 'tiger', start: {r:0, c:0}, commands: ['DOWN', 'DOWN', 'UP', 'UP'] }, { type: 'snake', start: {r:4, c:1}, commands: ['RIGHT', 'LEFT'] }] },
+  // 39
+  { theme: 'frog', size: 10, start: {r:4, c:0}, target: {r:4, c:9}, obstacles: [{r:0,c:4},{r:1,c:4},{r:2,c:4},{r:3,c:4},{r:5,c:4},{r:6,c:4},{r:7,c:4},{r:8,c:4},{r:9,c:4},{r:0,c:6},{r:1,c:6},{r:2,c:6},{r:3,c:6},{r:5,c:6},{r:6,c:6},{r:7,c:6},{r:8,c:6},{r:9,c:6},{r:4,c:2},{r:3,c:2},{r:5,c:2},{r:4,c:8},{r:3,c:8},{r:5,c:8}], enemies: [{ type: 'tiger', start: {r:1, c:5}, commands: ['DOWN', 'DOWN', 'UP', 'UP'] }, { type: 'tiger', start: {r:8, c:5}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }, { type: 'tiger', start: {r:4, c:5}, commands: ['LEFT', 'RIGHT'] }] },
+  // 40
+  { theme: 'alien', size: 10, start: {r:9, c:4}, target: {r:0, c:5}, obstacles: [{r:8,c:1},{r:8,c:2},{r:8,c:3},{r:8,c:4},{r:8,c:5},{r:8,c:6},{r:8,c:7},{r:8,c:8},{r:6,c:0},{r:6,c:1},{r:6,c:2},{r:6,c:3},{r:6,c:4},{r:6,c:5},{r:6,c:6},{r:6,c:7},{r:4,c:2},{r:4,c:3},{r:4,c:4},{r:4,c:5},{r:4,c:6},{r:4,c:7},{r:4,c:8},{r:4,c:9},{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:2,c:5},{r:2,c:6},{r:2,c:7}], enemies: [{ type: 'tiger', start: {r:7, c:0}, commands: ['RIGHT', 'RIGHT', 'RIGHT', 'LEFT', 'LEFT', 'LEFT'] }, { type: 'tiger', start: {r:5, c:9}, commands: ['LEFT', 'LEFT', 'LEFT', 'RIGHT', 'RIGHT', 'RIGHT'] }, { type: 'tiger', start: {r:3, c:0}, commands: ['RIGHT', 'RIGHT', 'RIGHT', 'LEFT', 'LEFT', 'LEFT'] }, { type: 'tiger', start: {r:1, c:9}, commands: ['LEFT', 'LEFT', 'LEFT', 'RIGHT', 'RIGHT', 'RIGHT'] }] }
 ];
 
 const LEVELS = RAW_LEVELS.map((lvl, idx) => {
@@ -104,7 +123,8 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         if (snakePos) break;
       }
       if (snakePos) {
-        newLvl.enemies = [{ start: snakePos, commands: ['DOWN', 'UP', 'RIGHT', 'LEFT'] }];
+        const eType = idx >= 9 ? 'tiger' : 'snake'; // 从第10关起刷老虎
+        newLvl.enemies = [{ type: eType, start: snakePos, commands: ['DOWN', 'UP', 'RIGHT', 'LEFT'] }];
       }
     }
   }
@@ -124,6 +144,42 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
       }
     });
   }
+
+  // 第十五关之后的关卡 (index >= 14)，大幅增加难度：包围终点 + 增加额外老虎
+  if (idx >= 14) {
+    // 1. 包围终点 (Target)
+    const tr = newLvl.target.r, tc = newLvl.target.c;
+    const targetNeighbors = [
+      {r: tr - 1, c: tc}, {r: tr + 1, c: tc}, {r: tr, c: tc - 1}, {r: tr, c: tc + 1}
+    ].filter(n => n.r >= 0 && n.r < newLvl.size && n.c >= 0 && n.c < newLvl.size);
+    
+    targetNeighbors.forEach(n => {
+      const isStart = (n.r === newLvl.start.r && n.c === newLvl.start.c);
+      const hasObs = newLvl.obstacles.some(o => o.r === n.r && o.c === n.c);
+      if (!isStart && !hasObs) {
+        newLvl.obstacles.push({r: n.r, c: n.c});
+      }
+    });
+
+    // 2. 随机在空地上生成一只额外的老虎
+    if (!newLvl.enemies) newLvl.enemies = [];
+    let extraTigerPos = null;
+    // 从右下角往前找，避免挤在起点附近
+    for (let r = newLvl.size - 1; r >= 0; r--) {
+      for (let c = newLvl.size - 1; c >= 0; c--) {
+        if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
+        if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
+        if (newLvl.enemies.some(e => e.start.r === r && e.start.c === c)) continue;
+        extraTigerPos = { r, c };
+        break;
+      }
+      if (extraTigerPos) break;
+    }
+    if (extraTigerPos) {
+      newLvl.enemies.push({ type: 'tiger', start: extraTigerPos, commands: ['UP', 'DOWN', 'LEFT', 'RIGHT'] });
+    }
+  }
+
   return newLvl;
 });
 
@@ -222,17 +278,19 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [pendingBombs, setPendingBombs] = useState([]);
   const [currentWeather, setCurrentWeather] = useState(getThemeWeather(currentLevel.theme));
   const [zoomScale, setZoomScale] = useState(1.0);
-  const [bombCount, setBombCount] = useState(() => {
-    const saved = localStorage.getItem('codingMazeBombs');
-    if (saved) {
-      const parsed = parseInt(saved, 10);
-      return isNaN(parsed) ? 0 : parsed;
-    }
-    return 0;
+  const [inventory, setInventory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('codingMazeInventory');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return { normal: 0, freeze: 0, super: 0 };
   });
-  const [isBombMode, setIsBombMode] = useState(false);
+  const [activeBombType, setActiveBombType] = useState(null);
+  const [activeExplosion, setActiveExplosion] = useState(null);
+  const [showShop, setShowShop] = useState(false);
+  const [shopTarget, setShopTarget] = useState(null);
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
-  const [destroyedEnemies, setDestroyedEnemies] = useState([]);
+  const [enemyHealths, setEnemyHealths] = useState([]);
   const [enemyPositions, setEnemyPositions] = useState([]);
   
   const [showMathQuiz, setShowMathQuiz] = useState(false);
@@ -323,11 +381,11 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsShaking(false);
     setIsJumping(false);
     setIsWalking(false);
-    setIsBombMode(false);
+    setActiveBombType(null);
     setTrail([]);
     setPendingBombs([]);
     setDestroyedObstacles([]);
-    setDestroyedEnemies([]);
+    setEnemyHealths(currentLevel.enemies ? currentLevel.enemies.map(e => e.type === 'tiger' ? 2 : 1) : []);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
   };
 
@@ -339,11 +397,17 @@ export default function CodingMazeGame({ lang, onBack }) {
     setTrail([]);
     setPos({ ...currentLevel.start });
     setStatusMsg('');
-    setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
+    setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
   };
 
-  const triggerMathQuiz = () => {
+  const triggerMathQuiz = (type, needed) => {
     audioSynth.playClick();
+    setShopTarget({ type, needed, answered: 0 });
+    setShowShop(false);
+    generateAndShowQuestion();
+  };
+
+  const generateAndShowQuestion = () => {
     const q = mathGenerator.generateQuestion(4, { minNumber: mathMin, maxNumber: mathMax, operations: ['add', 'sub'], lang: lang });
     setMathProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
     setMathInput('');
@@ -354,10 +418,20 @@ export default function CodingMazeGame({ lang, onBack }) {
     e.preventDefault();
     if (parseInt(mathInput, 10) === mathProblem.ans) {
       audioSynth.playCorrect();
-      const newBombs = bombCount + 2;
-      setBombCount(newBombs);
-      localStorage.setItem('codingMazeBombs', newBombs.toString());
-      setShowMathQuiz(false);
+      const newAnswered = shopTarget.answered + 1;
+      if (newAnswered >= shopTarget.needed) {
+        const newInv = { ...inventory };
+        if (shopTarget.type === 'normal') newInv.normal += 2;
+        if (shopTarget.type === 'freeze') newInv.freeze += 1;
+        if (shopTarget.type === 'super') newInv.super += 1;
+        setInventory(newInv);
+        localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
+        setShowMathQuiz(false);
+        setShopTarget(null);
+      } else {
+        setShopTarget(prev => ({ ...prev, answered: newAnswered }));
+        generateAndShowQuestion();
+      }
     } else {
       audioSynth.playIncorrect();
       setIsMathShaking(true);
@@ -393,7 +467,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     let currentPos = { ...currentLevel.start };
     setPos(currentPos);
     setTrail([]);
-    let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : [];
+    let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : [];
     setEnemyPositions(currentEnemyPositions);
 
     for (let i = 0; i < commands.length; i++) {
@@ -421,7 +495,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -437,7 +511,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -467,7 +541,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         resetTimeoutRef.current = setTimeout(() => {
           setIsShaking(false);
           setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
+          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
         }, 500);
         return;
       }
@@ -499,7 +573,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       resetTimeoutRef.current = setTimeout(() => {
         setIsShaking(false);
         setPos({ ...currentLevel.start });
-        setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => destroyedEnemies.includes(i) ? null : ({...e.start})) : []);
+        setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
       }, 500);
     }
     setIsPlaying(false);
@@ -510,10 +584,10 @@ export default function CodingMazeGame({ lang, onBack }) {
     const nextIdx = (levelIdx + 1) % LEVELS.length;
     setLevelIdx(nextIdx);
     localStorage.setItem('codingMazeLevel', nextIdx.toString());
-    const newBombs = bombCount + 1;
-    setBombCount(newBombs);
-    localStorage.setItem('codingMazeBombs', newBombs.toString());
-    setIsBombMode(false);
+    const newInv = { ...inventory, normal: inventory.normal + 1 };
+    setInventory(newInv);
+    localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
+    setActiveBombType(null);
     setDestroyedObstacles([]);
   };
 
@@ -521,12 +595,12 @@ export default function CodingMazeGame({ lang, onBack }) {
     if (window.confirm(lang === 'en' ? 'Reset all progress?' : '确定要重置所有闯关进度并回到第一关吗？')) {
       audioSynth.playClick();
       localStorage.removeItem('codingMazeLevel');
-      localStorage.removeItem('codingMazeBombs');
+      localStorage.removeItem('codingMazeInventory');
       setLevelIdx(0);
-      setBombCount(0);
-      setIsBombMode(false);
+      setInventory({ normal: 0, freeze: 0, super: 0 });
+      setActiveBombType(null);
       setDestroyedObstacles([]);
-      setDestroyedEnemies([]);
+      setEnemyHealths([]);
     }
   };
 
@@ -565,9 +639,9 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isObstacle = currentLevel.obstacles.some(o => o.r === r && o.c === c);
         const isDestroyed = destroyedObstacles.some(o => o.r === r && o.c === c);
 
-        const enemyIdx = enemyPositions.findIndex(ep => ep && ep.r === r && ep.c === c);
+        const enemyIdx = enemyPositions.findIndex((ep, idx) => ep && ep.r === r && ep.c === c && enemyHealths[idx] > 0);
         const isEnemy = enemyIdx !== -1;
-        const isEnemyDestroyed = currentLevel.enemies?.some((e, i) => destroyedEnemies.includes(i) && e.start.r === r && e.start.c === c);
+        const isEnemyDestroyed = currentLevel.enemies?.some((e, i) => enemyHealths[i] <= 0 && e.start.r === r && e.start.c === c);
 
         const isPendingBomb = pendingBombs.some(p => p.r === r && p.c === c);
         const isFootprint = trail.some(t => t.r === r && t.c === c);
@@ -590,7 +664,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           content = <span style={{ opacity: 0.3, fontSize: `${cellSize * 0.4}px` }}>🐾</span>;
         }
 
-        const canBomb = isBombMode && ((isObstacle && !isDestroyed) || isEnemy);
+        const canBomb = activeBombType !== null && ((isObstacle && !isDestroyed) || isEnemy);
 
         row.push(
           <div key={`${r}-${c}`} style={{
@@ -608,12 +682,27 @@ export default function CodingMazeGame({ lang, onBack }) {
             outlineOffset: '-2px'
           }} onClick={() => {
             if (canBomb && !isPendingBomb) {
+              const usedBomb = activeBombType;
+              setActiveBombType(null);
+              const newInv = { ...inventory, [usedBomb]: inventory[usedBomb] - 1 };
+              setInventory(newInv);
+              localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
+
               setPendingBombs([...pendingBombs, {r, c}]);
               audioSynth.playClick();
               setTimeout(() => {
-                audioSynth.playBomb();
+                if (usedBomb === 'freeze') audioSynth.playFreezeBomb();
+                else if (usedBomb === 'super') audioSynth.playSuperBomb();
+                else audioSynth.playBomb();
+                
                 setIsShaking(true);
                 setTimeout(() => setIsShaking(false), 300);
+                
+                const explId = Date.now();
+                setActiveExplosion({ r, c, type: usedBomb, id: explId });
+                setTimeout(() => {
+                  setActiveExplosion(prev => prev && prev.id === explId ? null : prev);
+                }, 500);
                 
                 if (containerRef.current) {
                   const rect = containerRef.current.getBoundingClientRect();
@@ -630,7 +719,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                       x: absX / window.innerWidth,
                       y: absY / window.innerHeight
                     },
-                    colors: ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
+                    colors: usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
                     ticks: 100,
                     gravity: 1.2
                   });
@@ -639,21 +728,33 @@ export default function CodingMazeGame({ lang, onBack }) {
                 setPendingBombs(prev => prev.filter(p => p.r !== r || p.c !== c));
                 
                 if (isEnemy) {
-                  setDestroyedEnemies(prev => [...prev, enemyIdx]);
-                  const newEp = [...enemyPositions];
-                  newEp[enemyIdx] = null;
-                  setEnemyPositions(newEp);
+                  setEnemyHealths(prev => {
+                    const next = [...prev];
+                    let dmg = 1;
+                    if (usedBomb === 'freeze') dmg = 2;
+                    if (usedBomb === 'super') dmg = 3;
+                    next[enemyIdx] -= dmg;
+                    return next;
+                  });
                 } else {
                   setDestroyedObstacles(prev => [...prev, { r, c }]);
                 }
-                const newBombs = bombCount - 1;
-                setBombCount(newBombs);
-                localStorage.setItem('codingMazeBombs', newBombs.toString());
               }, 500);
-              setIsBombMode(false);
             }
           }}>
             {content}
+            {activeExplosion && activeExplosion.r === r && activeExplosion.c === c && (
+              <img 
+                src={`/expl_${activeExplosion.type}.png`} 
+                alt="explosion"
+                style={{
+                  position: 'absolute', width: '250%', height: '250%', zIndex: 20,
+                  pointerEvents: 'none',
+                  animation: 'magicExplosion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                  color: activeExplosion.type === 'freeze' ? '#93c5fd' : activeExplosion.type === 'super' ? '#fde047' : '#fca5a5'
+                }} 
+              />
+            )}
           </div>
         );
       }
@@ -713,6 +814,12 @@ export default function CodingMazeGame({ lang, onBack }) {
               0%, 100% { transform: scale(1); opacity: 0.7; }
               50% { transform: scale(1.3); opacity: 1; }
             }
+            @keyframes magicExplosion {
+              0% { transform: scale(0.1) rotate(-20deg); opacity: 0.5; filter: brightness(2) drop-shadow(0 0 10px white); }
+              40% { transform: scale(1.2) rotate(15deg); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 25px currentColor); }
+              70% { transform: scale(0.9) rotate(-5deg); opacity: 0.9; filter: drop-shadow(0 0 15px currentColor); }
+              100% { transform: scale(1.4) rotate(5deg); opacity: 0; filter: blur(4px); }
+            }
             @keyframes bombExplosion {
               0% { transform: scale(0.2); opacity: 1; filter: brightness(2) drop-shadow(0 0 10px #ef4444); }
               40% { transform: scale(1.6); opacity: 1; filter: brightness(1.5) drop-shadow(0 0 20px #ef4444); }
@@ -771,6 +878,12 @@ export default function CodingMazeGame({ lang, onBack }) {
         {/* Enemy overlays */}
         {enemyPositions.map((ep, i) => {
           if (!ep) return null;
+          if (enemyHealths[i] <= 0) return null;
+          const eType = currentLevel.enemies[i]?.type || 'snake';
+          const emoji = eType === 'tiger' ? '🐯' : '🐍';
+          const maxHealth = eType === 'tiger' ? 2 : 1;
+          const curHealth = enemyHealths[i];
+          
           return (
             <div key={`enemy-${i}`} style={{
               position: 'absolute',
@@ -785,7 +898,34 @@ export default function CodingMazeGame({ lang, onBack }) {
               pointerEvents: 'none',
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
             }}>
-              🐍
+              {eType === 'tiger' ? (
+                <img src="/tiger_3d.png" style={{
+                  width: '90%', height: '90%', objectFit: 'contain',
+                  animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 'none'
+                }} />
+              ) : '🐍'}
+              {curHealth > 0 && curHealth < maxHealth && (
+                <div style={{
+                  position: 'absolute', top: '5%', right: '5%', 
+                  background: '#ef4444', color: 'white', 
+                  borderRadius: '10px', fontSize: '0.4em', 
+                  padding: '2px 4px', fontWeight: 'bold',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+                }}>
+                  {curHealth}/{maxHealth}
+                </div>
+              )}
+              {curHealth === 2 && (
+                 <div style={{
+                  position: 'absolute', top: '5%', right: '5%', 
+                  background: '#f97316', color: 'white', 
+                  borderRadius: '10px', fontSize: '0.4em', 
+                  padding: '2px 4px', fontWeight: 'bold',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+                }}>
+                  ♥2
+                </div>
+              )}
             </div>
           );
         })}
@@ -996,31 +1136,41 @@ export default function CodingMazeGame({ lang, onBack }) {
         {/* Controls and Run area */}
         <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', width: '100%', justifyContent: 'center', alignItems: 'stretch' }}>
           
-          <button 
-             className="bouncy-button secondary" 
-             onClick={() => { 
-               if(bombCount > 0 && !isPlaying && !isSolved) setIsBombMode(!isBombMode); 
-               else if(bombCount === 0 && !isPlaying && !isSolved) triggerMathQuiz();
-             }}
-             style={{ 
-                padding: isMobile ? '6px 10px' : '10px 18px', 
-                fontSize: isMobile ? '0.9rem' : '1rem',
-                background: bombCount === 0 ? '#bfdbfe' : (isBombMode ? '#fca5a5' : '#f8fafc'),
-                border: `2px solid ${bombCount === 0 ? '#3b82f6' : (isBombMode ? '#ef4444' : '#cbd5e1')}`,
-                color: bombCount === 0 ? '#1e40af' : '#334155',
-                display: 'flex', alignItems: 'center', gap: '4px',
-                borderRadius: '12px',
-                boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${bombCount === 0 ? '#60a5fa' : '#94a3b8'}`,
-                animation: isBombMode ? 'bombPulse 1.5s infinite' : 'none'
-             }}
-             title={bombCount === 0 ? (lang === 'en' ? 'Get Bombs' : '获取炸弹') : (lang === 'en' ? 'Use Bomb' : '使用炸弹（点击后选择要炸毁的障碍物）')}
-          >
-            {bombCount > 0 ? (
-              <>💣 <span style={{fontWeight:'bold'}}>x {bombCount}</span></>
-            ) : (
-              <span style={{fontWeight:'bold'}}>{lang === 'en' ? '➕ Get Bombs' : '➕ 获取炸弹'}</span>
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-start' }}>
+            <button 
+               className="bouncy-button secondary" 
+               onClick={() => { if (!isPlaying && !isSolved) setShowShop(true); }}
+               style={{ 
+                  padding: isMobile ? '6px 10px' : '8px 12px', 
+                  fontSize: isMobile ? '0.8rem' : '0.95rem',
+                  background: '#bfdbfe', border: '2px solid #3b82f6', color: '#1e40af',
+                  borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px',
+                  boxShadow: `0 ${isMobile ? 2 : 4}px 0 #60a5fa`
+               }}
+            >
+              🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
+            </button>
+            
+            {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0) && (
+              <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
+                {inventory.normal > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none' }}>
+                    💣 x{inventory.normal}
+                  </button>
+                )}
+                {inventory.freeze > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none' }}>
+                    ❄️ x{inventory.freeze}
+                  </button>
+                )}
+                {inventory.super > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none' }}>
+                    🌟 x{inventory.super}
+                  </button>
+                )}
+              </div>
             )}
-          </button>
+          </div>
 
           {isSolved ? (
             <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
@@ -1035,6 +1185,50 @@ export default function CodingMazeGame({ lang, onBack }) {
 
       </div>
       </div>
+
+      {/* Shop Modal */}
+      {showShop && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, margin: 0, padding: 0, backdropFilter: 'blur(3px)'
+        }}>
+          <div className="bounce-in" style={{
+            background: 'white', padding: isMobile ? '20px' : '30px', borderRadius: '24px',
+            textAlign: 'center', width: '90%', maxWidth: '400px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)', border: '4px solid #60a5fa'
+          }}>
+            <h3 style={{ margin: '0 0 15px 0', color: '#1e40af', fontSize: '1.4rem' }}>
+              {lang === 'en' ? 'Props Shop' : '道具补给站'}
+            </h3>
+            <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '0.95rem' }}>
+              {lang === 'en' ? 'Solve math problems to get special bombs!' : '计算算术题，获取强大的炸弹！'}
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+              <button onClick={() => triggerMathQuiz('normal', 1)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #94a3b8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>💣 <span>{lang === 'en' ? 'Normal Bomb x2' : '普通炸弹 x2'}</span></div>
+                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{lang === 'en' ? '1 Question' : '需答对 1 题'}</div>
+              </button>
+              <button onClick={() => triggerMathQuiz('freeze', 2)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #93c5fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#eff6ff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>❄️ <span style={{color: '#2563eb'}}>{lang === 'en' ? 'Freeze Bomb x1 (2 DMG)' : '冰冻弹 x1 (2点伤害)'}</span></div>
+                <div style={{ fontSize: '0.85rem', color: '#2563eb' }}>{lang === 'en' ? '2 Questions' : '需连答 2 题'}</div>
+              </button>
+              <button onClick={() => triggerMathQuiz('super', 3)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #fde047', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fefce8' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🌟 <span style={{color: '#ca8a04'}}>{lang === 'en' ? 'Super Bomb x1 (3 DMG)' : '穿甲弹 x1 (3点伤害)'}</span></div>
+                <div style={{ fontSize: '0.85rem', color: '#ca8a04' }}>{lang === 'en' ? '3 Questions' : '需连答 3 题'}</div>
+              </button>
+            </div>
+            
+            <button 
+              onClick={() => { audioSynth.playClick(); setShowShop(false); }}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem', padding: '10px' }}
+            >
+              {lang === 'en' ? 'Close' : '关闭'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Math Quiz Modal */}
       {showMathQuiz && mathProblem && (
@@ -1052,8 +1246,8 @@ export default function CodingMazeGame({ lang, onBack }) {
             <h3 style={{ margin: '0 0 10px 0', color: '#1e40af', fontSize: '1.4rem' }}>
               {lang === 'en' ? 'Math Challenge' : '算术挑战'}
             </h3>
-            <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '0.95rem' }}>
-              {lang === 'en' ? 'Solve it to get 2 bombs!' : '算对这道题，就能获得 2 颗炸弹哦！'}
+            <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '0.95rem', fontWeight: 'bold' }}>
+              {lang === 'en' ? `Challenge (${shopTarget?.answered + 1}/${shopTarget?.needed})` : `算术挑战 (${shopTarget?.answered + 1}/${shopTarget?.needed})`}
             </p>
             
             <div style={{ fontSize: '2.8rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '25px', letterSpacing: '3px' }}>

@@ -204,6 +204,91 @@ export const audioSynth = {
     } catch (e) {}
   },
 
+  // High pitch shatter for freeze bomb
+  playFreezeBomb() {
+    if (isMuted) return;
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      // High pitch noise for glass shatter
+      const bufferSize = ctx.sampleRate * 0.3; 
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i/bufferSize);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 3000;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.8, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start(now);
+      
+      // Ping
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(2000, now);
+      osc.frequency.exponentialRampToValueAtTime(3000, now + 0.1);
+      oscGain.gain.setValueAtTime(0.3, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } catch(e) {}
+  },
+
+  // Laser armor piercing big boom
+  playSuperBomb() {
+    if (isMuted) return;
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      
+      // Pew pew laser down sweep
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1500, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+      oscGain.gain.setValueAtTime(0.4, now);
+      oscGain.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+
+      // Deep boom right after
+      const bufferSize = ctx.sampleRate * 0.8; 
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1000, now + 0.1);
+      filter.frequency.exponentialRampToValueAtTime(40, now + 0.8);
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0, now);
+      noiseGain.gain.linearRampToValueAtTime(1.5, now + 0.15); // Loud boom
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(now + 0.1);
+    } catch(e) {}
+  },
+
   stopWeatherAmbiance() {
     try {
       const ctx = getAudioContext();
