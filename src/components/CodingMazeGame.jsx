@@ -1200,7 +1200,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               <RotateCcw size={isMobile ? 18 : 22} />
             </button>
           </div>
-          <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : '1.4rem', whiteSpace: 'nowrap', textAlign: 'center', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : 'clamp(1rem, 3vw, 1.4rem)', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
             {lang === 'en' ? (isMobile ? `${levelIdx + 1}/${LEVELS.length}` : `Maze (${levelIdx + 1}/${LEVELS.length})`) : (isMobile ? `第${levelIdx + 1}关` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`)}
           </h2>
           <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
