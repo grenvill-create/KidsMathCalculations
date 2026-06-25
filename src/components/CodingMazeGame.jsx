@@ -1071,7 +1071,9 @@ export default function CodingMazeGame({ lang, onBack }) {
     }
     return (
       <div className="maze-grid-container" key={levelIdx} style={{
-        animation: 'bounceInDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        animation: activeAtomicExplosion 
+          ? 'gridAtomicShake 1.8s ease-in-out' 
+          : 'bounceInDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         position: 'absolute',
         top: 0, left: 0, right: 0, bottom: 0,
         display: 'flex',
@@ -1192,6 +1194,32 @@ export default function CodingMazeGame({ lang, onBack }) {
               15% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1.5) saturate(1.5); }
               50% { transform: scale(1.1) translateY(-10px); opacity: 1; filter: brightness(1.1); }
               100% { transform: scale(1.3) translateY(-30px); opacity: 0; filter: blur(10px) brightness(0.8); }
+            }
+            @keyframes atomicRing {
+              0% { transform: scale(0.1); opacity: 0; filter: brightness(2) drop-shadow(0 0 5px #a855f7); }
+              10% { transform: scale(0.4); opacity: 1; filter: brightness(2) drop-shadow(0 0 15px #a855f7); }
+              50% { transform: scale(1.3); opacity: 0.8; filter: brightness(1.2) drop-shadow(0 0 10px #10b981); }
+              100% { transform: scale(2.2); opacity: 0; filter: blur(8px); }
+            }
+            @keyframes atomicCore {
+              0% { transform: scale(0.2) rotate(0deg); opacity: 0; filter: brightness(3); }
+              15% { transform: scale(1.1) rotate(15deg); opacity: 1; filter: brightness(1.8) drop-shadow(0 0 20px #ef4444); }
+              35% { transform: scale(1.05) rotate(-10deg); opacity: 0.9; }
+              70% { transform: scale(0.9) rotate(5deg); opacity: 0.6; }
+              100% { transform: scale(0); opacity: 0; filter: blur(5px); }
+            }
+            @keyframes gridAtomicShake {
+              0%, 100% { transform: scale(1) translate(0, 0) rotate(0deg); }
+              5% { transform: scale(1.05) translate(-10px, -10px) rotate(-2deg); }
+              10% { transform: scale(1.1) translate(12px, 12px) rotate(3deg); }
+              15% { transform: scale(1.08) translate(-15px, 8px) rotate(-4deg); }
+              20% { transform: scale(1.12) translate(14px, -12px) rotate(3deg); }
+              25% { transform: scale(1.1) translate(-12px, 10px) rotate(-3deg); }
+              35% { transform: scale(1.05) translate(8px, -8px) rotate(2deg); }
+              45% { transform: scale(1.02) translate(-6px, 6px) rotate(-1deg); }
+              55% { transform: scale(1.01) translate(4px, -4px) rotate(1deg); }
+              65% { transform: scale(1) translate(-2px, 2px) rotate(0deg); }
+              75% { transform: scale(1) translate(1px, -1px) rotate(0deg); }
             }
           `}
         </style>
@@ -1321,19 +1349,56 @@ export default function CodingMazeGame({ lang, onBack }) {
             alignItems: 'center',
             justifyContent: 'center',
             pointerEvents: 'none',
-            background: 'rgba(168, 85, 247, 0.2)',
-            animation: 'atomicFlash 2s forwards',
             borderRadius: isMobile ? '12px' : '24px',
             overflow: 'hidden'
           }}>
+            {/* Layer 1: Fullscreen flashing background */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              animation: 'atomicFlash 2.2s ease-out forwards',
+              zIndex: 1
+            }} />
+            
+            {/* Layer 2: Expanding energy shockwave ring */}
+            <img 
+              src={`${import.meta.env.BASE_URL}atomic_blast_wave.png`} 
+              alt="shockwave" 
+              style={{
+                position: 'absolute',
+                width: '150%',
+                height: '150%',
+                objectFit: 'contain',
+                animation: 'atomicRing 1.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards',
+                zIndex: 2
+              }}
+            />
+
+            {/* Layer 3: Glowing nuclear fireball core */}
+            <img 
+              src={`${import.meta.env.BASE_URL}atomic_fireball.png`} 
+              alt="fireball" 
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                animation: 'atomicCore 1.6s ease-out forwards',
+                zIndex: 3
+              }}
+            />
+
+            {/* Layer 4: Giant rising mushroom cloud */}
             <img 
               src={`${import.meta.env.BASE_URL}expl_atomic.png`} 
               alt="nuclear blast" 
               style={{
+                position: 'absolute',
                 width: '120%',
                 height: '120%',
                 objectFit: 'contain',
-                animation: 'atomicMushroom 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards'
+                animation: 'atomicMushroom 2.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards',
+                zIndex: 4
               }}
             />
           </div>
