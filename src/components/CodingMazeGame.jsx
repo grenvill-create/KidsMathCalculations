@@ -304,12 +304,21 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [inventory, setInventory] = useState(() => {
     try {
       const saved = localStorage.getItem('codingMazeInventory');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          normal: parsed.normal || 0,
+          freeze: parsed.freeze || 0,
+          super: parsed.super || 0,
+          atomic: parsed.atomic || 0
+        };
+      }
     } catch(e) {}
-    return { normal: 0, freeze: 0, super: 0 };
+    return { normal: 0, freeze: 0, super: 0, atomic: 0 };
   });
   const [activeBombType, setActiveBombType] = useState(null);
   const [activeExplosion, setActiveExplosion] = useState(null);
+  const [activeAtomicExplosion, setActiveAtomicExplosion] = useState(null);
   const [showShop, setShowShop] = useState(false);
   const [shopTarget, setShopTarget] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
@@ -451,6 +460,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setIsJumping(false);
     setIsWalking(false);
     setActiveBombType(null);
+    setActiveAtomicExplosion(null);
     setTrail([]);
     setPendingBombs([]);
     setDestroyedObstacles([]);
@@ -507,6 +517,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         if (shopTarget.type === 'normal') newInv.normal += 2;
         if (shopTarget.type === 'freeze') newInv.freeze += 1;
         if (shopTarget.type === 'super') newInv.super += 1;
+        if (shopTarget.type === 'atomic') newInv.atomic += 1;
         setInventory(newInv);
         localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
         setShowMathQuiz(false);
@@ -782,8 +793,9 @@ export default function CodingMazeGame({ lang, onBack }) {
       localStorage.removeItem('codingMazeLevel');
       localStorage.removeItem('codingMazeInventory');
       setLevelIdx(0);
-      setInventory({ normal: 0, freeze: 0, super: 0 });
+      setInventory({ normal: 0, freeze: 0, super: 0, atomic: 0 });
       setActiveBombType(null);
+      setActiveAtomicExplosion(null);
       setDestroyedObstacles([]);
       setEnemyHealths([]);
     }
@@ -903,7 +915,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           }
         }
 
-        const canBomb = activeBombType !== null && ((isObstacle && !isDestroyed) || isEnemy);
+        const canBomb = activeBombType !== null && (activeBombType === 'atomic' ? true : ((isObstacle && !isDestroyed) || isEnemy));
 
         row.push(
           <div key={`${r}-${c}`} style={{
@@ -932,16 +944,33 @@ export default function CodingMazeGame({ lang, onBack }) {
               setTimeout(() => {
                 if (usedBomb === 'freeze') audioSynth.playFreezeBomb();
                 else if (usedBomb === 'super') audioSynth.playSuperBomb();
+                else if (usedBomb === 'atomic') {
+                  audioSynth.playSuperBomb();
+                  // extra impact sound simulated by playSuperBomb
+                }
                 else audioSynth.playBomb();
                 
-                setIsShaking(true);
-                setTimeout(() => setIsShaking(false), 300);
-                
-                const explId = Date.now();
-                setActiveExplosion({ r, c, type: usedBomb, id: explId });
-                setTimeout(() => {
-                  setActiveExplosion(prev => prev && prev.id === explId ? null : prev);
-                }, 500);
+                if (usedBomb === 'atomic') {
+                  setIsShaking(true);
+                  setTimeout(() => setIsShaking(false), 1500);
+                  
+                  const explId = Date.now();
+                  setActiveAtomicExplosion({ id: explId });
+                  setTimeout(() => {
+                    setActiveAtomicExplosion(prev => prev && prev.id === explId ? null : prev);
+                  }, 2000);
+                  
+                  setEnemyHealths(prev => prev.map(() => 0));
+                } else {
+                  setIsShaking(true);
+                  setTimeout(() => setIsShaking(false), 300);
+                  
+                  const explId = Date.now();
+                  setActiveExplosion({ r, c, type: usedBomb, id: explId });
+                  setTimeout(() => {
+                    setActiveExplosion(prev => prev && prev.id === explId ? null : prev);
+                  }, 500);
+                }
                 
                 if (containerRef.current) {
                   const rect = containerRef.current.getBoundingClientRect();
@@ -950,39 +979,60 @@ export default function CodingMazeGame({ lang, onBack }) {
                   const absX = rect.left + c * cellW + cellW / 2;
                   const absY = rect.top + r * cellH + cellH / 2;
                   
-                  confetti({
-                    particleCount: 80,
-                    spread: 100,
-                    startVelocity: 30,
-                    origin: {
-                      x: absX / window.innerWidth,
-                      y: absY / window.innerHeight
-                    },
-                    colors: usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
-                    ticks: 100,
-                    gravity: 1.2
-                  });
+                  if (usedBomb === 'atomic') {
+                    for (let i = 0; i < 5; i++) {
+                      setTimeout(() => {
+                        confetti({
+                          particleCount: 100,
+                          spread: 180,
+                          startVelocity: 45,
+                          origin: {
+                            x: Math.random(),
+                            y: Math.random()
+                          },
+                          colors: ['#a855f7', '#d8b4fe', '#f3e8ff', '#f43f5e', '#fb7185', '#10b981'],
+                          ticks: 150,
+                          gravity: 0.8
+                        });
+                      }, i * 200);
+                    }
+                  } else {
+                    confetti({
+                      particleCount: 80,
+                      spread: 100,
+                      startVelocity: 30,
+                      origin: {
+                        x: absX / window.innerWidth,
+                        y: absY / window.innerHeight
+                      },
+                      colors: usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
+                      ticks: 100,
+                      gravity: 1.2
+                    });
+                  }
                 }
                 
                 setPendingBombs(prev => prev.filter(p => p.r !== r || p.c !== c));
                 
-                if (isEnemy) {
-                  setEnemyHealths(prev => {
-                    const next = [...prev];
-                    let dmg = 1;
-                    if (usedBomb === 'freeze') dmg = 2;
-                    if (usedBomb === 'super') dmg = 3;
-                    
-                    const eType = currentLevel.enemies[enemyIdx].type;
-                    if (eType === 'turtle' && usedBomb !== 'super') {
-                      dmg = 0; // Immune to normal/freeze bombs
-                    }
-                    
-                    next[enemyIdx] -= dmg;
-                    return next;
-                  });
-                } else {
-                  setDestroyedObstacles(prev => [...prev, { r, c }]);
+                if (usedBomb !== 'atomic') {
+                  if (isEnemy) {
+                    setEnemyHealths(prev => {
+                      const next = [...prev];
+                      let dmg = 1;
+                      if (usedBomb === 'freeze') dmg = 2;
+                      if (usedBomb === 'super') dmg = 3;
+                      
+                      const eType = currentLevel.enemies[enemyIdx].type;
+                      if (eType === 'turtle' && usedBomb !== 'super') {
+                        dmg = 0; // Immune to normal/freeze bombs
+                      }
+                      
+                      next[enemyIdx] -= dmg;
+                      return next;
+                    });
+                  } else {
+                    setDestroyedObstacles(prev => [...prev, { r, c }]);
+                  }
                 }
               }, 500);
             } else if (isEnemy && activeBombType === null) {
@@ -1130,6 +1180,18 @@ export default function CodingMazeGame({ lang, onBack }) {
               60% { transform: scale(1.5) translate(24px, -24px); opacity: 0.8; }
               80% { transform: scale(1.0) translate(32px, -32px); opacity: 0; }
             }
+            @keyframes atomicFlash {
+              0% { background: rgba(255, 255, 255, 0.95); }
+              15% { background: rgba(168, 85, 247, 0.8); }
+              40% { background: rgba(244, 63, 94, 0.4); }
+              100% { background: rgba(0, 0, 0, 0); }
+            }
+            @keyframes atomicMushroom {
+              0% { transform: scale(0.15) translateY(120px); opacity: 0; filter: brightness(3) saturate(2); }
+              15% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1.5) saturate(1.5); }
+              50% { transform: scale(1.1) translateY(-10px); opacity: 1; filter: brightness(1.1); }
+              100% { transform: scale(1.3) translateY(-30px); opacity: 0; filter: blur(10px) brightness(0.8); }
+            }
           `}
         </style>
         
@@ -1249,6 +1311,32 @@ export default function CodingMazeGame({ lang, onBack }) {
             </div>
           );
         })}
+        {activeAtomicExplosion && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            background: 'rgba(168, 85, 247, 0.2)',
+            animation: 'atomicFlash 2s forwards',
+            borderRadius: isMobile ? '12px' : '24px',
+            overflow: 'hidden'
+          }}>
+            <img 
+              src={`${import.meta.env.BASE_URL}expl_atomic.png`} 
+              alt="nuclear blast" 
+              style={{
+                width: '120%',
+                height: '120%',
+                objectFit: 'contain',
+                animation: 'atomicMushroom 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards'
+              }}
+            />
+          </div>
+        )}
       </div>
     );
   };
@@ -1471,7 +1559,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
             </button>
             
-            {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0) && (
+            {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0) && (
               <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
                 {inventory.normal > 0 && (
                   <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1489,6 +1577,12 @@ export default function CodingMazeGame({ lang, onBack }) {
                   <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     🌟 x{inventory.super}
                     <span style={{ fontSize: '0.75rem', color: activeBombType === 'super' ? '#a16207' : '#eab308', fontWeight: 'bold' }}>-3❤️</span>
+                  </button>
+                )}
+                {inventory.atomic > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'atomic' ? null : 'atomic')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'atomic' ? '#a855f7' : '#cbd5e1'}`, background: activeBombType === 'atomic' ? '#f3e8ff' : 'white', animation: activeBombType === 'atomic' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt="atomic" /> x{inventory.atomic}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'atomic' ? '#7e22ce' : '#a855f7', fontWeight: 'bold' }}>-ALL❤️</span>
                   </button>
                 )}
               </div>
@@ -1549,6 +1643,16 @@ export default function CodingMazeGame({ lang, onBack }) {
                   <div style={{ fontSize: '0.8rem', color: '#b45309', background: '#fef3c7', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -3❤️❤️❤️' : '威力: -3❤️❤️❤️'}</div>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#ca8a04' }}>{lang === 'en' ? '3 Questions' : '需连答 3 题'}</div>
+              </button>
+              <button onClick={() => triggerMathQuiz('atomic', 10)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #a855f7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#faf5ff' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
+                    <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt="atomic" />
+                    <span style={{color: '#9333ea'}}>{lang === 'en' ? 'Atomic Bomb x1' : '原子弹 x1'}</span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#7e22ce', background: '#f3e8ff', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Clear ALL Animals' : '威力: 清空全图动物'}</div>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#9333ea' }}>{lang === 'en' ? '10 Questions' : '需连答 10 题'}</div>
               </button>
             </div>
             
