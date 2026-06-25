@@ -90,6 +90,8 @@ const RAW_LEVELS = [
   {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
   // 30
   { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'dinosaur', start: {r:6, c:1}, commands: ['NONE'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }] },
+  // 31
+  { theme: 'frog', size: 10, start: {r:0, c:0}, target: {r:9, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:9,c:7},{r:8,c:7},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:4,c:5},{r:5,c:5},{r:6,c:5}], enemies: [{ type: 'tiger', start: {r:3, c:4}, commands: ['LEFT', 'RIGHT'] }, { type: 'snake', start: {r:7, c:3}, commands: ['UP', 'DOWN'] }] },
   // 32
   { theme: 'rabbit', size: 10, start: {r:0, c:0}, target: {r:9, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:7,c:0},{r:7,c:1},{r:7,c:2},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6},{r:7,c:7},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:2,c:7},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:9,c:5},{r:9,c:6}], enemies: [{ type: 'tiger', start: {r:8, c:3}, commands: ['RIGHT', 'LEFT'] }, { type: 'snake', start: {r:1, c:6}, commands: ['DOWN', 'DOWN', 'UP', 'UP'] }] },
   // 33
