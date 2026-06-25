@@ -124,7 +124,7 @@ export default function BubbleBondsGame({ lang, onBack }) {
         startNewRound(targetSum);
       }, 500);
     } else {
-      audioSynth.playError();
+      audioSynth.playIncorrect();
       // Shake effect
       const el = document.getElementById(`bubble-${bubble.id}`);
       if (el) {

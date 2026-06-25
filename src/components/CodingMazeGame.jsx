@@ -89,8 +89,7 @@ const RAW_LEVELS = [
   // 29
   {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
   // 30
-  // 31
-  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'tiger', start: {r:7, c:2}, commands: ['UP', 'DOWN'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'dinosaur', start: {r:6, c:1}, commands: ['NONE'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }] },
   // 32
   { theme: 'rabbit', size: 10, start: {r:0, c:0}, target: {r:9, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:7,c:0},{r:7,c:1},{r:7,c:2},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6},{r:7,c:7},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:2,c:7},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:9,c:5},{r:9,c:6}], enemies: [{ type: 'tiger', start: {r:8, c:3}, commands: ['RIGHT', 'LEFT'] }, { type: 'snake', start: {r:1, c:6}, commands: ['DOWN', 'DOWN', 'UP', 'UP'] }] },
   // 33
@@ -98,7 +97,7 @@ const RAW_LEVELS = [
   // 34
   { theme: 'cat', size: 10, start: {r:0, c:5}, target: {r:9, c:5}, obstacles: [{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:2,c:6},{r:2,c:7},{r:2,c:8},{r:2,c:9},{r:5,c:0},{r:5,c:1},{r:5,c:2},{r:5,c:3},{r:5,c:4},{r:5,c:6},{r:5,c:7},{r:5,c:8},{r:5,c:9},{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:8,c:3},{r:8,c:4},{r:8,c:6},{r:8,c:7},{r:8,c:8},{r:8,c:9}], enemies: [{ type: 'tiger', start: {r:3, c:5}, commands: ['LEFT', 'RIGHT'] }, { type: 'tiger', start: {r:6, c:5}, commands: ['RIGHT', 'LEFT'] }] },
   // 35
-  { theme: 'monkey', size: 10, start: {r:5, c:0}, target: {r:5, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:6,c:2},{r:7,c:2},{r:8,c:2},{r:9,c:2},{r:0,c:5},{r:1,c:5},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:6,c:5},{r:7,c:5},{r:8,c:5},{r:9,c:5},{r:0,c:8},{r:1,c:8},{r:2,c:8},{r:3,c:8},{r:4,c:8},{r:6,c:8},{r:7,c:8},{r:8,c:8},{r:9,c:8}], enemies: [{ type: 'tiger', start: {r:5, c:3}, commands: ['UP', 'DOWN'] }, { type: 'tiger', start: {r:5, c:6}, commands: ['DOWN', 'UP'] }, { type: 'tiger', start: {r:1, c:7}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'monkey', size: 10, start: {r: 5, c: 0}, target: {r: 5, c: 9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:6,c:2},{r:7,c:2},{r:8,c:2},{r:9,c:2},{r:0,c:5},{r:1,c:5},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:6,c:5},{r:7,c:5},{r:8,c:5},{r:9,c:5},{r:0,c:8},{r:1,c:8},{r:2,c:8},{r:3,c:8},{r:4,c:8},{r:6,c:8},{r:7,c:8},{r:8,c:8},{r:9,c:8}], enemies: [{ type: 'tiger', start: {r: 1, c: 7}, commands: ['LEFT', 'RIGHT'] }] },
   // 36
   { theme: 'bear', size: 10, start: {r:0, c:0}, target: {r:9, c:0}, obstacles: [{r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},{r:1,c:5},{r:1,c:6},{r:1,c:7},{r:1,c:8},{r:3,c:1},{r:3,c:2},{r:3,c:3},{r:3,c:4},{r:3,c:5},{r:3,c:6},{r:3,c:7},{r:3,c:8},{r:3,c:9},{r:5,c:0},{r:5,c:1},{r:5,c:2},{r:5,c:3},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:5,c:7},{r:5,c:8},{r:7,c:1},{r:7,c:2},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6},{r:7,c:7},{r:7,c:8},{r:7,c:9}], enemies: [{ type: 'tiger', start: {r:2, c:0}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }, { type: 'tiger', start: {r:4, c:9}, commands: ['LEFT', 'LEFT', 'RIGHT', 'RIGHT'] }, { type: 'tiger', start: {r:6, c:0}, commands: ['RIGHT', 'RIGHT', 'LEFT', 'LEFT'] }] },
   // 37
@@ -396,6 +395,48 @@ export default function CodingMazeGame({ lang, onBack }) {
     setShowParentGate(true);
   };
 
+  const getEnemyAt = (r, c) => {
+    if (!currentLevel.enemies) return -1;
+    for (let idx = 0; idx < currentLevel.enemies.length; idx++) {
+      const enemy = currentLevel.enemies[idx];
+      if (enemyHealths[idx] <= 0) continue;
+      const ep = enemyPositions[idx];
+      if (!ep) continue;
+      
+      if (enemy.type === 'dinosaur') {
+        if ((r === ep.r || r === ep.r + 1) && (c === ep.c || c === ep.c + 1)) {
+          return idx;
+        }
+      } else {
+        if (ep.r === r && ep.c === c) {
+          return idx;
+        }
+      }
+    }
+    return -1;
+  };
+
+  const isCellOnFire = (r, c) => {
+    if (!currentLevel.enemies) return false;
+    for (let idx = 0; idx < currentLevel.enemies.length; idx++) {
+      const enemy = currentLevel.enemies[idx];
+      if (enemy.type === 'dinosaur' && enemyHealths[idx] > 0) {
+        const ep = enemyPositions[idx];
+        if (!ep) continue;
+        
+        // Top:
+        if (r === ep.r - 1 && (c === ep.c || c === ep.c + 1)) return true;
+        // Bottom:
+        if (r === ep.r + 2 && (c === ep.c || c === ep.c + 1)) return true;
+        // Left:
+        if (c === ep.c - 1 && (r === ep.r || r === ep.r + 1)) return true;
+        // Right:
+        if (c === ep.c + 2 && (r === ep.r || r === ep.r + 1)) return true;
+      }
+    }
+    return false;
+  };
+
   const resetLevel = () => {
     if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
     setPos({ ...currentLevel.start });
@@ -412,6 +453,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setPendingBombs([]);
     setDestroyedObstacles([]);
     setEnemyHealths(currentLevel.enemies ? currentLevel.enemies.map(e => {
+      if (e.type === 'dinosaur') return 4;
       if (e.type === 'elephant') return 3;
       if (e.type === 'tiger') return 2;
       return 1;
@@ -603,20 +645,43 @@ export default function CodingMazeGame({ lang, onBack }) {
         }
       }
 
-      const hitEnemy = currentEnemyPositions.some(ep => ep && ep.r === nextR && ep.c === nextC);
-      if (hitEnemy) {
+      const hitEnemyIdx = currentEnemyPositions.findIndex((ep, idx) => {
+        if (!ep || enemyHealths[idx] <= 0) return false;
+        const enemyDef = currentLevel.enemies[idx];
+        if (enemyDef.type === 'dinosaur') {
+          return (nextR === ep.r || nextR === ep.r + 1) && (nextC === ep.c || nextC === ep.c + 1);
+        }
+        return ep.r === nextR && ep.c === nextC;
+      });
+      const hitEnemy = hitEnemyIdx !== -1;
+      
+      const hitFire = currentLevel.enemies?.some((enemy, idx) => {
+        if (enemy.type === 'dinosaur' && enemyHealths[idx] > 0) {
+          const ep = currentEnemyPositions[idx];
+          if (!ep) return false;
+          if (nextR === ep.r - 1 && (nextC === ep.c || nextC === ep.c + 1)) return true;
+          if (nextR === ep.r + 2 && (nextC === ep.c || nextC === ep.c + 1)) return true;
+          if (nextC === ep.c - 1 && (nextR === ep.r || nextR === ep.r + 1)) return true;
+          if (nextC === ep.c + 2 && (nextR === ep.r || nextR === ep.r + 1)) return true;
+        }
+        return false;
+      });
+
+      if (hitEnemy || hitFire) {
         audioSynth.playIncorrect();
-        setStatusMsg(lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。');
+        setStatusMsg(hitFire 
+          ? (lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。')
+          : (lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。'));
         setIsPlaying(false);
         setExecutingIdx(-1);
         setIsShaking(true);
         
         let caughtType = 'snake';
-        currentEnemyPositions.forEach((ep, eIdx) => {
-            if (ep && ep.r === nextR && ep.c === nextC) {
-                caughtType = currentLevel.enemies[eIdx].type;
-            }
-        });
+        if (hitEnemy) {
+          caughtType = currentLevel.enemies[hitEnemyIdx].type;
+        } else if (hitFire) {
+          caughtType = 'dinosaur';
+        }
         setCaughtBy(caughtType);
         
         resetTimeoutRef.current = setTimeout(() => {
@@ -780,7 +845,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isObstacle = currentLevel.obstacles.some(o => o.r === r && o.c === c);
         const isDestroyed = destroyedObstacles.some(o => o.r === r && o.c === c);
 
-        const enemyIdx = enemyPositions.findIndex((ep, idx) => ep && ep.r === r && ep.c === c && enemyHealths[idx] > 0);
+        const enemyIdx = getEnemyAt(r, c);
         const isEnemy = enemyIdx !== -1;
         const isEnemyDestroyed = currentLevel.enemies?.some((e, i) => enemyHealths[i] <= 0 && e.start.r === r && e.start.c === c);
 
@@ -788,6 +853,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isFootprint = trail.some(t => t.r === r && t.c === c);
 
         const isWeb = spiderWebs.some(w => w.r === r && w.c === c);
+        const isOnFire = isCellOnFire(r, c);
 
         if (isPendingBomb) {
           content = <span style={{ animation: 'fuseBurn 0.2s infinite alternate', display: 'inline-block' }}>🧨</span>;
@@ -803,6 +869,11 @@ export default function CodingMazeGame({ lang, onBack }) {
           borderColor = '#f87171';
         } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
           content = null;
+        } else if (isOnFire) {
+          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize * 0.5}px` }}>🔥</span>;
+          bg = '#ffedd5';
+          borderColor = '#f97316';
+          shadowColor = '#fdba74';
         } else if (isWeb) {
           content = <img src={`${import.meta.env.BASE_URL}spider_web.png`} style={{ width: '80%', height: '80%', opacity: 0.8 }} alt="web" />;
         } else if (isFootprint) {
@@ -914,7 +985,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               }, 500);
             } else if (isEnemy && activeBombType === null) {
               const eType = currentLevel.enemies[enemyIdx].type;
-              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake'].includes(eType)) {
+              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur'].includes(eType)) {
                 audioSynth.playClick();
                 setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
               }
@@ -1042,6 +1113,21 @@ export default function CodingMazeGame({ lang, onBack }) {
               70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); transform: scale(1.05); }
               100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
             }
+            @keyframes fireWobble {
+              0% { transform: scale(1) rotate(-3deg); filter: drop-shadow(0 2px 4px #f97316); }
+              100% { transform: scale(1.1) rotate(3deg); filter: drop-shadow(0 4px 8px #ef4444); }
+            }
+            @keyframes dinoBreathing {
+              0% { transform: scale(1) translateY(0); }
+              50% { transform: scale(1.05, 0.95) translateY(-2px); filter: drop-shadow(0 5px 8px rgba(239, 68, 68, 0.4)); }
+              100% { transform: scale(1) translateY(0); }
+            }
+            @keyframes fireSpit {
+              0%, 100% { transform: scale(0) translate(0, 0); opacity: 0; }
+              30% { transform: scale(1.2) translate(8px, -8px); opacity: 1; }
+              60% { transform: scale(1.5) translate(24px, -24px); opacity: 0.8; }
+              80% { transform: scale(1.0) translate(32px, -32px); opacity: 0; }
+            }
           `}
         </style>
         
@@ -1091,36 +1177,55 @@ export default function CodingMazeGame({ lang, onBack }) {
           if (!ep) return null;
           if (enemyHealths[i] <= 0) return null;
           const eType = currentLevel.enemies[i]?.type || 'snake';
-          const emoji = eType === 'tiger' ? '🐯' : '🐍';
-          const maxHealth = eType === 'elephant' ? 3 : (eType === 'tiger' || eType === 'rhino' ? 2 : 1);
+          const maxHealth = eType === 'dinosaur' ? 4 : eType === 'elephant' ? 3 : (eType === 'tiger' || eType === 'rhino' ? 2 : 1);
           const curHealth = enemyHealths[i];
+          
+          const isDinosaur = eType === 'dinosaur';
+          const span = isDinosaur ? 2 : 1;
+          const widthStr = `calc(${span} * (100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size} + ${span - 1} * ${gridGap}px)`;
+          const heightStr = `calc(${span} * (100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size} + ${span - 1} * ${gridGap}px)`;
           
           return (
             <div key={`enemy-${i}`} style={{
               position: 'absolute',
               top: `calc(${gridPadding}px + ${ep.r} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
               left: `calc(${gridPadding}px + ${ep.c} * (100% - ${2 * gridPadding}px + ${gridGap}px) / ${size})`,
-              width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
-              height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
+              width: widthStr,
+              height: heightStr,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: `${cellSize * 0.7}px`,
               transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
               zIndex: 9,
               pointerEvents: 'none'
             }}>
-              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake'].includes(eType) ? (
-                <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
-                  width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '90%', 
-                  height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '90%', 
-                  objectFit: 'contain',
-                  animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
-                             (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
-                              eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
-                              eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
-                              eType === 'snake' ? 'hoverWobble 1s infinite' :
-                              'idleBreathing 1.5s infinite alternate'),
-                  filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
-                }} />
+              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur'].includes(eType) ? (
+                <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
+                    width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
+                    height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
+                    objectFit: 'contain',
+                    animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
+                               (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
+                                eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
+                                eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
+                                eType === 'snake' ? 'hoverWobble 1s infinite' :
+                                eType === 'dinosaur' ? 'dinoBreathing 1.8s infinite alternate' :
+                                'idleBreathing 1.5s infinite alternate'),
+                    filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
+                  }} />
+                  {isDinosaur && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '10%',
+                      right: '10%',
+                      fontSize: `${cellSize * 0.75}px`,
+                      animation: 'fireSpit 1.8s infinite ease-in-out',
+                      pointerEvents: 'none'
+                    }}>
+                      🔥
+                    </div>
+                  )}
+                </div>
               ) : '🐯'}
               {maxHealth > 1 && (
                 <div style={{
