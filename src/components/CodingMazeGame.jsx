@@ -961,6 +961,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   }, 2000);
                   
                   setEnemyHealths(prev => prev.map(() => 0));
+                  setDestroyedObstacles(currentLevel.obstacles.map(o => ({ r: o.r, c: o.c })));
                 } else {
                   setIsShaking(true);
                   setTimeout(() => setIsShaking(false), 300);
