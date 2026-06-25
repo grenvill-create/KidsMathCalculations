@@ -430,6 +430,20 @@ body::before {
   to { stroke-dashoffset: -25; }
 }
 
+@keyframes backgroundDrift {
+  0% { background-position: 50% 50%; }
+  25% { background-position: 45% 55%; }
+  50% { background-position: 55% 45%; }
+  75% { background-position: 48% 48%; }
+  100% { background-position: 50% 50%; }
+}
+
+@keyframes sunShimmer {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-80px) scale(1.6); opacity: 0; }
+}
+
 /* Correct answer flash */
 .correct-flash {
   animation: correctFlash 0.5s ease;

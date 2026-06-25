@@ -243,13 +243,38 @@ const getThemeBackground = (theme) => {
 
 const WeatherOverlay = ({ weather }) => {
   if (weather === 'sun') {
+    const sunParticles = [];
+    for (let i = 0; i < 15; i++) {
+      const left = Math.random() * 100 + '%';
+      const top = 30 + Math.random() * 60 + '%';
+      const size = (4 + Math.random() * 6) + 'px';
+      const animDuration = (4 + Math.random() * 4) + 's';
+      const delay = (Math.random() * -8) + 's';
+      sunParticles.push(
+        <div key={i} style={{
+          position: 'absolute',
+          left,
+          top,
+          width: size,
+          height: size,
+          background: 'rgba(255, 243, 176, 0.6)',
+          borderRadius: '50%',
+          boxShadow: '0 0 8px rgba(255, 243, 176, 0.8)',
+          animation: `sunShimmer ${animDuration} linear ${delay} infinite`,
+          pointerEvents: 'none'
+        }} />
+      );
+    }
     return (
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        pointerEvents: 'none', zIndex: 0,
-        background: 'radial-gradient(circle at top left, rgba(255, 255, 200, 0.4) 0%, transparent 50%)',
-        mixBlendMode: 'screen'
-      }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'radial-gradient(circle at top left, rgba(255, 255, 200, 0.4) 0%, transparent 50%)',
+          mixBlendMode: 'screen',
+          pointerEvents: 'none'
+        }} />
+        {sunParticles}
+      </div>
     );
   }
   if (weather === 'fog') {
@@ -358,10 +383,26 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [parentGateProblem, setParentGateProblem] = useState(null);
   const [parentGateInput, setParentGateInput] = useState('');
   const [isParentGateShaking, setIsParentGateShaking] = useState(false);
-  const [customMinInput, setCustomMinInput] = useState(10);
-  const [customMaxInput, setCustomMaxInput] = useState(20);
-  const [mathMin, setMathMin] = useState(10);
-  const [mathMax, setMathMax] = useState(20);
+  const [mathMin, setMathMin] = useState(() => {
+    const saved = localStorage.getItem('codingMazeMathMin');
+    return saved ? parseInt(saved, 10) : 10;
+  });
+  const [mathMax, setMathMax] = useState(() => {
+    const saved = localStorage.getItem('codingMazeMathMax');
+    return saved ? parseInt(saved, 10) : 20;
+  });
+  const [atomicMin, setAtomicMin] = useState(() => {
+    const saved = localStorage.getItem('codingMazeAtomicMin');
+    return saved ? parseInt(saved, 10) : 15;
+  });
+  const [atomicMax, setAtomicMax] = useState(() => {
+    const saved = localStorage.getItem('codingMazeAtomicMax');
+    return saved ? parseInt(saved, 10) : 30;
+  });
+  const [customMinInput, setCustomMinInput] = useState(mathMin);
+  const [customMaxInput, setCustomMaxInput] = useState(mathMax);
+  const [customAtomicMinInput, setCustomAtomicMinInput] = useState(atomicMin);
+  const [customAtomicMaxInput, setCustomAtomicMaxInput] = useState(atomicMax);
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
@@ -423,6 +464,10 @@ export default function CodingMazeGame({ lang, onBack }) {
     const num2 = Math.floor(Math.random() * 5) + 5; // 5-9
     setParentGateProblem({ num1, num2, ans: num1 * num2 });
     setParentGateInput('');
+    setCustomMinInput(mathMin);
+    setCustomMaxInput(mathMax);
+    setCustomAtomicMinInput(atomicMin);
+    setCustomAtomicMaxInput(atomicMax);
     setShowParentGate(true);
   };
 
@@ -507,13 +552,18 @@ export default function CodingMazeGame({ lang, onBack }) {
 
   const triggerMathQuiz = (type, needed) => {
     audioSynth.playClick();
-    setShopTarget({ type, needed, answered: 0 });
+    const newTarget = { type, needed, answered: 0 };
+    setShopTarget(newTarget);
     setShowShop(false);
-    generateAndShowQuestion();
+    generateAndShowQuestion(newTarget);
   };
 
-  const generateAndShowQuestion = () => {
-    const q = mathGenerator.generateQuestion(4, { minNumber: mathMin, maxNumber: mathMax, operations: ['add', 'sub'], lang: lang });
+  const generateAndShowQuestion = (overrideTarget) => {
+    const activeTarget = overrideTarget || shopTarget;
+    const isAtomic = activeTarget && activeTarget.type === 'atomic';
+    const currentMin = isAtomic ? atomicMin : mathMin;
+    const currentMax = isAtomic ? atomicMax : mathMax;
+    const q = mathGenerator.generateQuestion(4, { minNumber: currentMin, maxNumber: currentMax, operations: ['add', 'sub'], lang: lang });
     setMathProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
     setMathInput('');
     setShowMathQuiz(true);
@@ -1448,8 +1498,9 @@ export default function CodingMazeGame({ lang, onBack }) {
       width: '100%',
       height: '100%',
       backgroundImage: `url(${getThemeBackground(currentLevel.theme)})`,
-      backgroundSize: 'cover',
+      backgroundSize: '115% 115%',
       backgroundPosition: 'center',
+      animation: 'backgroundDrift 25s infinite ease-in-out',
       transition: 'background-image 0.5s ease-in-out'
     }}>
       <WeatherOverlay weather={currentWeather} />
@@ -1829,16 +1880,18 @@ export default function CodingMazeGame({ lang, onBack }) {
             <h3 style={{ margin: '0 0 20px 0', color: '#334155', textAlign: 'center' }}>
               {lang === 'en' ? 'Bomb Math Difficulty' : '获取炸弹难度设置'}
             </h3>
-            <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '10px' }}>
-              {lang === 'en' ? 'Numerical range (e.g. 10 to 20):' : '计算数值范围 (例如 10 到 20)：'}
+            
+            {/* Regular bomb difficulty section */}
+            <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '8px', fontWeight: 'bold' }}>
+              {lang === 'en' ? 'Normal/Freeze/Super Bomb Range:' : '普通/冰冻/穿甲弹计算范围：'}
             </p>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
               <input 
                 type="number" 
                 value={customMinInput}
                 onChange={e => setCustomMinInput(e.target.value)}
                 style={{
-                  flex: 1, padding: '12px', fontSize: '1.2rem', borderRadius: '12px',
+                  flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
                 }}
                 placeholder="10"
@@ -1849,12 +1902,41 @@ export default function CodingMazeGame({ lang, onBack }) {
                 value={customMaxInput}
                 onChange={e => setCustomMaxInput(e.target.value)}
                 style={{
-                  flex: 1, padding: '12px', fontSize: '1.2rem', borderRadius: '12px',
+                  flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
                 }}
                 placeholder="20"
               />
             </div>
+
+            {/* Atomic bomb difficulty section */}
+            <p style={{ fontSize: '0.9rem', color: '#a855f7', marginBottom: '8px', fontWeight: 'bold' }}>
+              {lang === 'en' ? 'Atomic Bomb Range:' : '原子弹计算范围：'}
+            </p>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
+              <input 
+                type="number" 
+                value={customAtomicMinInput}
+                onChange={e => setCustomAtomicMinInput(e.target.value)}
+                style={{
+                  flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
+                  border: '2px solid #a855f7', textAlign: 'center', minWidth: 0
+                }}
+                placeholder="15"
+              />
+              <span style={{ fontSize: '1.2rem', color: '#a855f7', fontWeight: 'bold' }}>-</span>
+              <input 
+                type="number" 
+                value={customAtomicMaxInput}
+                onChange={e => setCustomAtomicMaxInput(e.target.value)}
+                style={{
+                  flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
+                  border: '2px solid #a855f7', textAlign: 'center', minWidth: 0
+                }}
+                placeholder="30"
+              />
+            </div>
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => { audioSynth.playClick(); setShowSettings(false); }}
@@ -1874,6 +1956,22 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setMathMax(vMax);
                   setCustomMinInput(vMin);
                   setCustomMaxInput(vMax);
+
+                  let aMin = parseInt(customAtomicMinInput);
+                  let aMax = parseInt(customAtomicMaxInput);
+                  if (isNaN(aMin) || aMin < 1) aMin = 1;
+                  if (isNaN(aMax) || aMax < aMin) aMax = aMin + 5;
+                  if (aMax > 1000) aMax = 1000;
+                  setAtomicMin(aMin);
+                  setAtomicMax(aMax);
+                  setCustomAtomicMinInput(aMin);
+                  setCustomAtomicMaxInput(aMax);
+
+                  localStorage.setItem('codingMazeMathMin', vMin);
+                  localStorage.setItem('codingMazeMathMax', vMax);
+                  localStorage.setItem('codingMazeAtomicMin', aMin);
+                  localStorage.setItem('codingMazeAtomicMax', aMax);
+
                   setShowSettings(false);
                 }}
                 style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#3b82f6', color: 'white', fontWeight: 'bold' }}
