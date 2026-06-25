@@ -563,7 +563,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const addCommand = (cmd) => {
     if (isPlaying || isSolved) return;
     audioSynth.playClick();
-    if (commands.length < 30) {
+    if (commands.length < 50) {
       setCommands([...commands, cmd]);
       resetToStart();
     }
