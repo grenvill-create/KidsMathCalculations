@@ -111,9 +111,9 @@ const RAW_LEVELS = [
   // 40
   { theme: 'alien', size: 10, start: {r:9, c:4}, target: {r:0, c:5}, obstacles: [{r:8,c:1},{r:8,c:2},{r:8,c:3},{r:8,c:4},{r:8,c:5},{r:8,c:6},{r:8,c:7},{r:8,c:8},{r:6,c:0},{r:6,c:1},{r:6,c:2},{r:6,c:3},{r:6,c:4},{r:6,c:5},{r:6,c:6},{r:6,c:7},{r:4,c:2},{r:4,c:3},{r:4,c:4},{r:4,c:5},{r:4,c:6},{r:4,c:7},{r:4,c:8},{r:4,c:9},{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:2,c:5},{r:2,c:6},{r:2,c:7}], enemies: [{ type: 'tiger', start: {r:7, c:0}, commands: ['RIGHT', 'RIGHT', 'RIGHT', 'LEFT', 'LEFT', 'LEFT'] }, { type: 'tiger', start: {r:5, c:9}, commands: ['LEFT', 'LEFT', 'LEFT', 'RIGHT', 'RIGHT', 'RIGHT'] }, { type: 'tiger', start: {r:3, c:0}, commands: ['RIGHT', 'RIGHT', 'RIGHT', 'LEFT', 'LEFT', 'LEFT'] }, { type: 'tiger', start: {r:1, c:9}, commands: ['LEFT', 'LEFT', 'LEFT', 'RIGHT', 'RIGHT', 'RIGHT'] }] },
   // 41
-  { theme: 'alien', size: 10, start: {r: 9, c: 9}, target: {r: 0, c: 0}, obstacles: [{r:1,c:1},{r:2,c:1},{r:3,c:1},{r:4,c:1},{r:6,c:3},{r:7,c:3},{r:8,c:3},{r:1,c:5},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:7,c:5},{r:8,c:5}], enemies: [{ type: 'dinosaur', start: {r: 4, c: 2}, commands: ['NONE'] }, { type: 'tiger', start: {r: 1, c: 8}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'alien', size: 10, start: {r: 9, c: 9}, target: {r: 0, c: 0}, obstacles: [{r:1,c:1},{r:2,c:1},{r:3,c:1},{r:4,c:1},{r:6,c:3},{r:7,c:3},{r:8,c:3},{r:1,c:5},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:7,c:5},{r:8,c:5}], enemies: [{ type: 'dinosaur', start: {r: 4, c: 2}, commands: ['NONE'] }, { type: 'ghost', start: {r: 1, c: 8}, commands: ['LEFT', 'RIGHT'] }] },
   // 42
-  { theme: 'bear', size: 10, start: {r: 9, c: 0}, target: {r: 0, c: 9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:5,c:4},{r:6,c:4},{r:7,c:4},{r:8,c:4},{r:9,c:4},{r:1,c:7},{r:2,c:7},{r:3,c:7},{r:4,c:7}], enemies: [{ type: 'rhino', start: {r: 5, c: 5}, commands: ['UP', 'DOWN'] }, { type: 'spider', start: {r: 2, c: 8}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'bear', size: 10, start: {r: 9, c: 0}, target: {r: 0, c: 9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:5,c:4},{r:6,c:4},{r:7,c:4},{r:8,c:4},{r:9,c:4},{r:1,c:7},{r:2,c:7},{r:3,c:7},{r:4,c:7}], enemies: [{ type: 'rhino', start: {r: 5, c: 5}, commands: ['UP', 'DOWN'] }, { type: 'zombie', start: {r: 2, c: 8}, commands: ['LEFT', 'RIGHT'] }] },
   // 43
   { theme: 'penguin', size: 10, start: {r: 0, c: 9}, target: {r: 9, c: 0}, obstacles: [{r:3,c:0},{r:3,c:1},{r:3,c:2},{r:3,c:3},{r:3,c:4},{r:3,c:5},{r:3,c:6},{r:3,c:7},{r:6,c:2},{r:6,c:3},{r:6,c:4},{r:6,c:5},{r:6,c:6},{r:6,c:7},{r:6,c:8},{r:6,c:9}], enemies: [{ type: 'turtle', start: {r: 2, c: 2}, commands: ['RIGHT', 'LEFT'] }, { type: 'turtle', start: {r: 5, c: 5}, commands: ['LEFT', 'RIGHT'] }, { type: 'tiger', start: {r: 8, c: 8}, commands: ['UP', 'DOWN'] }] },
   // 44
@@ -121,7 +121,7 @@ const RAW_LEVELS = [
   // 45
   { theme: 'monkey', size: 10, start: {r: 9, c: 5}, target: {r: 0, c: 5}, obstacles: [{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:2,c:5},{r:2,c:6},{r:2,c:7},{r:5,c:0},{r:5,c:1},{r:5,c:2},{r:5,c:3},{r:5,c:6},{r:5,c:7},{r:5,c:8},{r:5,c:9},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6}], enemies: [{ type: 'elephant', start: {r: 4, c: 4}, commands: ['LEFT', 'RIGHT'] }, { type: 'elephant', start: {r: 6, c: 4}, commands: ['RIGHT', 'LEFT'] }] },
   // 46
-  { theme: 'cat', size: 11, start: {r: 10, c: 0}, target: {r: 0, c: 10}, obstacles: [{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:6,c:2},{r:7,c:2},{r:8,c:2},{r:5,c:4},{r:6,c:4},{r:7,c:4},{r:8,c:4},{r:9,c:4},{r:1,c:7},{r:2,c:7},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:7,c:7},{r:8,c:7}], enemies: [{ type: 'rhino', start: {r: 3, c: 3}, commands: ['UP', 'DOWN'] }, { type: 'rhino', start: {r: 7, c: 5}, commands: ['DOWN', 'UP'] }, { type: 'spider', start: {r: 5, c: 9}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'cat', size: 11, start: {r: 10, c: 0}, target: {r: 0, c: 10}, obstacles: [{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:6,c:2},{r:7,c:2},{r:8,c:2},{r:5,c:4},{r:6,c:4},{r:7,c:4},{r:8,c:4},{r:9,c:4},{r:1,c:7},{r:2,c:7},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:7,c:7},{r:8,c:7}], enemies: [{ type: 'rhino', start: {r: 3, c: 3}, commands: ['UP', 'DOWN'] }, { type: 'rhino', start: {r: 7, c: 5}, commands: ['DOWN', 'UP'] }, { type: 'witch', start: {r: 5, c: 9}, commands: ['LEFT', 'RIGHT'] }] },
   // 47
   { theme: 'mouse', size: 11, start: {r: 0, c: 0}, target: {r: 10, c: 10}, obstacles: [{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:2,c:5},{r:2,c:6},{r:2,c:7},{r:2,c:8},{r:2,c:9},{r:7,c:1},{r:7,c:2},{r:7,c:3},{r:7,c:4},{r:7,c:5},{r:7,c:6},{r:7,c:7},{r:7,c:8},{r:7,c:9},{r:7,c:10}], enemies: [{ type: 'dinosaur', start: {r: 4, c: 4}, commands: ['NONE'] }, { type: 'dinosaur', start: {r: 8, c: 2}, commands: ['NONE'] }] },
   // 48
@@ -129,7 +129,11 @@ const RAW_LEVELS = [
   // 49
   { theme: 'dog', size: 11, start: {r: 5, c: 0}, target: {r: 5, c: 10}, obstacles: [{r:0,c:3},{r:1,c:3},{r:2,c:3},{r:3,c:3},{r:4,c:3},{r:6,c:3},{r:7,c:3},{r:8,c:3},{r:9,c:3},{r:10,c:3},{r:0,c:7},{r:1,c:7},{r:2,c:7},{r:3,c:7},{r:4,c:7},{r:6,c:7},{r:7,c:7},{r:8,c:7},{r:9,c:7},{r:10,c:7}], enemies: [{ type: 'elephant', start: {r: 5, c: 2}, commands: ['UP', 'DOWN'] }, { type: 'dinosaur', start: {r: 5, c: 5}, commands: ['NONE'] }] },
   // 50
-  { theme: 'alien', size: 11, start: {r: 10, c: 10}, target: {r: 0, c: 0}, obstacles: [{r:1,c:1},{r:2,c:1},{r:3,c:1},{r:4,c:1},{r:5,c:1},{r:7,c:3},{r:8,c:3},{r:9,c:3},{r:10,c:3},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:7,c:5},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:7,c:7},{r:8,c:7}], enemies: [{ type: 'dinosaur', start: {r: 2, c: 2}, commands: ['NONE'] }, { type: 'dinosaur', start: {r: 8, c: 4}, commands: ['NONE'] }, { type: 'rhino', start: {r: 4, c: 9}, commands: ['UP', 'DOWN'] }] }
+  { theme: 'alien', size: 11, start: {r: 10, c: 10}, target: {r: 0, c: 0}, obstacles: [{r:1,c:1},{r:2,c:1},{r:3,c:1},{r:4,c:1},{r:5,c:1},{r:7,c:3},{r:8,c:3},{r:9,c:3},{r:10,c:3},{r:2,c:5},{r:3,c:5},{r:4,c:5},{r:5,c:5},{r:6,c:5},{r:7,c:5},{r:3,c:7},{r:4,c:7},{r:5,c:7},{r:6,c:7},{r:7,c:7},{r:8,c:7}], enemies: [{ type: 'magma', start: {r: 2, c: 2}, commands: ['NONE'] }, { type: 'dinosaur', start: {r: 8, c: 4}, commands: ['NONE'] }, { type: 'rhino', start: {r: 4, c: 9}, commands: ['UP', 'DOWN'] }] },
+  // 51
+  { theme: 'cat', size: 10, start: {r: 9, c: 0}, target: {r: 0, c: 9}, obstacles: [{r:1,c:8},{r:2,c:8},{r:3,c:8},{r:4,c:8},{r:5,c:8},{r:6,c:8},{r:7,c:8},{r:8,c:8},{r:8,c:1},{r:8,c:2},{r:8,c:3},{r:8,c:4},{r:8,c:5},{r:8,c:6},{r:8,c:7}], enemies: [{ type: 'witch', start: {r: 4, c: 4}, commands: ['UP', 'DOWN'] }, { type: 'ghost', start: {r: 2, c: 6}, commands: ['LEFT', 'RIGHT'] }] },
+  // 52
+  { theme: 'alien', size: 10, start: {r: 0, c: 0}, target: {r: 9, c: 9}, obstacles: [{r:1,c:1},{r:1,c:2},{r:2,c:1},{r:7,c:7},{r:7,c:8},{r:8,c:7}], enemies: [{ type: 'magma', start: {r: 5, c: 5}, commands: ['NONE'] }, { type: 'zombie', start: {r: 4, c: 8}, commands: ['LEFT', 'RIGHT'] }] }
 ];
 
 const LEVELS = RAW_LEVELS.map((lvl, idx) => {
@@ -496,18 +500,22 @@ export default function CodingMazeGame({ lang, onBack }) {
     if (!currentLevel.enemies) return false;
     for (let idx = 0; idx < currentLevel.enemies.length; idx++) {
       const enemy = currentLevel.enemies[idx];
-      if (enemy.type === 'dinosaur' && enemyHealths[idx] > 0) {
+      if (enemyHealths[idx] > 0) {
         const ep = enemyPositions[idx];
         if (!ep) continue;
-        
-        // Top:
-        if (r === ep.r - 1 && (c === ep.c || c === ep.c + 1)) return true;
-        // Bottom:
-        if (r === ep.r + 2 && (c === ep.c || c === ep.c + 1)) return true;
-        // Left:
-        if (c === ep.c - 1 && (r === ep.r || r === ep.r + 1)) return true;
-        // Right:
-        if (c === ep.c + 2 && (r === ep.r || r === ep.r + 1)) return true;
+        if (enemy.type === 'dinosaur') {
+          // Top:
+          if (r === ep.r - 1 && (c === ep.c || c === ep.c + 1)) return true;
+          // Bottom:
+          if (r === ep.r + 2 && (c === ep.c || c === ep.c + 1)) return true;
+          // Left:
+          if (c === ep.c - 1 && (r === ep.r || r === ep.r + 1)) return true;
+          // Right:
+          if (c === ep.c + 2 && (r === ep.r || r === ep.r + 1)) return true;
+        } else if (enemy.type === 'magma') {
+          // 1x1 Magma Golem fires: adjacent cells (Up, Down, Left, Right)
+          if (Math.abs(r - ep.r) + Math.abs(c - ep.c) === 1) return true;
+        }
       }
     }
     return false;
@@ -531,8 +539,8 @@ export default function CodingMazeGame({ lang, onBack }) {
     setDestroyedObstacles([]);
     setEnemyHealths(currentLevel.enemies ? currentLevel.enemies.map(e => {
       if (e.type === 'dinosaur') return 4;
-      if (e.type === 'elephant') return 3;
-      if (e.type === 'tiger') return 2;
+      if (e.type === 'elephant' || e.type === 'magma') return 3;
+      if (e.type === 'tiger' || e.type === 'rhino' || e.type === 'witch' || e.type === 'zombie') return 2;
       return 1;
     }) : []);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
@@ -1108,7 +1116,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               }, 500);
             } else if (isEnemy && activeBombType === null) {
               const eType = currentLevel.enemies[enemyIdx].type;
-              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur'].includes(eType)) {
+              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType)) {
                 audioSynth.playClick();
                 setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
               }
@@ -1247,6 +1255,24 @@ export default function CodingMazeGame({ lang, onBack }) {
               50% { transform: scale(1.05, 0.95) translateY(-2px); filter: drop-shadow(0 5px 8px rgba(239, 68, 68, 0.4)); }
               100% { transform: scale(1) translateY(0); }
             }
+            @keyframes ghostFloat {
+              0%, 100% { transform: translateY(0) scale(1) rotate(-1deg); opacity: 0.65; filter: drop-shadow(0 4px 6px rgba(168, 85, 247, 0.25)); }
+              50% { transform: translateY(-6px) scale(0.96) rotate(2deg); opacity: 0.85; filter: drop-shadow(0 8px 12px rgba(168, 85, 247, 0.45)); }
+            }
+            @keyframes witchHover {
+              0%, 100% { transform: translateY(0) rotate(-2deg); }
+              50% { transform: translateY(-4px) rotate(2deg) scale(1.02); }
+            }
+            @keyframes zombieLimp {
+              0%, 100% { transform: translate(0, 0) rotate(0deg); }
+              25% { transform: translate(-1px, -2px) rotate(-6deg); }
+              50% { transform: translate(0, 0) rotate(0deg); }
+              75% { transform: translate(1px, -1px) rotate(4deg); }
+            }
+            @keyframes magmaBubble {
+              0%, 100% { transform: scale(1) skewX(0deg); filter: drop-shadow(0 2px 4px #dc2626) brightness(1); }
+              50% { transform: scale(1.05, 0.95) skewX(1deg); filter: drop-shadow(0 4px 8px #f97316) brightness(1.25); }
+            }
             @keyframes fireSpit {
               0%, 100% { transform: scale(0) translate(0, 0); opacity: 0; }
               30% { transform: scale(1.2) translate(8px, -8px); opacity: 1; }
@@ -1340,7 +1366,9 @@ export default function CodingMazeGame({ lang, onBack }) {
           if (!ep) return null;
           if (enemyHealths[i] <= 0) return null;
           const eType = currentLevel.enemies[i]?.type || 'snake';
-          const maxHealth = eType === 'dinosaur' ? 4 : eType === 'elephant' ? 3 : (eType === 'tiger' || eType === 'rhino' ? 2 : 1);
+          const maxHealth = eType === 'dinosaur' ? 4 : 
+                            (eType === 'elephant' || eType === 'magma') ? 3 : 
+                            (eType === 'tiger' || eType === 'rhino' || eType === 'witch' || eType === 'zombie') ? 2 : 1;
           const curHealth = enemyHealths[i];
           
           const isDinosaur = eType === 'dinosaur';
@@ -1361,8 +1389,16 @@ export default function CodingMazeGame({ lang, onBack }) {
               zIndex: 9,
               pointerEvents: 'none'
             }}>
-              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur'].includes(eType) ? (
-                <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType) ? (
+                <div style={{ 
+                  position: 'relative', 
+                  width: '100%', 
+                  height: '100%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  opacity: eType === 'ghost' ? 0.75 : 1
+                }}>
                   <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
                     width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
                     height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
@@ -1373,6 +1409,10 @@ export default function CodingMazeGame({ lang, onBack }) {
                                 eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
                                 eType === 'snake' ? 'hoverWobble 1s infinite' :
                                 eType === 'dinosaur' ? 'dinoBreathing 1.8s infinite alternate' :
+                                eType === 'ghost' ? 'ghostFloat 2s infinite ease-in-out' :
+                                eType === 'witch' ? 'witchHover 1.5s infinite ease-in-out' :
+                                eType === 'zombie' ? 'zombieLimp 1.2s infinite' :
+                                eType === 'magma' ? 'magmaBubble 1.4s infinite alternate' :
                                 'idleBreathing 1.5s infinite alternate'),
                     filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
                   }} />
