@@ -384,6 +384,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [isMathShaking, setIsMathShaking] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showParentGate, setShowParentGate] = useState(false);
+  const [showMonsterMenu, setShowMonsterMenu] = useState(false);
   const [parentGateProblem, setParentGateProblem] = useState(null);
   const [parentGateInput, setParentGateInput] = useState('');
   const [isParentGateShaking, setIsParentGateShaking] = useState(false);
@@ -1576,6 +1577,9 @@ export default function CodingMazeGame({ lang, onBack }) {
             <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
               <RotateCcw size={isMobile ? 18 : 22} />
             </button>
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowMonsterMenu(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Monster Guide' : '怪物图鉴'}>
+              👾
+            </button>
           </div>
           <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : 'clamp(1rem, 3vw, 1.4rem)', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
             {lang === 'en' ? (isMobile ? `${levelIdx + 1}/${LEVELS.length}` : `Maze (${levelIdx + 1}/${LEVELS.length})`) : (isMobile ? `第${levelIdx + 1}关` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`)}
@@ -2127,6 +2131,134 @@ export default function CodingMazeGame({ lang, onBack }) {
               {lang === 'en' ? 'Tap to try again' : '点击屏幕重新开始'}
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Monster Menu Modal */}
+      {showMonsterMenu && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'linear-gradient(135deg, rgba(15,12,41,0.97) 0%, rgba(48,43,99,0.97) 50%, rgba(36,36,62,0.97) 100%)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          zIndex: 3500, overflowY: 'auto', padding: '16px'
+        }}>
+          <style>{`
+            @keyframes monsterCardPop {
+              0% { transform: scale(0.6) translateY(30px); opacity: 0; }
+              70% { transform: scale(1.05) translateY(-4px); opacity: 1; }
+              100% { transform: scale(1) translateY(0); opacity: 1; }
+            }
+            @keyframes hpPulse {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.15); }
+            }
+            @keyframes titleGlow {
+              0%, 100% { text-shadow: 0 0 10px rgba(168,85,247,0.5), 0 0 30px rgba(59,130,246,0.3); }
+              50% { text-shadow: 0 0 20px rgba(168,85,247,0.9), 0 0 50px rgba(59,130,246,0.6); }
+            }
+          `}</style>
+
+          {/* Title */}
+          <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '8px' }}>
+            <h2 style={{
+              color: 'white', fontSize: isMobile ? '1.6rem' : '2.2rem',
+              margin: '0 0 6px 0', fontWeight: '800',
+              animation: 'titleGlow 2s infinite'
+            }}>👾 {lang === 'en' ? 'Monster Guide' : '怪物图鉴'}</h2>
+            <p style={{ color: 'rgba(255,255,255,0.6)', margin: 0, fontSize: '0.9rem' }}>
+              {lang === 'en' ? 'All enemies in Coding Maze' : '编程迷宫中的所有怪物'}
+            </p>
+          </div>
+
+          {/* Monster Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: isMobile ? '10px' : '16px',
+            width: '100%', maxWidth: '900px', marginBottom: '20px'
+          }}>
+            {[
+              { type: 'snake',    emoji: '🐍', name: lang==='en'?'Snake':'蛇',       hp: 1, color: '#16a34a', glow: '#4ade80', anim: 'hoverWobble 1s infinite',          desc: lang==='en'?'Slithers back and forth':'左右来回滑行' },
+              { type: 'spider',   emoji: '🕷️', name: lang==='en'?'Spider':'蜘蛛',    hp: 1, color: '#7c3aed', glow: '#a78bfa', anim: 'hoverWobble 1.2s infinite ease-in-out', desc: lang==='en'?'Sets sticky webs':'设置黏网陷阱' },
+              { type: 'turtle',   emoji: '🐢', name: lang==='en'?'Turtle':'乌龟',    hp: 1, color: '#0891b2', glow: '#67e8f9', anim: 'hoverWobble 2s infinite ease-in-out', desc: lang==='en'?'Slow but sturdy':'缓慢但顽固' },
+              { type: 'tiger',    emoji: '🐯', name: lang==='en'?'Tiger':'老虎',     hp: 2, color: '#ea580c', glow: '#fb923c', anim: 'idleBreathing 1.5s infinite alternate', desc: lang==='en'?'Fast predator':'凶猛的猎手' },
+              { type: 'rhino',    emoji: '🦏', name: lang==='en'?'Rhino':'犀牛',     hp: 2, color: '#78716c', glow: '#d6d3d1', anim: 'shakeAngry 0.8s infinite',          desc: lang==='en'?'Always angry':'永远愤怒' },
+              { type: 'ghost',    emoji: '👻', name: lang==='en'?'Ghost':'幽灵',     hp: 1, color: '#8b5cf6', glow: '#c4b5fd', anim: 'ghostFloat 2s infinite ease-in-out', desc: lang==='en'?'Fades in and out':'忽明忽暗漂浮' },
+              { type: 'zombie',   emoji: '🧟', name: lang==='en'?'Zombie':'僵尸',    hp: 2, color: '#65a30d', glow: '#bef264', anim: 'zombieLimp 1.2s infinite',          desc: lang==='en'?'Stumbles forward':'蹒跚跛行' },
+              { type: 'witch',    emoji: '🧙', name: lang==='en'?'Witch':'女巫',     hp: 2, color: '#9333ea', glow: '#e879f9', anim: 'witchHover 1.5s infinite ease-in-out', desc: lang==='en'?'Flies on broomstick':'骑扫帚飞行' },
+              { type: 'elephant', emoji: '🐘', name: lang==='en'?'Elephant':'大象',  hp: 3, color: '#475569', glow: '#94a3b8', anim: 'idleBreathing 1.5s infinite alternate', desc: lang==='en'?'Huge and heavy':'巨大沉重' },
+              { type: 'magma',    emoji: '🌋', name: lang==='en'?'Magma':'岩浆怪',  hp: 3, color: '#dc2626', glow: '#f97316', anim: 'magmaBubble 1.4s infinite alternate', desc: lang==='en'?'Burns nearby tiles':'周围格子着火🔥' },
+              { type: 'dinosaur', emoji: '🦕', name: lang==='en'?'Dinosaur':'恐龙',  hp: 4, color: '#b91c1c', glow: '#ef4444', anim: 'dinoBreathing 1.8s infinite alternate', desc: lang==='en'?'2x2 BOSS! Spits fire':'2x2大boss! 喷火🔥' },
+            ].map((m, idx) => (
+              <div key={m.type} style={{
+                background: `linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)`,
+                border: `2px solid ${m.glow}44`,
+                borderRadius: '20px',
+                padding: isMobile ? '12px 8px' : '18px 12px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                backdropFilter: 'blur(10px)',
+                boxShadow: `0 4px 20px ${m.glow}22, inset 0 1px 0 rgba(255,255,255,0.1)`,
+                animation: `monsterCardPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${idx * 0.06}s both`,
+                cursor: 'default'
+              }}>
+                {/* Monster image */}
+                <div style={{
+                  width: isMobile ? '70px' : '90px',
+                  height: isMobile ? '70px' : '90px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: m.type === 'ghost' ? 0.8 : 1
+                }}>
+                  <img src={`${import.meta.env.BASE_URL}${m.type}_3d.png`} style={{
+                    width: '100%', height: '100%', objectFit: 'contain',
+                    animation: m.anim,
+                    filter: `drop-shadow(0 4px 8px ${m.glow}88)`
+                  }} />
+                </div>
+
+                {/* Name */}
+                <div style={{
+                  color: 'white', fontWeight: '800',
+                  fontSize: isMobile ? '0.85rem' : '1rem',
+                  textShadow: `0 0 8px ${m.glow}`
+                }}>{m.emoji} {m.name}</div>
+
+                {/* HP hearts */}
+                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', marginRight: '2px' }}>HP</span>
+                  {Array.from({ length: m.hp }).map((_, hi) => (
+                    <span key={hi} style={{
+                      fontSize: isMobile ? '14px' : '16px',
+                      animation: `hpPulse 1s infinite ${hi * 0.15}s`,
+                      display: 'inline-block'
+                    }}>❤️</span>
+                  ))}
+                </div>
+
+                {/* Description */}
+                <div style={{
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: isMobile ? '0.65rem' : '0.72rem',
+                  textAlign: 'center', lineHeight: '1.3'
+                }}>{m.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Close button */}
+          <button
+            onClick={() => { audioSynth.playClick(); setShowMonsterMenu(false); }}
+            style={{
+              padding: '14px 48px', borderRadius: '50px', border: 'none',
+              background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+              color: 'white', fontWeight: '800', fontSize: '1.1rem',
+              cursor: 'pointer', marginBottom: '16px',
+              boxShadow: '0 6px 24px rgba(139,92,246,0.5)',
+              fontFamily: 'Fredoka, sans-serif'
+            }}
+          >
+            {lang === 'en' ? '✕ Close' : '✕ 关闭'}
+          </button>
         </div>
       )}
 
