@@ -478,6 +478,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [inputFreezeInv, setInputFreezeInv] = useState(0);
   const [inputSuperInv, setInputSuperInv] = useState(0);
   const [inputAtomicInv, setInputAtomicInv] = useState(0);
+  const [inputLevelIdx, setInputLevelIdx] = useState(levelIdx);
 
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
@@ -558,6 +559,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     setInputFreezeInv(inventory.freeze);
     setInputSuperInv(inventory.super);
     setInputAtomicInv(inventory.atomic);
+    setInputLevelIdx(levelIdx);
 
     setShowParentGate(true);
   };
@@ -2169,6 +2171,39 @@ export default function CodingMazeGame({ lang, onBack }) {
               </div>
             </div>
 
+            {/* Direct Level Selection for Parents */}
+            <p style={{ fontSize: '0.95rem', color: '#dc2626', marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+              {lang === 'en' ? 'Set Current Level (Parent Override):' : '设置当前关卡（强行跳关）：'}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '6px', marginBottom: '20px', maxHeight: '180px', overflowY: 'auto', padding: '6px', background: '#fef2f2', borderRadius: '12px', border: '1px solid #fee2e2' }}>
+              {LEVELS.map((lvl, index) => {
+                const isActive = index === inputLevelIdx;
+                return (
+                  <button
+                    key={`parent-lvl-${index}`}
+                    type="button"
+                    onClick={() => {
+                      audioSynth.playClick();
+                      setInputLevelIdx(index);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '6px 0',
+                      borderRadius: '8px',
+                      border: isActive ? '2px solid #dc2626' : '1px solid #fca5a5',
+                      background: isActive ? '#dc2626' : '#fff',
+                      color: isActive ? '#fff' : '#dc2626',
+                      fontWeight: 'bold',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              })}
+            </div>
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => { audioSynth.playClick(); setShowSettings(false); }}
@@ -2217,6 +2252,13 @@ export default function CodingMazeGame({ lang, onBack }) {
                     atomic: inputAtomicInv
                   };
                   setInventory(newInv);
+
+                  // Update current level and unlock progress
+                  setLevelIdx(inputLevelIdx);
+                  localStorage.setItem('codingMazeLevel', inputLevelIdx.toString());
+                  const newMax = Math.max(maxUnlockedLevel, inputLevelIdx);
+                  setMaxUnlockedLevel(newMax);
+                  localStorage.setItem('codingMazeMaxUnlockedLevel', newMax.toString());
 
                   localStorage.setItem('codingMazeMathMin', vMin);
                   localStorage.setItem('codingMazeMathMax', vMax);
