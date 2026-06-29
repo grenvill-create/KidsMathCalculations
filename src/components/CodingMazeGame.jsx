@@ -153,8 +153,17 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         if (firstEnemyPos) break;
       }
       if (firstEnemyPos) {
-        const eType = idx >= 4 ? 'tiger' : 'snake'; // 从第5关起出现老虎
-        newLvl.enemies = [{ type: eType, start: firstEnemyPos, commands: ['DOWN', 'UP', 'RIGHT', 'LEFT'] }];
+        let eType = idx >= 4 ? 'tiger' : 'snake'; // 从第5关起出现老虎
+        if (idx >= 29) {
+          // 第30关起陆续出现新怪物
+          const pool = ['tiger', 'ghost'];
+          if (idx >= 32) pool.push('witch');
+          if (idx >= 35) pool.push('zombie');
+          if (idx >= 38) pool.push('magma');
+          eType = pool[Math.floor(Math.random() * pool.length)];
+        }
+        const commandsList = eType === 'magma' ? ['NONE'] : ['DOWN', 'UP', 'RIGHT', 'LEFT'];
+        newLvl.enemies = [{ type: eType, start: firstEnemyPos, commands: commandsList }];
       }
     }
   }
@@ -211,7 +220,14 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
       
       if (extraEnemyPos) {
         let eType = 'tiger';
-        if (idx >= 14) {
+        if (idx >= 29) {
+          // 第30关起陆续出现新怪物
+          const pool = ['tiger', 'spider', 'elephant', 'rhino', 'ghost'];
+          if (idx >= 32) pool.push('witch');
+          if (idx >= 35) pool.push('zombie');
+          if (idx >= 38) pool.push('magma');
+          eType = pool[Math.floor(Math.random() * pool.length)];
+        } else if (idx >= 14) {
           // level 15+: 混合大象、蜘蛛、老虎
           const r = Math.random();
           if (r < 0.25) eType = 'elephant';
@@ -220,7 +236,8 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
           // level 5-14: 混合蜘蛛、老虎
           if (Math.random() < 0.4) eType = 'spider';
         }
-        newLvl.enemies.push({ type: eType, start: extraEnemyPos, commands: ['UP', 'DOWN', 'LEFT', 'RIGHT'] });
+        const commandsList = eType === 'magma' ? ['NONE'] : ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+        newLvl.enemies.push({ type: eType, start: extraEnemyPos, commands: commandsList });
       }
     }
   }
