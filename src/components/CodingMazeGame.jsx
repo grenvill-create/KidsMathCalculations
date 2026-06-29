@@ -334,6 +334,11 @@ export default function CodingMazeGame({ lang, onBack }) {
     }
     return 0;
   });
+  
+  const levelIdxRef = useRef(levelIdx);
+  useEffect(() => {
+    levelIdxRef.current = levelIdx;
+  }, [levelIdx]);
 
   const currentLevel = LEVELS[levelIdx] || LEVELS[0];
   const [commands, setCommands] = useState([]);
@@ -731,7 +736,9 @@ export default function CodingMazeGame({ lang, onBack }) {
     let currentEnemyPositions = currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : [];
     setEnemyPositions(currentEnemyPositions);
 
+    const startLevelIdx = levelIdx;
     for (let i = 0; i < commands.length; i++) {
+      if (levelIdxRef.current !== startLevelIdx) return;
       setExecutingIdx(i);
       const cmd = commands[i];
       setIsWalking(true);
@@ -781,7 +788,8 @@ export default function CodingMazeGame({ lang, onBack }) {
         let anyElephantMoved = false;
         currentEnemyPositions = currentEnemyPositions.map((ep, eIdx) => {
           if (!ep) return null;
-          const enemyDef = currentLevel.enemies[eIdx];
+          const enemyDef = currentLevel.enemies?.[eIdx];
+          if (!enemyDef) return null;
           
           if (enemyDef.type === 'spider') {
             if (!currentWebs.some(w => w.r === ep.r && w.c === ep.c)) {
@@ -820,7 +828,8 @@ export default function CodingMazeGame({ lang, onBack }) {
 
       const hitEnemyIdx = currentEnemyPositions.findIndex((ep, idx) => {
         if (!ep || enemyHealths[idx] <= 0) return false;
-        const enemyDef = currentLevel.enemies[idx];
+        const enemyDef = currentLevel.enemies?.[idx];
+        if (!enemyDef) return false;
         if (enemyDef.type === 'dinosaur') {
           return (nextR === ep.r || nextR === ep.r + 1) && (nextC === ep.c || nextC === ep.c + 1);
         }
@@ -851,7 +860,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         
         let caughtType = 'snake';
         if (hitEnemy) {
-          caughtType = currentLevel.enemies[hitEnemyIdx].type;
+          caughtType = currentLevel.enemies?.[hitEnemyIdx]?.type || 'snake';
         } else if (hitFire) {
           caughtType = 'dinosaur';
         }
@@ -1191,7 +1200,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                       if (usedBomb === 'freeze') dmg = 2;
                       if (usedBomb === 'super') dmg = 3;
                       
-                      const eType = currentLevel.enemies[enemyIdx].type;
+                      const eType = currentLevel.enemies?.[enemyIdx]?.type || 'snake';
                       if (eType === 'turtle' && usedBomb !== 'super') {
                         dmg = 0; // Immune to normal/freeze bombs
                       }
@@ -1205,7 +1214,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                 }
               }, 500);
             } else if (isEnemy && activeBombType === null) {
-              const eType = currentLevel.enemies[enemyIdx].type;
+              const eType = currentLevel.enemies?.[enemyIdx]?.type || 'snake';
               if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType)) {
                 audioSynth.playClick();
                 setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
@@ -1455,7 +1464,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         {enemyPositions.map((ep, i) => {
           if (!ep) return null;
           if (enemyHealths[i] <= 0) return null;
-          const eType = currentLevel.enemies[i]?.type || 'snake';
+          const eType = currentLevel.enemies?.[i]?.type || 'snake';
           const maxHealth = eType === 'dinosaur' ? 4 : 
                             (eType === 'elephant' || eType === 'magma') ? 3 : 
                             (eType === 'tiger' || eType === 'rhino' || eType === 'witch' || eType === 'zombie') ? 2 : 1;
