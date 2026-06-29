@@ -469,6 +469,11 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [inputSuperAward, setInputSuperAward] = useState(superAward);
   const [inputAtomicAward, setInputAtomicAward] = useState(atomicAward);
 
+  const [inputNormalInv, setInputNormalInv] = useState(0);
+  const [inputFreezeInv, setInputFreezeInv] = useState(0);
+  const [inputSuperInv, setInputSuperInv] = useState(0);
+  const [inputAtomicInv, setInputAtomicInv] = useState(0);
+
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
@@ -543,6 +548,11 @@ export default function CodingMazeGame({ lang, onBack }) {
     setInputFreezeAward(freezeAward);
     setInputSuperAward(superAward);
     setInputAtomicAward(atomicAward);
+
+    setInputNormalInv(inventory.normal);
+    setInputFreezeInv(inventory.freeze);
+    setInputSuperInv(inventory.super);
+    setInputAtomicInv(inventory.atomic);
 
     setShowParentGate(true);
   };
@@ -2119,6 +2129,37 @@ export default function CodingMazeGame({ lang, onBack }) {
               </div>
             </div>
 
+            {/* Custom Backpack Inventory Quantity Section */}
+            <p style={{ fontSize: '0.95rem', color: '#047857', marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+              {lang === 'en' ? 'Modify Backpack Inventory Quantity:' : '直接修改背包中炸弹数量：'}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
+              {/* Normal Bomb Inv */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>💣 普通弹:</span>
+                <input type="number" value={inputNormalInv} onChange={e => setInputNormalInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+              </div>
+              
+              {/* Freeze Bomb Inv */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2563eb' }}>❄️ 冰冻弹:</span>
+                <input type="number" value={inputFreezeInv} onChange={e => setInputFreezeInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+              </div>
+
+              {/* Super Bomb Inv */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#ca8a04' }}>🌟 穿甲弹:</span>
+                <input type="number" value={inputSuperInv} onChange={e => setInputSuperInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+              </div>
+
+              {/* Atomic Bomb Inv */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#9333ea' }}>☢️ 原子弹:</span>
+                <input type="number" value={inputAtomicInv} onChange={e => setInputAtomicInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+              </div>
+            </div>
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => { audioSynth.playClick(); setShowSettings(false); }}
@@ -2159,6 +2200,15 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setSuperAward(inputSuperAward);
                   setAtomicAward(inputAtomicAward);
 
+                  // Directly modify inventory quantities
+                  const newInv = {
+                    normal: inputNormalInv,
+                    freeze: inputFreezeInv,
+                    super: inputSuperInv,
+                    atomic: inputAtomicInv
+                  };
+                  setInventory(newInv);
+
                   localStorage.setItem('codingMazeMathMin', vMin);
                   localStorage.setItem('codingMazeMathMax', vMax);
                   localStorage.setItem('codingMazeAtomicMin', aMin);
@@ -2171,6 +2221,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   localStorage.setItem('codingMazeFreezeAward', inputFreezeAward);
                   localStorage.setItem('codingMazeSuperAward', inputSuperAward);
                   localStorage.setItem('codingMazeAtomicAward', inputAtomicAward);
+                  localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
 
                   setShowSettings(false);
                 }}
