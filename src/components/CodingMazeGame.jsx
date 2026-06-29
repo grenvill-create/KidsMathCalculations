@@ -385,6 +385,22 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [showSettings, setShowSettings] = useState(false);
   const [showParentGate, setShowParentGate] = useState(false);
   const [showMonsterMenu, setShowMonsterMenu] = useState(false);
+  const [showLevelMap, setShowLevelMap] = useState(false);
+  const [maxUnlockedLevel, setMaxUnlockedLevel] = useState(() => {
+    const saved = localStorage.getItem('codingMazeMaxUnlockedLevel');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed)) {
+        return Math.min(Math.max(0, parsed), LEVELS.length - 1);
+      }
+    }
+    const savedLvl = localStorage.getItem('codingMazeLevel');
+    if (savedLvl) {
+      const parsed = parseInt(savedLvl, 10);
+      if (!isNaN(parsed)) return Math.min(Math.max(0, parsed), LEVELS.length - 1);
+    }
+    return 0;
+  });
   const [parentGateProblem, setParentGateProblem] = useState(null);
   const [parentGateInput, setParentGateInput] = useState('');
   const [isParentGateShaking, setIsParentGateShaking] = useState(false);
@@ -859,6 +875,12 @@ export default function CodingMazeGame({ lang, onBack }) {
     const nextIdx = (levelIdx + 1) % LEVELS.length;
     setLevelIdx(nextIdx);
     localStorage.setItem('codingMazeLevel', nextIdx.toString());
+    
+    // Update max unlocked level progress
+    const newMax = Math.max(maxUnlockedLevel, nextIdx);
+    setMaxUnlockedLevel(newMax);
+    localStorage.setItem('codingMazeMaxUnlockedLevel', newMax.toString());
+
     const newInv = { ...inventory, normal: inventory.normal + 1 };
     setInventory(newInv);
     localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
@@ -870,8 +892,10 @@ export default function CodingMazeGame({ lang, onBack }) {
     if (window.confirm(lang === 'en' ? 'Reset all progress?' : '确定要重置所有闯关进度并回到第一关吗？')) {
       audioSynth.playClick();
       localStorage.removeItem('codingMazeLevel');
+      localStorage.removeItem('codingMazeMaxUnlockedLevel');
       localStorage.removeItem('codingMazeInventory');
       setLevelIdx(0);
+      setMaxUnlockedLevel(0);
       setInventory({ normal: 0, freeze: 0, super: 0, atomic: 0 });
       setActiveBombType(null);
       setActiveAtomicExplosion(null);
@@ -1580,6 +1604,9 @@ export default function CodingMazeGame({ lang, onBack }) {
             <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowMonsterMenu(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Monster Guide' : '怪物图鉴'}>
               👾
             </button>
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowLevelMap(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Select Level' : '选择关卡'}>
+              🗺️
+            </button>
           </div>
           <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : 'clamp(1rem, 3vw, 1.4rem)', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
             {lang === 'en' ? (isMobile ? `${levelIdx + 1}/${LEVELS.length}` : `Maze (${levelIdx + 1}/${LEVELS.length})`) : (isMobile ? `第${levelIdx + 1}关` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`)}
@@ -1981,6 +2008,30 @@ export default function CodingMazeGame({ lang, onBack }) {
               />
             </div>
 
+            {/* Quick Unlocking option in Parental Panel */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', color: '#64748b', marginBottom: '6px', fontWeight: 'bold' }}>
+                {lang === 'en' ? 'Level Manager:' : '进度管理：'}
+              </label>
+              <button 
+                type="button"
+                onClick={() => {
+                  audioSynth.playClick();
+                  setMaxUnlockedLevel(LEVELS.length - 1);
+                  localStorage.setItem('codingMazeMaxUnlockedLevel', (LEVELS.length - 1).toString());
+                  alert(lang === 'en' ? 'All levels unlocked successfully!' : '已成功解锁所有 52 关！');
+                }}
+                style={{
+                  width: '100%', padding: '10px', borderRadius: '12px', 
+                  border: '2px dashed #3b82f6', background: '#eff6ff', 
+                  color: '#1d4ed8', fontWeight: 'bold', cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                🔓 {lang === 'en' ? 'Unlock All Levels' : '解锁所有关卡'}
+              </button>
+            </div>
+
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => { audioSynth.playClick(); setShowSettings(false); }}
@@ -2259,6 +2310,156 @@ export default function CodingMazeGame({ lang, onBack }) {
           >
             {lang === 'en' ? '✕ Close' : '✕ 关闭'}
           </button>
+        </div>
+      )}
+
+      {/* Level Selector Modal (Map) */}
+      {showLevelMap && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(15, 23, 42, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 3400, padding: '16px'
+        }}>
+          <style>{`
+            @keyframes mapLevelPop {
+              0% { transform: scale(0.7); opacity: 0; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            @keyframes borderPulse {
+              0%, 100% { box-shadow: 0 0 0 2px #eab308, 0 0 10px #eab308; }
+              50% { box-shadow: 0 0 0 5px #eab308, 0 0 20px #fbbf24; }
+            }
+          `}</style>
+          <div className="bounce-in" style={{
+            background: 'white',
+            borderRadius: '28px',
+            width: '100%',
+            maxWidth: '560px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+            border: '6px solid #3b82f6',
+            overflow: 'hidden'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+              color: 'white', padding: '18px 24px', textAlign: 'center'
+            }}>
+              <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800' }}>
+                🗺️ {lang === 'en' ? 'Select Level' : '选择关卡'}
+              </h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>
+                {lang === 'en' ? `Replay beaten levels or jump ahead` : `重玩打过的关卡或跳关`} (HP: {maxUnlockedLevel + 1}/{LEVELS.length})
+              </p>
+            </div>
+
+            {/* Grid Container */}
+            <div style={{
+              padding: '20px',
+              overflowY: 'auto',
+              flex: 1,
+              background: '#f8fafc'
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gap: '10px',
+                justifyItems: 'center'
+              }}>
+                {LEVELS.map((lvl, index) => {
+                  const isLocked = index > maxUnlockedLevel;
+                  const isActive = index === levelIdx;
+                  
+                  // Style colors based on level block
+                  let bg = '#e2e8f0';
+                  let color = '#475569';
+                  let border = '2px solid #cbd5e1';
+                  
+                  if (!isLocked) {
+                    if (index >= 34) {
+                      // Ultimate levels: purple
+                      bg = '#f3e8ff';
+                      color = '#7e22ce';
+                      border = '2px solid #c084fc';
+                    } else if (index >= 20) {
+                      // Mid/Advanced: orange
+                      bg = '#ffedd5';
+                      color = '#c2410c';
+                      border = '2px solid #fdbb2d';
+                    } else {
+                      // Easy/basic: green
+                      bg = '#dcfce7';
+                      color = '#15803d';
+                      border = '2px solid #86efac';
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={`lvl-btn-${index}`}
+                      disabled={isLocked}
+                      onClick={() => {
+                        audioSynth.playClick();
+                        setLevelIdx(index);
+                        localStorage.setItem('codingMazeLevel', index.toString());
+                        setShowLevelMap(false);
+                      }}
+                      style={{
+                        width: '54px',
+                        height: '54px',
+                        borderRadius: '50%',
+                        border: isActive ? '3px solid #eab308' : border,
+                        background: isLocked ? '#cbd5e1' : bg,
+                        color: isLocked ? '#94a3b8' : color,
+                        fontSize: '1.1rem',
+                        fontWeight: '800',
+                        cursor: isLocked ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        transition: 'all 0.2s',
+                        animation: isActive ? 'borderPulse 1.5s infinite' : 'none',
+                        opacity: isLocked ? 0.6 : 1,
+                        boxShadow: isActive ? '0 0 10px rgba(234,179,8,0.5)' : 'none'
+                      }}
+                    >
+                      {isLocked ? '🔒' : index + 1}
+                      {isActive && (
+                        <span style={{
+                          position: 'absolute', top: '-4px', right: '-4px',
+                          fontSize: '10px', background: '#eab308', borderRadius: '50%',
+                          width: '16px', height: '16px', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', color: 'white', border: '1px solid white'
+                        }}>⭐</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '16px', display: 'flex', justifyContent: 'center',
+              background: '#f1f5f9', borderTop: '1px solid #e2e8f0'
+            }}>
+              <button
+                onClick={() => { audioSynth.playClick(); setShowLevelMap(false); }}
+                style={{
+                  padding: '10px 36px', borderRadius: '50px', border: 'none',
+                  background: '#64748b', color: 'white', fontWeight: 'bold',
+                  fontSize: '1rem', cursor: 'pointer', fontFamily: 'Fredoka, sans-serif'
+                }}
+              >
+                {lang === 'en' ? '✕ Close' : '✕ 关闭'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
