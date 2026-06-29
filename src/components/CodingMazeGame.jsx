@@ -424,6 +424,51 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [customMaxInput, setCustomMaxInput] = useState(mathMax);
   const [customAtomicMinInput, setCustomAtomicMinInput] = useState(atomicMin);
   const [customAtomicMaxInput, setCustomAtomicMaxInput] = useState(atomicMax);
+  
+  const [normalNeeded, setNormalNeeded] = useState(() => {
+    const saved = localStorage.getItem('codingMazeNormalNeeded');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [freezeNeeded, setFreezeNeeded] = useState(() => {
+    const saved = localStorage.getItem('codingMazeFreezeNeeded');
+    return saved ? parseInt(saved, 10) : 2;
+  });
+  const [superNeeded, setSuperNeeded] = useState(() => {
+    const saved = localStorage.getItem('codingMazeSuperNeeded');
+    return saved ? parseInt(saved, 10) : 3;
+  });
+  const [atomicNeeded, setAtomicNeeded] = useState(() => {
+    const saved = localStorage.getItem('codingMazeAtomicNeeded');
+    return saved ? parseInt(saved, 10) : 10;
+  });
+
+  const [normalAward, setNormalAward] = useState(() => {
+    const saved = localStorage.getItem('codingMazeNormalAward');
+    return saved ? parseInt(saved, 10) : 2;
+  });
+  const [freezeAward, setFreezeAward] = useState(() => {
+    const saved = localStorage.getItem('codingMazeFreezeAward');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [superAward, setSuperAward] = useState(() => {
+    const saved = localStorage.getItem('codingMazeSuperAward');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [atomicAward, setAtomicAward] = useState(() => {
+    const saved = localStorage.getItem('codingMazeAtomicAward');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+
+  const [inputNormalNeeded, setInputNormalNeeded] = useState(normalNeeded);
+  const [inputFreezeNeeded, setInputFreezeNeeded] = useState(freezeNeeded);
+  const [inputSuperNeeded, setInputSuperNeeded] = useState(superNeeded);
+  const [inputAtomicNeeded, setInputAtomicNeeded] = useState(atomicNeeded);
+
+  const [inputNormalAward, setInputNormalAward] = useState(normalAward);
+  const [inputFreezeAward, setInputFreezeAward] = useState(freezeAward);
+  const [inputSuperAward, setInputSuperAward] = useState(superAward);
+  const [inputAtomicAward, setInputAtomicAward] = useState(atomicAward);
+
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
@@ -489,6 +534,16 @@ export default function CodingMazeGame({ lang, onBack }) {
     setCustomMaxInput(mathMax);
     setCustomAtomicMinInput(atomicMin);
     setCustomAtomicMaxInput(atomicMax);
+    
+    setInputNormalNeeded(normalNeeded);
+    setInputFreezeNeeded(freezeNeeded);
+    setInputSuperNeeded(superNeeded);
+    setInputAtomicNeeded(atomicNeeded);
+    setInputNormalAward(normalAward);
+    setInputFreezeAward(freezeAward);
+    setInputSuperAward(superAward);
+    setInputAtomicAward(atomicAward);
+
     setShowParentGate(true);
   };
 
@@ -609,10 +664,10 @@ export default function CodingMazeGame({ lang, onBack }) {
       const newAnswered = shopTarget.answered + 1;
       if (newAnswered >= shopTarget.needed) {
         const newInv = { ...inventory };
-        if (shopTarget.type === 'normal') newInv.normal += 2;
-        if (shopTarget.type === 'freeze') newInv.freeze += 1;
-        if (shopTarget.type === 'super') newInv.super += 1;
-        if (shopTarget.type === 'atomic') newInv.atomic += 1;
+        if (shopTarget.type === 'normal') newInv.normal += normalAward;
+        if (shopTarget.type === 'freeze') newInv.freeze += freezeAward;
+        if (shopTarget.type === 'super') newInv.super += superAward;
+        if (shopTarget.type === 'atomic') newInv.atomic += atomicAward;
         setInventory(newInv);
         localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
         setShowMathQuiz(false);
@@ -1831,36 +1886,36 @@ export default function CodingMazeGame({ lang, onBack }) {
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-              <button onClick={() => triggerMathQuiz('normal', 1)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #94a3b8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+              <button onClick={() => triggerMathQuiz('normal', normalNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #94a3b8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>💣 <span>{lang === 'en' ? 'Normal Bomb x2' : '普通炸弹 x2'}</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>💣 <span>{lang === 'en' ? `Normal Bomb x${normalAward}` : `普通炸弹 x${normalAward}`}</span></div>
                   <div style={{ fontSize: '0.8rem', color: '#dc2626', background: '#fee2e2', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -1❤️' : '威力: -1❤️'}</div>
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{lang === 'en' ? '1 Question' : '需答对 1 题'}</div>
+                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{lang === 'en' ? `${normalNeeded} Question${normalNeeded > 1 ? 's' : ''}` : `需答对 ${normalNeeded} 题`}</div>
               </button>
-              <button onClick={() => triggerMathQuiz('freeze', 2)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #93c5fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#eff6ff' }}>
+              <button onClick={() => triggerMathQuiz('freeze', freezeNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #93c5fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#eff6ff' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>❄️ <span style={{color: '#2563eb'}}>{lang === 'en' ? 'Freeze Bomb x1' : '冰冻弹 x1'}</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>❄️ <span style={{color: '#2563eb'}}>{lang === 'en' ? `Freeze Bomb x${freezeAward}` : `冰冻弹 x${freezeAward}`}</span></div>
                   <div style={{ fontSize: '0.8rem', color: '#1d4ed8', background: '#dbeafe', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -2❤️❤️' : '威力: -2❤️❤️'}</div>
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#2563eb' }}>{lang === 'en' ? '2 Questions' : '需连答 2 题'}</div>
+                <div style={{ fontSize: '0.85rem', color: '#2563eb' }}>{lang === 'en' ? `${freezeNeeded} Questions` : `需连答 ${freezeNeeded} 题`}</div>
               </button>
-              <button onClick={() => triggerMathQuiz('super', 3)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #fde047', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fefce8' }}>
+              <button onClick={() => triggerMathQuiz('super', superNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #fde047', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fefce8' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🌟 <span style={{color: '#ca8a04'}}>{lang === 'en' ? 'Super Bomb x1' : '穿甲弹 x1'}</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🌟 <span style={{color: '#ca8a04'}}>{lang === 'en' ? `Super Bomb x${superAward}` : `穿甲弹 x${superAward}`}</span></div>
                   <div style={{ fontSize: '0.8rem', color: '#b45309', background: '#fef3c7', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Damage: -3❤️❤️❤️' : '威力: -3❤️❤️❤️'}</div>
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#ca8a04' }}>{lang === 'en' ? '3 Questions' : '需连答 3 题'}</div>
+                <div style={{ fontSize: '0.85rem', color: '#ca8a04' }}>{lang === 'en' ? `${superNeeded} Questions` : `需连答 ${superNeeded} 题`}</div>
               </button>
-              <button onClick={() => triggerMathQuiz('atomic', 10)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #a855f7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#faf5ff' }}>
+              <button onClick={() => triggerMathQuiz('atomic', atomicNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #a855f7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#faf5ff' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
                     <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '20px', height: '20px', objectFit: 'contain' }} alt="atomic" />
-                    <span style={{color: '#9333ea'}}>{lang === 'en' ? 'Atomic Bomb x1' : '原子弹 x1'}</span>
+                    <span style={{color: '#9333ea'}}>{lang === 'en' ? `Atomic Bomb x${atomicAward}` : `原子弹 x${atomicAward}`}</span>
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#7e22ce', background: '#f3e8ff', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Clear ALL Animals' : '威力: 清空全图动物'}</div>
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#9333ea' }}>{lang === 'en' ? '10 Questions' : '需连答 10 题'}</div>
+                <div style={{ fontSize: '0.85rem', color: '#9333ea' }}>{lang === 'en' ? `${atomicNeeded} Questions` : `需连答 ${atomicNeeded} 题`}</div>
               </button>
             </div>
             
@@ -1946,15 +2001,16 @@ export default function CodingMazeGame({ lang, onBack }) {
         }}>
           <div className="bounce-in card-shadow" style={{
             background: 'white', borderRadius: '24px', padding: '24px',
-            width: '90%', maxWidth: '340px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            width: '90%', maxWidth: '440px', maxHeight: '85vh', overflowY: 'auto',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
           }}>
-            <h3 style={{ margin: '0 0 20px 0', color: '#334155', textAlign: 'center' }}>
-              {lang === 'en' ? 'Bomb Math Difficulty' : '获取炸弹难度设置'}
+            <h3 style={{ margin: '0 0 20px 0', color: '#334155', textAlign: 'center', fontWeight: '800' }}>
+              {lang === 'en' ? 'Parental Settings' : '家长控制中心'}
             </h3>
             
             {/* Regular bomb difficulty section */}
             <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '8px', fontWeight: 'bold' }}>
-              {lang === 'en' ? 'Normal/Freeze/Super Bomb Range:' : '普通/冰冻/穿甲弹计算范围：'}
+              {lang === 'en' ? 'Normal/Freeze/Super Bomb Range:' : '普通/冰冻/穿甲弹加减法范围：'}
             </p>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
               <input 
@@ -1982,7 +2038,7 @@ export default function CodingMazeGame({ lang, onBack }) {
 
             {/* Atomic bomb difficulty section */}
             <p style={{ fontSize: '0.9rem', color: '#a855f7', marginBottom: '8px', fontWeight: 'bold' }}>
-              {lang === 'en' ? 'Atomic Bomb Range:' : '原子弹计算范围：'}
+              {lang === 'en' ? 'Atomic Bomb Range:' : '原子弹加减法范围：'}
             </p>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
               <input 
@@ -2008,12 +2064,65 @@ export default function CodingMazeGame({ lang, onBack }) {
               />
             </div>
 
+            {/* Custom Bomb Settings Section */}
+            <p style={{ fontSize: '0.95rem', color: '#1e3a8a', marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+              {lang === 'en' ? 'Props Config (Award / Questions):' : '获取道具与连答题目数设置：'}
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+              {/* Normal Bomb */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.85rem', width: '80px', fontWeight: 'bold' }}>💣 普通弹:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>获得</span>
+                  <input type="number" value={inputNormalAward} onChange={e => setInputNormalAward(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>个，答</span>
+                  <input type="number" value={inputNormalNeeded} onChange={e => setInputNormalNeeded(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
+                </div>
+              </div>
+              
+              {/* Freeze Bomb */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.85rem', width: '80px', fontWeight: 'bold', color: '#2563eb' }}>❄️ 冰冻弹:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>获得</span>
+                  <input type="number" value={inputFreezeAward} onChange={e => setInputFreezeAward(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>个，答</span>
+                  <input type="number" value={inputFreezeNeeded} onChange={e => setInputFreezeNeeded(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
+                </div>
+              </div>
 
+              {/* Super Bomb */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.85rem', width: '80px', fontWeight: 'bold', color: '#ca8a04' }}>🌟 穿甲弹:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>获得</span>
+                  <input type="number" value={inputSuperAward} onChange={e => setInputSuperAward(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>个，答</span>
+                  <input type="number" value={inputSuperNeeded} onChange={e => setInputSuperNeeded(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
+                </div>
+              </div>
+
+              {/* Atomic Bomb */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.85rem', width: '80px', fontWeight: 'bold', color: '#9333ea' }}>☢️ 原子弹:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>获得</span>
+                  <input type="number" value={inputAtomicAward} onChange={e => setInputAtomicAward(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>个，答</span>
+                  <input type="number" value={inputAtomicNeeded} onChange={e => setInputAtomicNeeded(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
+                </div>
+              </div>
+            </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => { audioSynth.playClick(); setShowSettings(false); }}
-                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#e2e8f0', color: '#475569', fontWeight: 'bold' }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#e2e8f0', color: '#475569', fontWeight: 'bold', cursor: 'pointer' }}
               >
                 {lang === 'en' ? 'Cancel' : '取消'}
               </button>
@@ -2040,14 +2149,32 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setCustomAtomicMinInput(aMin);
                   setCustomAtomicMaxInput(aMax);
 
+                  // Save props configuration
+                  setNormalNeeded(inputNormalNeeded);
+                  setFreezeNeeded(inputFreezeNeeded);
+                  setSuperNeeded(inputSuperNeeded);
+                  setAtomicNeeded(inputAtomicNeeded);
+                  setNormalAward(inputNormalAward);
+                  setFreezeAward(inputFreezeAward);
+                  setSuperAward(inputSuperAward);
+                  setAtomicAward(inputAtomicAward);
+
                   localStorage.setItem('codingMazeMathMin', vMin);
                   localStorage.setItem('codingMazeMathMax', vMax);
                   localStorage.setItem('codingMazeAtomicMin', aMin);
                   localStorage.setItem('codingMazeAtomicMax', aMax);
+                  localStorage.setItem('codingMazeNormalNeeded', inputNormalNeeded);
+                  localStorage.setItem('codingMazeFreezeNeeded', inputFreezeNeeded);
+                  localStorage.setItem('codingMazeSuperNeeded', inputSuperNeeded);
+                  localStorage.setItem('codingMazeAtomicNeeded', inputAtomicNeeded);
+                  localStorage.setItem('codingMazeNormalAward', inputNormalAward);
+                  localStorage.setItem('codingMazeFreezeAward', inputFreezeAward);
+                  localStorage.setItem('codingMazeSuperAward', inputSuperAward);
+                  localStorage.setItem('codingMazeAtomicAward', inputAtomicAward);
 
                   setShowSettings(false);
                 }}
-                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#3b82f6', color: 'white', fontWeight: 'bold' }}
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#3b82f6', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
               >
                 {lang === 'en' ? 'Save' : '保存'}
               </button>
