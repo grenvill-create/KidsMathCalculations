@@ -2008,29 +2008,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               />
             </div>
 
-            {/* Quick Unlocking option in Parental Panel */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.9rem', color: '#64748b', marginBottom: '6px', fontWeight: 'bold' }}>
-                {lang === 'en' ? 'Level Manager:' : '进度管理：'}
-              </label>
-              <button 
-                type="button"
-                onClick={() => {
-                  audioSynth.playClick();
-                  setMaxUnlockedLevel(LEVELS.length - 1);
-                  localStorage.setItem('codingMazeMaxUnlockedLevel', (LEVELS.length - 1).toString());
-                  alert(lang === 'en' ? 'All levels unlocked successfully!' : '已成功解锁所有 52 关！');
-                }}
-                style={{
-                  width: '100%', padding: '10px', borderRadius: '12px', 
-                  border: '2px dashed #3b82f6', background: '#eff6ff', 
-                  color: '#1d4ed8', fontWeight: 'bold', cursor: 'pointer',
-                  fontSize: '0.9rem'
-                }}
-              >
-                🔓 {lang === 'en' ? 'Unlock All Levels' : '解锁所有关卡'}
-              </button>
-            </div>
+
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
