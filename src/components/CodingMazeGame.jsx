@@ -381,11 +381,13 @@ export default function CodingMazeGame({ lang, onBack }) {
           normal: parsed.normal || 0,
           freeze: parsed.freeze || 0,
           super: parsed.super || 0,
-          atomic: parsed.atomic || 0
+          atomic: parsed.atomic || 0,
+          torch: parsed.torch || 0,
+          shield: parsed.shield || 0
         };
       }
     } catch(e) {}
-    return { normal: 0, freeze: 0, super: 0, atomic: 0 };
+    return { normal: 0, freeze: 0, super: 0, atomic: 0, torch: 0, shield: 0 };
   });
   const [activeBombType, setActiveBombType] = useState(null);
   const [activeExplosion, setActiveExplosion] = useState(null);
@@ -393,6 +395,10 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [showShop, setShowShop] = useState(false);
   const [shopTarget, setShopTarget] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+
+  const [hasShield, setHasShield] = useState(false);
+  const [burningFires, setBurningFires] = useState([]);
+
   const [spiderWebs, setSpiderWebs] = useState([]);
   const [webStuckPrompt, setWebStuckPrompt] = useState(null);
   const [webStruggle, setWebStruggle] = useState(false);
@@ -445,9 +451,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [customMinInput, setCustomMinInput] = useState(mathMin);
   const [customMaxInput, setCustomMaxInput] = useState(mathMax);
   const [customAtomicMinInput, setCustomAtomicMinInput] = useState(atomicMin);
-  const [customAtomicMaxInput, setCustomAtomicMaxInput] = useState(atomicMax);
-  
-  const [normalNeeded, setNormalNeeded] = useState(() => {
+  const [customAtomicMaxInput, setCustomAtomicMaxInput] = useState(atomicMax);  const [normalNeeded, setNormalNeeded] = useState(() => {
     const saved = localStorage.getItem('codingMazeNormalNeeded');
     return saved ? parseInt(saved, 10) : 1;
   });
@@ -462,6 +466,14 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [atomicNeeded, setAtomicNeeded] = useState(() => {
     const saved = localStorage.getItem('codingMazeAtomicNeeded');
     return saved ? parseInt(saved, 10) : 10;
+  });
+  const [torchNeeded, setTorchNeeded] = useState(() => {
+    const saved = localStorage.getItem('codingMazeTorchNeeded');
+    return saved ? parseInt(saved, 10) : 2;
+  });
+  const [shieldNeeded, setShieldNeeded] = useState(() => {
+    const saved = localStorage.getItem('codingMazeShieldNeeded');
+    return saved ? parseInt(saved, 10) : 4;
   });
 
   const [normalAward, setNormalAward] = useState(() => {
@@ -480,21 +492,35 @@ export default function CodingMazeGame({ lang, onBack }) {
     const saved = localStorage.getItem('codingMazeAtomicAward');
     return saved ? parseInt(saved, 10) : 1;
   });
+  const [torchAward, setTorchAward] = useState(() => {
+    const saved = localStorage.getItem('codingMazeTorchAward');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [shieldAward, setShieldAward] = useState(() => {
+    const saved = localStorage.getItem('codingMazeShieldAward');
+    return saved ? parseInt(saved, 10) : 1;
+  });
 
   const [inputNormalNeeded, setInputNormalNeeded] = useState(normalNeeded);
   const [inputFreezeNeeded, setInputFreezeNeeded] = useState(freezeNeeded);
   const [inputSuperNeeded, setInputSuperNeeded] = useState(superNeeded);
   const [inputAtomicNeeded, setInputAtomicNeeded] = useState(atomicNeeded);
+  const [inputTorchNeeded, setInputTorchNeeded] = useState(torchNeeded);
+  const [inputShieldNeeded, setInputShieldNeeded] = useState(shieldNeeded);
 
   const [inputNormalAward, setInputNormalAward] = useState(normalAward);
   const [inputFreezeAward, setInputFreezeAward] = useState(freezeAward);
   const [inputSuperAward, setInputSuperAward] = useState(superAward);
   const [inputAtomicAward, setInputAtomicAward] = useState(atomicAward);
+  const [inputTorchAward, setInputTorchAward] = useState(torchAward);
+  const [inputShieldAward, setInputShieldAward] = useState(shieldAward);
 
   const [inputNormalInv, setInputNormalInv] = useState(0);
   const [inputFreezeInv, setInputFreezeInv] = useState(0);
   const [inputSuperInv, setInputSuperInv] = useState(0);
   const [inputAtomicInv, setInputAtomicInv] = useState(0);
+  const [inputTorchInv, setInputTorchInv] = useState(0);
+  const [inputShieldInv, setInputShieldInv] = useState(0);
   const [inputLevelIdx, setInputLevelIdx] = useState(levelIdx);
 
   const [isMobile, setIsMobile] = useState(false);
@@ -567,15 +593,22 @@ export default function CodingMazeGame({ lang, onBack }) {
     setInputFreezeNeeded(freezeNeeded);
     setInputSuperNeeded(superNeeded);
     setInputAtomicNeeded(atomicNeeded);
+    setInputTorchNeeded(torchNeeded);
+    setInputShieldNeeded(shieldNeeded);
+
     setInputNormalAward(normalAward);
     setInputFreezeAward(freezeAward);
     setInputSuperAward(superAward);
     setInputAtomicAward(atomicAward);
+    setInputTorchAward(torchAward);
+    setInputShieldAward(shieldAward);
 
     setInputNormalInv(inventory.normal);
     setInputFreezeInv(inventory.freeze);
     setInputSuperInv(inventory.super);
     setInputAtomicInv(inventory.atomic);
+    setInputTorchInv(inventory.torch || 0);
+    setInputShieldInv(inventory.shield || 0);
     setInputLevelIdx(levelIdx);
 
     setShowParentGate(true);
@@ -643,6 +676,8 @@ export default function CodingMazeGame({ lang, onBack }) {
     setTrail([]);
     setPendingBombs([]);
     setDestroyedObstacles([]);
+    setBurningFires([]);
+    setHasShield(false);
     setEnemyHealths(currentLevel.enemies ? currentLevel.enemies.map(e => {
       if (e.type === 'dinosaur') return 4;
       if (e.type === 'elephant' || e.type === 'magma') return 3;
@@ -702,6 +737,8 @@ export default function CodingMazeGame({ lang, onBack }) {
         if (shopTarget.type === 'freeze') newInv.freeze += freezeAward;
         if (shopTarget.type === 'super') newInv.super += superAward;
         if (shopTarget.type === 'atomic') newInv.atomic += atomicAward;
+        if (shopTarget.type === 'torch') newInv.torch = (newInv.torch || 0) + torchAward;
+        if (shopTarget.type === 'shield') newInv.shield = (newInv.shield || 0) + shieldAward;
         setInventory(newInv);
         localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
         setShowMathQuiz(false);
@@ -839,6 +876,29 @@ export default function CodingMazeGame({ lang, onBack }) {
         });
         setEnemyPositions(currentEnemyPositions);
         
+        // Check if any enemy stepped onto a torch fire!
+        currentEnemyPositions.forEach((ep, eIdx) => {
+          if (!ep || enemyHealths[eIdx] <= 0) return;
+          const isAtFire = burningFires.some(f => f.r === ep.r && f.c === ep.c);
+          if (isAtFire) {
+            // Deduct health
+            setEnemyHealths(prev => {
+              const next = [...prev];
+              next[eIdx] = Math.max(0, next[eIdx] - 1);
+              if (next[eIdx] <= 0) {
+                // Enemy dies!
+                currentEnemyPositions[eIdx] = null;
+                setEnemyPositions([...currentEnemyPositions]);
+                setStatusMsg(lang === 'en' ? '🔥 Enemy burned and vanished!' : '🔥 怪物踩中火把火焰消失了！');
+              } else {
+                setStatusMsg(lang === 'en' ? '🔥 Enemy burned by fire! (-1 HP)' : '🔥 怪物踩中火把火焰受到 1 点伤害！');
+              }
+              return next;
+            });
+            audioSynth.playBomb();
+          }
+        });
+        
         if (anyElephantMoved) {
            setIsShaking(true);
            setTimeout(() => setIsShaking(false), 200); // short stomp shake
@@ -866,32 +926,41 @@ export default function CodingMazeGame({ lang, onBack }) {
           if (nextC === ep.c + 2 && (nextR === ep.r || nextR === ep.r + 1)) return true;
         }
         return false;
-      });
+      }) || isCellOnFire(nextR, nextC);
 
       if (hitEnemy || hitFire) {
-        audioSynth.playIncorrect();
-        setStatusMsg(hitFire 
-          ? (lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。')
-          : (lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。'));
-        setIsPlaying(false);
-        setExecutingIdx(-1);
-        setIsShaking(true);
-        
-        let caughtType = 'snake';
-        if (hitEnemy) {
-          caughtType = currentLevel.enemies?.[hitEnemyIdx]?.type || 'snake';
-        } else if (hitFire) {
-          caughtType = 'dinosaur';
+        if (hasShield) {
+          setHasShield(false);
+          setStatusMsg(hitFire 
+            ? (lang === 'en' ? '🛡️ Shield blocked fire damage!' : '🛡️ 护盾抵挡了一次火焰伤害！')
+            : (lang === 'en' ? '🛡️ Shield blocked enemy hit!' : '🛡️ 护盾抵挡了一次怪兽袭击！'));
+          audioSynth.playCorrect();
+          // Hero stays alive and continues!
+        } else {
+          audioSynth.playIncorrect();
+          setStatusMsg(hitFire 
+            ? (lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。')
+            : (lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。'));
+          setIsPlaying(false);
+          setExecutingIdx(-1);
+          setIsShaking(true);
+          
+          let caughtType = 'snake';
+          if (hitEnemy) {
+            caughtType = currentLevel.enemies?.[hitEnemyIdx]?.type || 'snake';
+          } else if (hitFire) {
+            caughtType = 'dinosaur';
+          }
+          setCaughtBy(caughtType);
+          
+          resetTimeoutRef.current = setTimeout(() => {
+            setIsShaking(false);
+            setPos({ ...currentLevel.start });
+            setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+            setSpiderWebs([]);
+          }, 500);
+          return;
         }
-        setCaughtBy(caughtType);
-        
-        resetTimeoutRef.current = setTimeout(() => {
-          setIsShaking(false);
-          setPos({ ...currentLevel.start });
-          setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
-          setSpiderWebs([]);
-        }, 500);
-        return;
       }
       
       const hitWeb = currentWebs.some(w => w.r === nextR && w.c === nextC);
@@ -989,7 +1058,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       localStorage.removeItem('codingMazeInventory');
       setLevelIdx(0);
       setMaxUnlockedLevel(0);
-      setInventory({ normal: 0, freeze: 0, super: 0, atomic: 0 });
+      setInventory({ normal: 0, freeze: 0, super: 0, atomic: 0, torch: 0, shield: 0 });
       setActiveBombType(null);
       setActiveAtomicExplosion(null);
       setDestroyedObstacles([]);
@@ -1063,7 +1132,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         const isFootprint = trail.some(t => t.r === r && t.c === c);
 
         const isWeb = spiderWebs.some(w => w.r === r && w.c === c);
-        const isOnFire = isCellOnFire(r, c);
+        const isOnFire = isCellOnFire(r, c) || burningFires.some(f => f.r === r && f.c === c);
 
         if (isPendingBomb) {
           content = <span style={{ animation: 'fuseBurn 0.2s infinite alternate', display: 'inline-block' }}>🧨</span>;
@@ -1111,7 +1180,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           }
         }
 
-        const canBomb = activeBombType !== null && (activeBombType === 'atomic' ? true : ((isObstacle && !isDestroyed) || isEnemy));
+        const canBomb = activeBombType !== null && (activeBombType === 'atomic' || activeBombType === 'torch' ? true : ((isObstacle && !isDestroyed) || isEnemy));
 
         row.push(
           <div key={`${r}-${c}`} style={{
@@ -1131,7 +1200,7 @@ export default function CodingMazeGame({ lang, onBack }) {
             if (canBomb && !isPendingBomb) {
               const usedBomb = activeBombType;
               setActiveBombType(null);
-              const newInv = { ...inventory, [usedBomb]: inventory[usedBomb] - 1 };
+              const newInv = { ...inventory, [usedBomb]: (inventory[usedBomb] || 0) - 1 };
               setInventory(newInv);
               localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
 
@@ -1163,7 +1232,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setTimeout(() => setIsShaking(false), 300);
                   
                   const explId = Date.now();
-                  setActiveExplosion({ r, c, type: usedBomb, id: explId });
+                  setActiveExplosion({ r, c, type: usedBomb === 'torch' ? 'normal' : usedBomb, id: explId });
                   setTimeout(() => {
                     setActiveExplosion(prev => prev && prev.id === explId ? null : prev);
                   }, 500);
@@ -1195,14 +1264,14 @@ export default function CodingMazeGame({ lang, onBack }) {
                     }
                   } else {
                     confetti({
-                      particleCount: 80,
-                      spread: 100,
+                      particleCount: usedBomb === 'torch' ? 50 : 80,
+                      spread: usedBomb === 'torch' ? 80 : 100,
                       startVelocity: 30,
                       origin: {
                         x: absX / window.innerWidth,
                         y: absY / window.innerHeight
                       },
-                      colors: usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
+                      colors: usedBomb === 'torch' ? ['#f97316', '#fdba74', '#ef4444', '#f59e0b'] : (usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b']),
                       ticks: 100,
                       gravity: 1.2
                     });
@@ -1212,23 +1281,49 @@ export default function CodingMazeGame({ lang, onBack }) {
                 setPendingBombs(prev => prev.filter(p => p.r !== r || p.c !== c));
                 
                 if (usedBomb !== 'atomic') {
-                  if (isEnemy) {
-                    setEnemyHealths(prev => {
-                      const next = [...prev];
-                      let dmg = 1;
-                      if (usedBomb === 'freeze') dmg = 2;
-                      if (usedBomb === 'super') dmg = 3;
-                      
-                      const eType = currentLevel.enemies?.[enemyIdx]?.type || 'snake';
-                      if (eType === 'turtle' && usedBomb !== 'super') {
-                        dmg = 0; // Immune to normal/freeze bombs
-                      }
-                      
-                      next[enemyIdx] -= dmg;
-                      return next;
-                    });
+                  if (usedBomb === 'torch') {
+                    setBurningFires(prev => [...prev, { r, c }]);
+                    if (isObstacle) {
+                      setDestroyedObstacles(prev => [...prev, { r, c }]);
+                    }
+                    if (isEnemy) {
+                      setEnemyHealths(prev => {
+                        const next = [...prev];
+                        next[enemyIdx] = Math.max(0, next[enemyIdx] - 1);
+                        if (next[enemyIdx] <= 0) {
+                          // Clean up position instantly
+                          const epCopy = [...enemyPositions];
+                          epCopy[enemyIdx] = null;
+                          setEnemyPositions(epCopy);
+                        }
+                        return next;
+                      });
+                    }
                   } else {
-                    setDestroyedObstacles(prev => [...prev, { r, c }]);
+                    if (isEnemy) {
+                      setEnemyHealths(prev => {
+                        const next = [...prev];
+                        let dmg = 1;
+                        if (usedBomb === 'freeze') dmg = 2;
+                        if (usedBomb === 'super') dmg = 3;
+                        
+                        const eType = currentLevel.enemies?.[enemyIdx]?.type || 'snake';
+                        if (eType === 'turtle' && usedBomb !== 'super') {
+                          dmg = 0; // Immune to normal/freeze bombs
+                        }
+                        
+                        next[enemyIdx] -= dmg;
+                        if (next[enemyIdx] <= 0) {
+                          // Clean up position instantly
+                          const epCopy = [...enemyPositions];
+                          epCopy[enemyIdx] = null;
+                          setEnemyPositions(epCopy);
+                        }
+                        return next;
+                      });
+                    } else {
+                      setDestroyedObstacles(prev => [...prev, { r, c }]);
+                    }
                   }
                 }
               }, 500);
@@ -1286,6 +1381,10 @@ export default function CodingMazeGame({ lang, onBack }) {
       }}>
         <style>
           {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
             @keyframes targetPulse {
               0%, 100% { transform: scale(1); }
               50% { transform: scale(1.12); filter: brightness(1.15); }
@@ -1477,6 +1576,17 @@ export default function CodingMazeGame({ lang, onBack }) {
           zIndex: 10,
           filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.25))'
         }}>
+          {hasShield && (
+            <div style={{
+              position: 'absolute',
+              inset: '-6px',
+              borderRadius: '50%',
+              border: '3px dashed #60a5fa',
+              boxShadow: '0 0 10px #3b82f6, inset 0 0 10px #3b82f6',
+              animation: 'spin 4s linear infinite',
+              pointerEvents: 'none'
+            }} />
+          )}
           {tTheme.hero}
         </div>
         {/* Enemy overlays */}
@@ -1860,7 +1970,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
             </button>
             
-            {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0) && (
+            {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0 || inventory.torch > 0 || inventory.shield > 0) && (
               <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
                 {inventory.normal > 0 && (
                   <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1884,6 +1994,30 @@ export default function CodingMazeGame({ lang, onBack }) {
                   <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'atomic' ? null : 'atomic')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'atomic' ? '#a855f7' : '#cbd5e1'}`, background: activeBombType === 'atomic' ? '#f3e8ff' : 'white', animation: activeBombType === 'atomic' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt="atomic" /> x{inventory.atomic}
                     <span style={{ fontSize: '0.75rem', color: activeBombType === 'atomic' ? '#7e22ce' : '#a855f7', fontWeight: 'bold' }}>-ALL❤️</span>
+                  </button>
+                )}
+                {inventory.torch > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'torch' ? null : 'torch')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'torch' ? '#f97316' : '#cbd5e1'}`, background: activeBombType === 'torch' ? '#fed7aa' : 'white', animation: activeBombType === 'torch' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    🔥 x{inventory.torch}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'torch' ? '#c2410c' : '#f97316', fontWeight: 'bold' }}>烧毁</span>
+                  </button>
+                )}
+                {inventory.shield > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => {
+                    if (isPlaying || isSolved) return;
+                    if (hasShield) {
+                      setStatusMsg(lang === 'en' ? 'Shield is already active!' : '护盾已处于激活状态！');
+                      return;
+                    }
+                    audioSynth.playCorrect();
+                    setHasShield(true);
+                    const newInv = { ...inventory, shield: (inventory.shield || 0) - 1 };
+                    setInventory(newInv);
+                    localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
+                    setStatusMsg(lang === 'en' ? '🛡️ Shield activated!' : '🛡️ 守护护盾已开启！');
+                  }} style={{ padding: '4px 8px', borderRadius: '8px', border: '2px solid #cbd5e1', background: 'white', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    🛡️ x{inventory.shield}
+                    <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 'bold' }}>防护</span>
                   </button>
                 )}
               </div>
@@ -1954,6 +2088,20 @@ export default function CodingMazeGame({ lang, onBack }) {
                   <div style={{ fontSize: '0.8rem', color: '#7e22ce', background: '#f3e8ff', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Clear ALL Animals' : '威力: 清空全图动物'}</div>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#9333ea' }}>{lang === 'en' ? `${atomicNeeded} Questions` : `需连答 ${atomicNeeded} 题`}</div>
+              </button>
+              <button onClick={() => triggerMathQuiz('torch', torchNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #f97316', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff7ed' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🔥 <span style={{color: '#ea580c'}}>{lang === 'en' ? `Torch x${torchAward}` : `火把 x${torchAward}`}</span></div>
+                  <div style={{ fontSize: '0.8rem', color: '#c2410c', background: '#ffedd5', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Burn Obstacle & Set Fire' : '功能: 烧毁障碍并留火'}</div>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#ea580c' }}>{lang === 'en' ? `${torchNeeded} Questions` : `需连答 ${torchNeeded} 题`}</div>
+              </button>
+              <button onClick={() => triggerMathQuiz('shield', shieldNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #3b82f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#eff6ff' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🛡️ <span style={{color: '#2563eb'}}>{lang === 'en' ? `Guardian Shield x${shieldAward}` : `守护神盾 x${shieldAward}`}</span></div>
+                  <div style={{ fontSize: '0.8rem', color: '#1d4ed8', background: '#dbeafe', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Block One Attack' : '功能: 抵挡一次攻击'}</div>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#2563eb' }}>{lang === 'en' ? `${shieldNeeded} Questions` : `需连答 ${shieldNeeded} 题`}</div>
               </button>
             </div>
             
@@ -2155,6 +2303,30 @@ export default function CodingMazeGame({ lang, onBack }) {
                   <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
                 </div>
               </div>
+
+              {/* Torch */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.85rem', width: '80px', fontWeight: 'bold', color: '#f97316' }}>🔥 火把:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>获得</span>
+                  <input type="number" value={inputTorchAward} onChange={e => setInputTorchAward(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>个，答</span>
+                  <input type="number" value={inputTorchNeeded} onChange={e => setInputTorchNeeded(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
+                </div>
+              </div>
+
+              {/* Shield */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.85rem', width: '80px', fontWeight: 'bold', color: '#2563eb' }}>🛡️ 守护盾:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>获得</span>
+                  <input type="number" value={inputShieldAward} onChange={e => setInputShieldAward(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>个，答</span>
+                  <input type="number" value={inputShieldNeeded} onChange={e => setInputShieldNeeded(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '50px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>题</span>
+                </div>
+              </div>
             </div>
 
             {/* Custom Backpack Inventory Quantity Section */}
@@ -2162,7 +2334,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               {lang === 'en' ? 'Modify Backpack Inventory Quantity:' : '直接修改背包中炸弹数量：'}
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px' }}>
               {/* Normal Bomb Inv */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>💣 普通弹:</span>
@@ -2185,6 +2357,18 @@ export default function CodingMazeGame({ lang, onBack }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#9333ea' }}>☢️ 原子弹:</span>
                 <input type="number" value={inputAtomicInv} onChange={e => setInputAtomicInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+              </div>
+
+              {/* Torch Inv */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#f97316' }}>🔥 火把:</span>
+                <input type="number" value={inputTorchInv} onChange={e => setInputTorchInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+              </div>
+
+              {/* Shield Inv */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2563eb' }}>🛡️ 守护盾:</span>
+                <input type="number" value={inputShieldInv} onChange={e => setInputShieldInv(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '100%', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
               </div>
             </div>
 
@@ -2256,17 +2440,24 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setFreezeNeeded(inputFreezeNeeded);
                   setSuperNeeded(inputSuperNeeded);
                   setAtomicNeeded(inputAtomicNeeded);
+                  setTorchNeeded(inputTorchNeeded);
+                  setShieldNeeded(inputShieldNeeded);
+
                   setNormalAward(inputNormalAward);
                   setFreezeAward(inputFreezeAward);
                   setSuperAward(inputSuperAward);
                   setAtomicAward(inputAtomicAward);
+                  setTorchAward(inputTorchAward);
+                  setShieldAward(inputShieldAward);
 
                   // Directly modify inventory quantities
                   const newInv = {
                     normal: inputNormalInv,
                     freeze: inputFreezeInv,
                     super: inputSuperInv,
-                    atomic: inputAtomicInv
+                    atomic: inputAtomicInv,
+                    torch: inputTorchInv,
+                    shield: inputShieldInv
                   };
                   setInventory(newInv);
 
@@ -2285,10 +2476,15 @@ export default function CodingMazeGame({ lang, onBack }) {
                   localStorage.setItem('codingMazeFreezeNeeded', inputFreezeNeeded);
                   localStorage.setItem('codingMazeSuperNeeded', inputSuperNeeded);
                   localStorage.setItem('codingMazeAtomicNeeded', inputAtomicNeeded);
+                  localStorage.setItem('codingMazeTorchNeeded', inputTorchNeeded);
+                  localStorage.setItem('codingMazeShieldNeeded', inputShieldNeeded);
+                  
                   localStorage.setItem('codingMazeNormalAward', inputNormalAward);
                   localStorage.setItem('codingMazeFreezeAward', inputFreezeAward);
                   localStorage.setItem('codingMazeSuperAward', inputSuperAward);
                   localStorage.setItem('codingMazeAtomicAward', inputAtomicAward);
+                  localStorage.setItem('codingMazeTorchAward', inputTorchAward);
+                  localStorage.setItem('codingMazeShieldAward', inputShieldAward);
                   localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
 
                   setShowSettings(false);
