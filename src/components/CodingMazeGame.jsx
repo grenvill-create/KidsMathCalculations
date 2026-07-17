@@ -242,6 +242,31 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
     }
   }
 
+  // 确保每一关都包含至少一个骷髅士兵
+  if (!newLvl.enemies) newLvl.enemies = [];
+  const hasSkeleton = newLvl.enemies.some(e => e.type === 'skeleton');
+  if (!hasSkeleton) {
+    let skeletonPos = null;
+    for (let r = 0; r < newLvl.size; r++) {
+      for (let c = 0; c < newLvl.size; c++) {
+        if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
+        if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
+        if (newLvl.enemies.some(e => e.start && e.start.r === r && e.start.c === c)) continue;
+        skeletonPos = { r, c };
+        break;
+      }
+      if (skeletonPos) break;
+    }
+    if (skeletonPos) {
+      const commandsList = idx < 5 ? ['NONE'] : ['LEFT', 'RIGHT'];
+      newLvl.enemies.push({
+        type: 'skeleton',
+        start: skeletonPos,
+        commands: commandsList
+      });
+    }
+  }
+
   return newLvl;
 });
 
