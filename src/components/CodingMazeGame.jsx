@@ -79,7 +79,7 @@ const RAW_LEVELS = [
   // 24
   {theme:"cat",size:8,start:{r:2,c:0},target:{r:5,c:7},obstacles:[{r:7,c:6},{r:5,c:1},{r:3,c:4},{r:7,c:1},{r:1,c:0},{r:0,c:6},{r:2,c:6},{r:2,c:2},{r:1,c:0},{r:1,c:3},{r:1,c:7},{r:5,c:1},{r:5,c:0},{r:2,c:6},{r:6,c:2},{r:1,c:4},{r:1,c:3}]},
   // 25
-  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ type: 'tiger', start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }]},
+  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ type: 'tiger', start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }, { type: 'skeleton', start: {r: 1, c: 2}, commands: ['RIGHT', 'LEFT'] }]},
   // 26
   {theme:"bear",size:9,start:{r:4,c:0},target:{r:5,c:8},obstacles:[{r:6,c:0},{r:2,c:1},{r:3,c:1},{r:4,c:6},{r:2,c:1},{r:4,c:8},{r:6,c:6},{r:6,c:1},{r:4,c:5},{r:1,c:8},{r:8,c:7},{r:4,c:5},{r:4,c:7},{r:0,c:7},{r:7,c:4},{r:2,c:8},{r:2,c:0},{r:3,c:2},{r:1,c:2},{r:2,c:8},{r:0,c:6},{r:7,c:7}]},
   // 27
@@ -89,7 +89,7 @@ const RAW_LEVELS = [
   // 29
   {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
   // 30
-  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'dinosaur', start: {r:6, c:1}, commands: ['NONE'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'dinosaur', start: {r:6, c:1}, commands: ['NONE'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }, { type: 'skeleton', start: {r: 4, c: 4}, commands: ['LEFT', 'RIGHT'] }] },
   // 31
   { theme: 'frog', size: 10, start: {r:0, c:0}, target: {r:9, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:9,c:7},{r:8,c:7},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:4,c:5},{r:5,c:5},{r:6,c:5}], enemies: [{ type: 'tiger', start: {r:3, c:4}, commands: ['LEFT', 'RIGHT'] }, { type: 'snake', start: {r:7, c:3}, commands: ['UP', 'DOWN'] }] },
   // 32
@@ -156,7 +156,7 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         let eType = idx >= 4 ? 'tiger' : 'snake'; // 从第5关起出现老虎
         if (idx >= 29) {
           // 第30关起陆续出现新怪物
-          const pool = ['tiger', 'ghost'];
+          const pool = ['tiger', 'ghost', 'skeleton'];
           if (idx >= 32) pool.push('witch');
           if (idx >= 35) pool.push('zombie');
           if (idx >= 38) pool.push('magma');
@@ -222,7 +222,7 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         let eType = 'tiger';
         if (idx >= 29) {
           // 第30关起陆续出现新怪物
-          const pool = ['tiger', 'spider', 'elephant', 'rhino', 'ghost'];
+          const pool = ['tiger', 'spider', 'elephant', 'rhino', 'ghost', 'skeleton'];
           if (idx >= 32) pool.push('witch');
           if (idx >= 35) pool.push('zombie');
           if (idx >= 38) pool.push('magma');
@@ -682,6 +682,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       if (e.type === 'dinosaur') return 4;
       if (e.type === 'elephant' || e.type === 'magma') return 3;
       if (e.type === 'tiger' || e.type === 'rhino' || e.type === 'witch' || e.type === 'zombie') return 2;
+      if (e.type === 'skeleton') return 1;
       return 1;
     }) : []);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
@@ -1329,7 +1330,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               }, 500);
             } else if (isEnemy && activeBombType === null) {
               const eType = currentLevel.enemies?.[enemyIdx]?.type || 'snake';
-              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType)) {
+              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma', 'skeleton'].includes(eType)) {
                 audioSynth.playClick();
                 setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
               }
@@ -1486,6 +1487,13 @@ export default function CodingMazeGame({ lang, onBack }) {
               50% { transform: translate(0, 0) rotate(0deg); }
               75% { transform: translate(1px, -1px) rotate(4deg); }
             }
+            @keyframes skeletonRattle {
+              0%, 100% { transform: translate(0, 0) rotate(0deg); }
+              20% { transform: translate(-1.5px, 0.5px) rotate(-2deg); }
+              40% { transform: translate(1.5px, -0.5px) rotate(2deg); }
+              60% { transform: translate(-1.5px, -0.5px) rotate(-1deg); }
+              80% { transform: translate(1.5px, 0.5px) rotate(1deg); }
+            }
             @keyframes magmaBubble {
               0%, 100% { transform: scale(1) skewX(0deg); filter: drop-shadow(0 2px 4px #dc2626) brightness(1); }
               50% { transform: scale(1.05, 0.95) skewX(1deg); filter: drop-shadow(0 4px 8px #f97316) brightness(1.25); }
@@ -1617,7 +1625,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               zIndex: 9,
               pointerEvents: 'none'
             }}>
-              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType) ? (
+              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma', 'skeleton'].includes(eType) ? (
                 <div style={{ 
                   position: 'relative', 
                   width: '100%', 
@@ -1641,6 +1649,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                                 eType === 'witch' ? 'witchHover 1.5s infinite ease-in-out' :
                                 eType === 'zombie' ? 'zombieLimp 1.2s infinite' :
                                 eType === 'magma' ? 'magmaBubble 1.4s infinite alternate' :
+                                eType === 'skeleton' ? 'skeletonRattle 0.5s infinite' :
                                 'idleBreathing 1.5s infinite alternate'),
                     filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
                   }} />
@@ -2661,6 +2670,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               { type: 'elephant', emoji: '🐘', name: lang==='en'?'Elephant':'大象',  hp: 3, color: '#475569', glow: '#94a3b8', anim: 'idleBreathing 1.5s infinite alternate', desc: lang==='en'?'Huge and heavy':'巨大沉重' },
               { type: 'magma',    emoji: '🌋', name: lang==='en'?'Magma':'岩浆怪',  hp: 3, color: '#dc2626', glow: '#f97316', anim: 'magmaBubble 1.4s infinite alternate', desc: lang==='en'?'Burns nearby tiles':'周围格子着火🔥' },
               { type: 'dinosaur', emoji: '🦕', name: lang==='en'?'Dinosaur':'恐龙',  hp: 4, color: '#b91c1c', glow: '#ef4444', anim: 'dinoBreathing 1.8s infinite alternate', desc: lang==='en'?'2x2 BOSS! Spits fire':'2x2大boss! 喷火🔥' },
+              { type: 'skeleton', emoji: '💀', name: lang==='en'?'Skeleton':'骷髅士兵',hp: 1, color: '#6b7280', glow: '#9ca3af', anim: 'skeletonRattle 0.5s infinite', desc: lang==='en'?'A frightening skeleton warrior':'手持邪恶铁刃的恐怖骷髅兵' },
             ].map((m, idx) => (
               <div key={m.type} style={{
                 background: `linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)`,
