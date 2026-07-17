@@ -883,6 +883,22 @@ export default function CodingMazeGame({ lang, onBack }) {
             anyElephantMoved = true;
           }
 
+          if (enemyDef.type === 'skeleton') {
+            let er = ep.r, ec = ep.c;
+            const chaseSteps = levelIdx < 5 ? 1 : 2;
+            for (let s = 0; s < chaseSteps; s++) {
+              let dr = currentPos.r - er;
+              let dc = currentPos.c - ec;
+              if (dr === 0 && dc === 0) break;
+              if (Math.abs(dr) >= Math.abs(dc)) {
+                er += dr > 0 ? 1 : -1;
+              } else {
+                ec += dc > 0 ? 1 : -1;
+              }
+            }
+            return { r: er, c: ec };
+          }
+
           const eCmd = enemyDef.commands[i % enemyDef.commands.length];
           let er = ep.r, ec = ep.c;
           let steps = enemyDef.type === 'rhino' ? 2 : 1;
@@ -955,37 +971,110 @@ export default function CodingMazeGame({ lang, onBack }) {
       }) || isCellOnFire(nextR, nextC);
 
       if (hitEnemy || hitFire) {
-        if (hasShield) {
-          setHasShield(false);
-          setStatusMsg(hitFire 
-            ? (lang === 'en' ? '🛡️ Shield blocked fire damage!' : '🛡️ 护盾抵挡了一次火焰伤害！')
-            : (lang === 'en' ? '🛡️ Shield blocked enemy hit!' : '🛡️ 护盾抵挡了一次怪兽袭击！'));
-          audioSynth.playCorrect();
-          // Hero stays alive and continues!
-        } else {
-          audioSynth.playIncorrect();
-          setStatusMsg(hitFire 
-            ? (lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。')
-            : (lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。'));
-          setIsPlaying(false);
-          setExecutingIdx(-1);
-          setIsShaking(true);
-          
-          let caughtType = 'snake';
-          if (hitEnemy) {
-            caughtType = currentLevel.enemies?.[hitEnemyIdx]?.type || 'snake';
-          } else if (hitFire) {
-            caughtType = 'dinosaur';
+        const hitEnemyDef = hitEnemy ? currentLevel.enemies?.[hitEnemyIdx] : null;
+        if (hitEnemyDef && hitEnemyDef.type === 'skeleton') {
+          if (hasShield) {
+            setHasShield(false);
+            setStatusMsg(lang === 'en' ? '🛡️ Shield blocked skeleton battle!' : '🛡️ 护盾挡住了骷髅士兵！');
+            audioSynth.playCorrect();
+            setEnemyHealths(prev => {
+              const next = [...prev];
+              next[hitEnemyIdx] = 0;
+              currentEnemyPositions[hitEnemyIdx] = null;
+              setEnemyPositions([...currentEnemyPositions]);
+              return next;
+            });
+          } else {
+            audioSynth.playIncorrect();
+            setStatusMsg(lang === 'en' ? '⚠️ Skeleton battle begins!' : '⚠️ 遭遇骷髅士兵，决斗开始！');
+            
+            let wonBattle = true;
+            for (let qIdx = 0; qIdx < 2; qIdx++) {
+              setStatusMsg(lang === 'en' 
+                ? `Skeleton Battle! Solve question ${qIdx + 1}/2` 
+                : `💀 骷髅决战！请解答第 ${qIdx + 1}/2 题`);
+              
+              const q = mathGenerator.generateQuestion(4, { minNumber: mathMin, maxNumber: mathMax, operations: ['add', 'sub'], lang: lang });
+              setMathProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
+              setMathInput('');
+              setShowMathQuiz(true);
+              
+              const solved = await new Promise(resolve => {
+                setWebStuckPrompt({ resolve });
+              });
+              
+              if (!solved) {
+                wonBattle = false;
+                break;
+              }
+              
+              if (qIdx < 1) {
+                await new Promise(res => setTimeout(res, 100));
+              }
+            }
+            
+            setShowMathQuiz(false);
+            
+            if (!wonBattle) {
+              audioSynth.playIncorrect();
+              setStatusMsg(lang === 'en' ? 'Defeated by the skeleton!' : '决斗失败，被骷髅兵击败！');
+              setIsPlaying(false);
+              setExecutingIdx(-1);
+              setIsShaking(true);
+              setCaughtBy('skeleton');
+              
+              resetTimeoutRef.current = setTimeout(() => {
+                setIsShaking(false);
+                setPos({ ...currentLevel.start });
+                setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+                setSpiderWebs([]);
+              }, 500);
+              return;
+            } else {
+              audioSynth.playCorrect();
+              setStatusMsg(lang === 'en' ? '🎉 Defeated the skeleton!' : '🎉 成功战胜骷髅兵，它化为尘土！');
+              
+              setEnemyHealths(prev => {
+                const next = [...prev];
+                next[hitEnemyIdx] = 0;
+                currentEnemyPositions[hitEnemyIdx] = null;
+                setEnemyPositions([...currentEnemyPositions]);
+                return next;
+              });
+            }
           }
-          setCaughtBy(caughtType);
-          
-          resetTimeoutRef.current = setTimeout(() => {
-            setIsShaking(false);
-            setPos({ ...currentLevel.start });
-            setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
-            setSpiderWebs([]);
-          }, 500);
-          return;
+        } else {
+          if (hasShield) {
+            setHasShield(false);
+            setStatusMsg(hitFire 
+              ? (lang === 'en' ? '🛡️ Shield blocked fire damage!' : '🛡️ 护盾抵挡了一次火焰伤害！')
+              : (lang === 'en' ? '🛡️ Shield blocked enemy hit!' : '🛡️ 护盾抵挡了一次怪兽袭击！'));
+            audioSynth.playCorrect();
+          } else {
+            audioSynth.playIncorrect();
+            setStatusMsg(hitFire 
+              ? (lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。')
+              : (lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。'));
+            setIsPlaying(false);
+            setExecutingIdx(-1);
+            setIsShaking(true);
+            
+            let caughtType = 'snake';
+            if (hitEnemy) {
+              caughtType = currentLevel.enemies?.[hitEnemyIdx]?.type || 'snake';
+            } else if (hitFire) {
+              caughtType = 'dinosaur';
+            }
+            setCaughtBy(caughtType);
+            
+            resetTimeoutRef.current = setTimeout(() => {
+              setIsShaking(false);
+              setPos({ ...currentLevel.start });
+              setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+              setSpiderWebs([]);
+            }, 500);
+            return;
+          }
         }
       }
       
