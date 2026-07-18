@@ -383,6 +383,7 @@ export default function CodingMazeGame({ lang, onBack }) {
   }, [levelIdx]);
 
   const currentLevel = LEVELS[levelIdx] || LEVELS[0];
+  const tTheme = THEMES[currentLevel.theme] || THEMES.fox;
   const [commands, setCommands] = useState([]);
   const [pos, setPos] = useState({ ...currentLevel.start });
   const [isPlaying, setIsPlaying] = useState(false);
@@ -430,6 +431,9 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
   const [enemyHealths, setEnemyHealths] = useState([]);
   const [enemyPositions, setEnemyPositions] = useState([]);
+  const [isSkeletonBattle, setIsSkeletonBattle] = useState(false);
+  const [skeletonMistakes, setSkeletonMistakes] = useState(0);
+  const [skeletonQuestionIdx, setSkeletonQuestionIdx] = useState(0);
   
   const [showMathQuiz, setShowMathQuiz] = useState(false);
   const [mathProblem, setMathProblem] = useState(null);
@@ -752,7 +756,9 @@ export default function CodingMazeGame({ lang, onBack }) {
       if (webStuckPrompt) {
         webStuckPrompt.resolve(true);
         setWebStuckPrompt(null);
-        setShowMathQuiz(false);
+        if (!isSkeletonBattle) {
+          setShowMathQuiz(false);
+        }
         return;
       }
 
@@ -780,9 +786,23 @@ export default function CodingMazeGame({ lang, onBack }) {
       setTimeout(() => setIsMathShaking(false), 500);
       
       if (webStuckPrompt) {
-        webStuckPrompt.resolve(false);
-        setWebStuckPrompt(null);
-        setShowMathQuiz(false);
+        if (isSkeletonBattle) {
+          setSkeletonMistakes(prev => {
+            const next = prev + 1;
+            if (next >= 2) {
+              webStuckPrompt.resolve(false);
+              setWebStuckPrompt(null);
+              setShowMathQuiz(false);
+            } else {
+              setStatusMsg(lang === 'en' ? '❌ Wrong! One chance left.' : '❌ 答错了！还有最后一次机会。');
+            }
+            return next;
+          });
+        } else {
+          webStuckPrompt.resolve(false);
+          setWebStuckPrompt(null);
+          setShowMathQuiz(false);
+        }
       }
     }
   };
@@ -994,8 +1014,13 @@ export default function CodingMazeGame({ lang, onBack }) {
             audioSynth.playIncorrect();
             setStatusMsg(lang === 'en' ? '⚠️ Skeleton battle begins!' : '⚠️ 遭遇骷髅士兵，决斗开始！');
             
+            setIsSkeletonBattle(true);
+            setSkeletonMistakes(0);
+            setSkeletonQuestionIdx(0);
+            
             let wonBattle = true;
             for (let qIdx = 0; qIdx < 2; qIdx++) {
+              setSkeletonQuestionIdx(qIdx);
               setStatusMsg(lang === 'en' 
                 ? `Skeleton Battle! Solve question ${qIdx + 1}/2` 
                 : `💀 骷髅决战！请解答第 ${qIdx + 1}/2 题`);
@@ -1020,6 +1045,7 @@ export default function CodingMazeGame({ lang, onBack }) {
             }
             
             setShowMathQuiz(false);
+            setIsSkeletonBattle(false);
             
             if (!wonBattle) {
               audioSynth.playIncorrect();
@@ -2258,8 +2284,93 @@ export default function CodingMazeGame({ lang, onBack }) {
             border: '4px solid #60a5fa'
           }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e40af', fontSize: '1.4rem' }}>
-              {lang === 'en' ? 'Math Challenge' : '算术挑战'}
+              {isSkeletonBattle 
+                ? (lang === 'en' ? '💀 Skeleton Battle 💀' : '💀 决战骷髅兵 💀')
+                : (lang === 'en' ? 'Math Challenge' : '算术挑战')}
             </h3>
+            {isSkeletonBattle && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'linear-gradient(135deg, #1e1b4b 0%, #311042 100%)',
+                padding: '12px',
+                borderRadius: '16px',
+                border: '3px solid #7c3aed',
+                boxShadow: '0 8px 16px rgba(124, 58, 237, 0.3)',
+                marginBottom: '15px',
+                color: 'white',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                {/* Hero Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                  <div style={{ 
+                    fontSize: '2.5rem', 
+                    animation: isMathShaking ? 'heroShake 0.4s' : 'idleBreathing 1.5s infinite alternate' 
+                  }}>{tTheme.hero}</div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#4ade80', marginTop: '4px' }}>
+                    {lang === 'en' ? 'Hero' : '小勇士'}
+                  </div>
+                  {/* Hero HP */}
+                  <div style={{ display: 'flex', gap: '3px', marginTop: '4px' }}>
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <span key={i} style={{ 
+                        fontSize: '14px',
+                        opacity: i < (2 - skeletonMistakes) ? 1 : 0.25,
+                        transition: 'opacity 0.3s'
+                      }}>❤️</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* VS Badge */}
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  padding: '0 10px'
+                }}>
+                  <span style={{ 
+                    fontSize: '1.2rem', 
+                    fontWeight: '900', 
+                    color: '#f43f5e', 
+                    textShadow: '0 0 10px #f43f5e',
+                    animation: 'targetPulse 1s infinite'
+                  }}>VS</span>
+                </div>
+
+                {/* Skeleton Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                  <div style={{ width: '50px', height: '50px', position: 'relative' }}>
+                    <img 
+                      src={`${import.meta.env.BASE_URL}skeleton_3d.png`} 
+                      alt="skeleton" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'contain',
+                        animation: 'skeletonRattle 0.5s infinite' 
+                      }} 
+                    />
+                  </div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#f43f5e', marginTop: '4px' }}>
+                    {lang === 'en' ? 'Skeleton' : '骷髅兵'}
+                  </div>
+                  {/* Skeleton HP */}
+                  <div style={{ display: 'flex', gap: '3px', marginTop: '4px' }}>
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <span key={i} style={{ 
+                        fontSize: '14px', 
+                        opacity: i < (2 - skeletonQuestionIdx) ? 1 : 0.25,
+                        transition: 'opacity 0.3s'
+                      }}>💀</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
             {shopTarget ? (
               <p style={{ margin: '0 0 20px 0', color: '#1e40af', fontSize: '1rem', fontWeight: 'bold', background: '#e0f2fe', padding: '6px 12px', borderRadius: '20px', display: 'inline-block' }}>
                 {lang === 'en' 
@@ -2268,7 +2379,9 @@ export default function CodingMazeGame({ lang, onBack }) {
               </p>
             ) : (
               <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '1rem', fontWeight: 'bold' }}>
-                {lang === 'en' ? 'Solve the problem to escape!' : '答对题目即可脱身！'}
+                {isSkeletonBattle 
+                  ? (lang === 'en' ? 'Defeat the skeleton with correct math!' : '用正确的心算击败骷髅！')
+                  : (lang === 'en' ? 'Solve the problem to escape!' : '答对题目即可脱身！')}
               </p>
             )}
             
@@ -2294,16 +2407,18 @@ export default function CodingMazeGame({ lang, onBack }) {
               </button>
             </form>
             
-            <button 
-              onClick={() => { audioSynth.playClick(); setShowMathQuiz(false); }}
-              style={{
-                marginTop: '15px', background: 'none', border: 'none', color: '#94a3b8',
-                textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem',
-                padding: '10px'
-              }}
-            >
-              {lang === 'en' ? 'Cancel' : '放弃挑战'}
-            </button>
+             {!isSkeletonBattle && (
+               <button 
+                 onClick={() => { audioSynth.playClick(); setShowMathQuiz(false); }}
+                 style={{
+                   marginTop: '15px', background: 'none', border: 'none', color: '#94a3b8',
+                   textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem',
+                   padding: '10px'
+                 }}
+               >
+                 {lang === 'en' ? 'Cancel' : '放弃挑战'}
+               </button>
+             )}
           </div>
         </div>
       )}
