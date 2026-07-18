@@ -1695,6 +1695,19 @@ export default function CodingMazeGame({ lang, onBack }) {
               65% { transform: scale(1) translate(-2px, 2px) rotate(0deg); }
               75% { transform: scale(1) translate(1px, -1px) rotate(0deg); }
             }
+            @keyframes skeletonCycle1 {
+              0%, 33.32% { opacity: 1; visibility: visible; }
+              33.33%, 100% { opacity: 0; visibility: hidden; }
+            }
+            @keyframes skeletonCycle2 {
+              0%, 33.32% { opacity: 0; visibility: hidden; }
+              33.33%, 66.65% { opacity: 1; visibility: visible; }
+              66.66%, 100% { opacity: 0; visibility: hidden; }
+            }
+            @keyframes skeletonCycle3 {
+              0%, 66.65% { opacity: 0; visibility: hidden; }
+              66.66%, 100% { opacity: 1; visibility: visible; }
+            }
           `}
         </style>
         
@@ -1788,24 +1801,52 @@ export default function CodingMazeGame({ lang, onBack }) {
                   justifyContent: 'center',
                   opacity: eType === 'ghost' ? 0.75 : 1
                 }}>
-                  <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
-                    width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
-                    height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
-                    objectFit: 'contain',
-                    animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
-                               (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
-                                eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
-                                eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
-                                eType === 'snake' ? 'hoverWobble 1s infinite' :
-                                eType === 'dinosaur' ? 'dinoBreathing 1.8s infinite alternate' :
-                                eType === 'ghost' ? 'ghostFloat 2s infinite ease-in-out' :
-                                eType === 'witch' ? 'witchHover 1.5s infinite ease-in-out' :
-                                eType === 'zombie' ? 'zombieLimp 1.2s infinite' :
-                                eType === 'magma' ? 'magmaBubble 1.4s infinite alternate' :
-                                eType === 'skeleton' ? 'skeletonRattle 0.5s infinite' :
-                                'idleBreathing 1.5s infinite alternate'),
-                    filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
-                  }} />
+                  {eType === 'skeleton' ? (
+                    <>
+                      <img src={`${import.meta.env.BASE_URL}skeleton_frame1.png`} style={{
+                        position: 'absolute',
+                        width: '95%',
+                        height: '95%',
+                        objectFit: 'contain',
+                        animation: 'skeletonCycle1 0.75s steps(1) infinite',
+                        filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
+                      }} />
+                      <img src={`${import.meta.env.BASE_URL}skeleton_frame2.png`} style={{
+                        position: 'absolute',
+                        width: '95%',
+                        height: '95%',
+                        objectFit: 'contain',
+                        animation: 'skeletonCycle2 0.75s steps(1) infinite',
+                        filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
+                      }} />
+                      <img src={`${import.meta.env.BASE_URL}skeleton_frame3.png`} style={{
+                        position: 'absolute',
+                        width: '95%',
+                        height: '95%',
+                        objectFit: 'contain',
+                        animation: 'skeletonCycle3 0.75s steps(1) infinite',
+                        filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
+                      }} />
+                    </>
+                  ) : (
+                    <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
+                      width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
+                      height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
+                      objectFit: 'contain',
+                      animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
+                                 (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
+                                  eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
+                                  eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
+                                  eType === 'snake' ? 'hoverWobble 1s infinite' :
+                                  eType === 'dinosaur' ? 'dinoBreathing 1.8s infinite alternate' :
+                                  eType === 'ghost' ? 'ghostFloat 2s infinite ease-in-out' :
+                                  eType === 'witch' ? 'witchHover 1.5s infinite ease-in-out' :
+                                  eType === 'zombie' ? 'zombieLimp 1.2s infinite' :
+                                  eType === 'magma' ? 'magmaBubble 1.4s infinite alternate' :
+                                  'idleBreathing 1.5s infinite alternate'),
+                      filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
+                    }} />
+                  )}
                   {isDinosaur && (
                     <div style={{
                       position: 'absolute',
@@ -2626,17 +2667,10 @@ export default function CodingMazeGame({ lang, onBack }) {
 
                 {/* Skeleton Column */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                  <div style={{ width: '50px', height: '50px', position: 'relative' }}>
-                    <img 
-                      src={`${import.meta.env.BASE_URL}skeleton_3d.png`} 
-                      alt="skeleton" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'contain',
-                        animation: 'skeletonRattle 0.5s infinite' 
-                      }} 
-                    />
+                  <div style={{ width: '50px', height: '50px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={`${import.meta.env.BASE_URL}skeleton_frame1.png`} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'contain', animation: 'skeletonCycle1 0.75s steps(1) infinite' }} />
+                    <img src={`${import.meta.env.BASE_URL}skeleton_frame2.png`} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'contain', animation: 'skeletonCycle2 0.75s steps(1) infinite' }} />
+                    <img src={`${import.meta.env.BASE_URL}skeleton_frame3.png`} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'contain', animation: 'skeletonCycle3 0.75s steps(1) infinite' }} />
                   </div>
                   <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#f43f5e', marginTop: '4px' }}>
                     {lang === 'en' ? 'Skeleton' : '骷髅兵'}
