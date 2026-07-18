@@ -1932,7 +1932,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       <div style={{
         width: '100%',
         height: '100%',
-        maxWidth: '600px',
+        maxWidth: '800px',
         display: 'flex',
         flexDirection: 'column',
         padding: isMobile ? '8px' : '20px',
@@ -1942,7 +1942,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         flex: '1 1 0',
         minHeight: 0,
         width: '100%', 
-        maxWidth: '600px', 
+        maxWidth: '800px', 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
