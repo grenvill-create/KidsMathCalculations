@@ -2177,7 +2177,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       <WeatherOverlay weather={currentWeather} />
       
       {isMobile ? (
-        /* Mobile layout: keep vertical scroll */
+        /* Mobile layout: EXACT original vertical stack */
         <div style={{
           width: '100%',
           height: '100%',
@@ -2191,17 +2191,250 @@ export default function CodingMazeGame({ lang, onBack }) {
             flex: '1 1 0',
             minHeight: 0,
             width: '100%', 
+            maxWidth: '600px', 
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center', 
             padding: '6px 8px',
             boxSizing: 'border-box'
           }}>
-            {headerNode}
-            {mazeNode}
-            {queueNode}
-            {directionsNode}
-            {runNode}
+            {/* Header */}
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                <button className="bouncy-button secondary" onClick={onBack} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                  <ArrowLeft size={18} />
+                </button>
+                <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
+                  <RotateCcw size={18} />
+                </button>
+                <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowMonsterMenu(true); }} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '16px' }} title={lang === 'en' ? 'Monster Guide' : '怪物图鉴'}>
+                  👾
+                </button>
+                <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowLevelMap(true); }} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '16px' }} title={lang === 'en' ? 'Select Level' : '选择关卡'}>
+                  🗺️
+                </button>
+              </div>
+              <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: '1.1rem', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
+                {lang === 'en' ? `${levelIdx + 1}/${LEVELS.length}` : `第${levelIdx + 1}关`}
+              </h2>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                <button className="bouncy-button secondary" onClick={triggerSettings} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Settings' : '设置'}>
+                  <Settings size={18} />
+                </button>
+                <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="缩小">
+                  <ZoomOut size={18} />
+                </button>
+                <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="放大">
+                  <ZoomIn size={18} />
+                </button>
+                <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                  <RefreshCw size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Maze Container */}
+            <div 
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{
+              flex: '1 1 auto',
+              minHeight: 0,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: '3px',
+              perspective: '1000px'
+            }}>
+              <div ref={containerRef} style={{
+                 height: '100%',
+                 maxWidth: '100%',
+                 aspectRatio: '1 / 1',
+                 position: 'relative',
+                 transform: `scale(${zoomScale}) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+                 transformOrigin: 'center center',
+                 transition: tilt.rx === 0 && tilt.ry === 0 ? 'transform 0.5s ease-out' : 'transform 0.1s ease-out',
+                 transformStyle: 'preserve-3d'
+              }}>
+                {renderGrid()}
+              </div>
+            </div>
+
+            {/* Status */}
+            <div style={{ flexShrink: 0, height: '16px', fontSize: '0.8rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: '2px' }}>
+              {statusMsg}
+            </div>
+
+            {/* Commands strip */}
+            <div style={{ 
+              width: '100%', 
+              flexShrink: 0,
+              minHeight: `${cmdBtnSize + 8}px`, 
+              maxHeight: `${cmdBtnSize * 2 + 16}px`,
+              overflowY: 'auto',
+              border: '2px solid #cbd5e1', 
+              borderRadius: '10px', 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              alignContent: 'flex-start',
+              gap: '3px', 
+              padding: '3px', 
+              marginBottom: '4px',
+              backgroundColor: '#f8fafc', 
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)',
+              boxSizing: 'border-box'
+            }}>
+              {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: '0.75rem', lineHeight: `${cmdBtnSize}px` }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
+              {commands.map((cmd, idx) => (
+                <div key={idx} onClick={() => removeCommand(idx)} style={{
+                  width: `${cmdBtnSize}px`, 
+                  height: `${cmdBtnSize}px`, 
+                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white',
+                  borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: isPlaying || isSolved ? 'default' : 'pointer', 
+                  boxShadow: `0 2px 0 #1e40af`,
+                  position: 'relative',
+                  animation: idx === executingIdx ? 'glowPulse 0.5s infinite' : 'none',
+                  zIndex: idx === executingIdx ? 10 : 1,
+                  flexShrink: 0
+                }}>
+                  {getCmdIcon(cmd)}
+                  
+                  {/* Step badge */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: -3, left: -3, 
+                    background: '#10b981', color: 'white', 
+                    fontSize: '0.55rem', fontWeight: 'bold', 
+                    width: '14px', height: '14px', 
+                    borderRadius: '50%', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.2)' 
+                  }}>
+                    {idx + 1}
+                  </div>
+
+                  {!isPlaying && !isSolved && (
+                    <div style={{ 
+                      position: 'absolute', top: -3, right: -3, 
+                      background: '#ef4444', borderRadius: '50%', 
+                      padding: '1px', color: 'white', 
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                      lineHeight: 0
+                    }}>
+                      <X size={8} strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Direction buttons */}
+            <div style={{ display: 'flex', flexShrink: 0, gap: '6px', marginBottom: '4px' }}>
+              {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
+                <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
+                  style={{
+                    width: `${dirBtnSize}px`, 
+                    height: `${dirBtnSize}px`,
+                    borderRadius: '12px',
+                    background: isPlaying || isSolved ? '#cbd5e1' : 'linear-gradient(135deg, #fcd34d, #f59e0b)',
+                    border: 'none', color: isPlaying || isSolved ? '#94a3b8' : 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: isPlaying || isSolved ? 'none' : `0 2px 0 #d97706`,
+                    cursor: isPlaying || isSolved ? 'default' : 'pointer',
+                    transition: 'all 0.1s'
+                  }}
+                  onMouseDown={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.boxShadow = '0 0 0 #d97706'; } }}
+                  onMouseUp={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 2px 0 #d97706`; } }}
+                  onMouseLeave={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 2px 0 #d97706`; } }}
+                >
+                  {getCmdIcon(cmd)}
+                </button>
+              ))}
+            </div>
+
+            {/* Controls and Run area */}
+            <div style={{ display: 'flex', flexShrink: 0, gap: '6px', width: '100%', justifyContent: 'center', alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-start' }}>
+                <button 
+                   className="bouncy-button secondary" 
+                   onClick={() => { if (!isPlaying && !isSolved) setShowShop(true); }}
+                   style={{ 
+                      padding: '6px 10px', 
+                      fontSize: '0.8rem',
+                      background: '#bfdbfe', border: '2px solid #3b82f6', color: '#1e40af',
+                      borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px',
+                      boxShadow: `0 2px 0 #60a5fa`
+                   }}
+                >
+                  🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
+                </button>
+                
+                {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0 || inventory.torch > 0 || inventory.shield > 0) && (
+                  <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
+                    {inventory.normal > 0 && (
+                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        💣 x{inventory.normal}
+                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'normal' ? '#b91c1c' : '#ef4444', fontWeight: 'bold' }}>-1❤️</span>
+                      </button>
+                    )}
+                    {inventory.freeze > 0 && (
+                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        ❄️ x{inventory.freeze}
+                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'freeze' ? '#1d4ed8' : '#3b82f6', fontWeight: 'bold' }}>-2❤️</span>
+                      </button>
+                    )}
+                    {inventory.super > 0 && (
+                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        🌟 x{inventory.super}
+                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'super' ? '#a16207' : '#eab308', fontWeight: 'bold' }}>-3❤️</span>
+                      </button>
+                    )}
+                    {inventory.atomic > 0 && (
+                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'atomic' ? null : 'atomic')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'atomic' ? '#a855f7' : '#cbd5e1'}`, background: activeBombType === 'atomic' ? '#f3e8ff' : 'white', animation: activeBombType === 'atomic' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt="atomic" /> x{inventory.atomic}
+                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'atomic' ? '#7e22ce' : '#a855f7', fontWeight: 'bold' }}>-ALL❤️</span>
+                      </button>
+                    )}
+                    {inventory.torch > 0 && (
+                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'torch' ? null : 'torch')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'torch' ? '#f97316' : '#cbd5e1'}`, background: activeBombType === 'torch' ? '#fed7aa' : 'white', animation: activeBombType === 'torch' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        🔥 x{inventory.torch}
+                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'torch' ? '#c2410c' : '#f97316', fontWeight: 'bold' }}>烧毁</span>
+                      </button>
+                    )}
+                    {inventory.shield > 0 && (
+                      <button className="bouncy-button secondary" onClick={() => {
+                        if (isPlaying || isSolved) return;
+                        if (hasShield) {
+                          setStatusMsg(lang === 'en' ? 'Shield is already active!' : '护盾已处于激活状态！');
+                          return;
+                        }
+                        audioSynth.playCorrect();
+                        setHasShield(true);
+                        const newInv = { ...inventory, shield: (inventory.shield || 0) - 1 };
+                        setInventory(newInv);
+                        localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
+                        setStatusMsg(lang === 'en' ? '🛡️ Shield activated!' : '🛡️ 守护护盾已开启！');
+                      }} style={{ padding: '4px 8px', borderRadius: '8px', border: '2px solid #cbd5e1', background: 'white', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        🛡️ x{inventory.shield}
+                        <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 'bold' }}>防护</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {isSolved ? (
+                <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: '6px 14px', fontSize: '0.9rem' }}>
+                  {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
+                </button>
+              ) : (
+                <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: '6px 14px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
+                  <Play size={14} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       ) : (
