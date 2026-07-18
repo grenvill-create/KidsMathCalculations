@@ -887,8 +887,8 @@ export default function CodingMazeGame({ lang, onBack }) {
             let er = ep.r, ec = ep.c;
             const chaseSteps = levelIdx < 5 ? 1 : 2;
             for (let s = 0; s < chaseSteps; s++) {
-              let dr = currentPos.r - er;
-              let dc = currentPos.c - ec;
+              let dr = nextR - er;
+              let dc = nextC - ec;
               if (dr === 0 && dc === 0) break;
               if (Math.abs(dr) >= Math.abs(dc)) {
                 er += dr > 0 ? 1 : -1;
@@ -953,6 +953,12 @@ export default function CodingMazeGame({ lang, onBack }) {
         if (!enemyDef) return false;
         if (enemyDef.type === 'dinosaur') {
           return (nextR === ep.r || nextR === ep.r + 1) && (nextC === ep.c || nextC === ep.c + 1);
+        }
+        if (enemyDef.type === 'skeleton') {
+          const oldEp = enemyPositions[idx];
+          const landed = ep.r === nextR && ep.c === nextC;
+          const swapped = oldEp && (ep.r === currentPos.r && ep.c === currentPos.c) && (oldEp.r === nextR && oldEp.c === nextC);
+          return landed || swapped;
         }
         return ep.r === nextR && ep.c === nextC;
       });
