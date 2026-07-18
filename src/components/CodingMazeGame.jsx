@@ -1296,7 +1296,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
           content = null;
         } else if (isOnFire) {
-          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize * 0.85}px` }}>🔥</span>;
+          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize}px` }}>🔥</span>;
           bg = '#ffedd5';
           borderColor = '#f97316';
           shadowColor = '#fdba74';
@@ -1337,7 +1337,7 @@ export default function CodingMazeGame({ lang, onBack }) {
             borderRadius: isMobile ? '6px' : '12px',
             border: `${isMobile ? 1 : 2}px solid ${borderColor}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: `${cellSize * 0.95}px`,
+            fontSize: `${cellSize}px`,
             boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
             position: 'relative',
             cursor: canBomb ? 'crosshair' : (isEnemy && activeBombType === null ? 'pointer' : 'default'),
@@ -1724,7 +1724,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: `${cellSize * 0.95}px`,
+          fontSize: `${cellSize}px`,
           transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
           animation: webStruggle ? 'webStruggle 0.3s infinite' : (isShaking ? 'heroShake 0.4s' : (isSolved ? 'victorySpin 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' : (isJumping ? 'heroJump 0.5s infinite' : (isWalking ? 'wobbleWalk 0.4s infinite' : 'none')))),
           zIndex: 10,
