@@ -1296,7 +1296,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
           content = null;
         } else if (isOnFire) {
-          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize * 0.97}px` }}>🔥</span>;
+          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize * 0.82}px`, lineHeight: 1 }}>🔥</span>;
           bg = '#ffedd5';
           borderColor = '#f97316';
           shadowColor = '#fdba74';
@@ -1331,18 +1331,22 @@ export default function CodingMazeGame({ lang, onBack }) {
 
         row.push(
           <div key={`${r}-${c}`} style={{
-            flex: 1,
-            height: '100%',
+            width: `${cellSize}px`,
+            height: `${cellSize}px`,
+            flexShrink: 0,
             backgroundColor: bg,
-            borderRadius: isMobile ? '6px' : '12px',
+            borderRadius: isMobile ? '6px' : '10px',
             border: `${isMobile ? 1 : 2}px solid ${borderColor}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: `${cellSize * 0.97}px`,
+            fontSize: `${cellSize * 0.82}px`,
+            lineHeight: 1,
+            overflow: 'hidden',
             boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
             position: 'relative',
             cursor: canBomb ? 'crosshair' : (isEnemy && activeBombType === null ? 'pointer' : 'default'),
             outline: canBomb ? '2px solid red' : 'none',
-            outlineOffset: '-2px'
+            outlineOffset: '-2px',
+            boxSizing: 'border-box'
           }} onClick={() => {
             if (canBomb && !isPendingBomb) {
               const usedBomb = activeBombType;
@@ -1502,18 +1506,21 @@ export default function CodingMazeGame({ lang, onBack }) {
         );
       }
       grid.push(
-        <div key={r} style={{ display: 'flex', gap: `${gridGap}px`, flex: 1 }}>
+        <div key={r} style={{ display: 'flex', gap: `${gridGap}px`, height: `${cellSize}px`, flexShrink: 0 }}>
           {row}
         </div>
       );
     }
+    const totalGridSize = 2 * gridPadding + size * cellSize + (size - 1) * gridGap;
     return (
       <div className="maze-grid-container" key={levelIdx} style={{
         animation: activeAtomicExplosion 
           ? 'gridAtomicShake 1.8s ease-in-out' 
           : 'bounceInDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
+        top: 0, left: 0,
+        width: `${totalGridSize}px`,
+        height: `${totalGridSize}px`,
         display: 'flex',
         flexDirection: 'column',
         gap: `${gridGap}px`,
@@ -1724,7 +1731,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: `${cellSize * 0.97}px`,
+          fontSize: `${cellSize * 0.82}px`,
           transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
           animation: webStruggle ? 'webStruggle 0.3s infinite' : (isShaking ? 'heroShake 0.4s' : (isSolved ? 'victorySpin 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' : (isJumping ? 'heroJump 0.5s infinite' : (isWalking ? 'wobbleWalk 0.4s infinite' : 'none')))),
           zIndex: 10,
