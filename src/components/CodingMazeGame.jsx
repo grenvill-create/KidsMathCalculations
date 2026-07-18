@@ -2438,52 +2438,29 @@ export default function CodingMazeGame({ lang, onBack }) {
           </div>
         </div>
       ) : (
-        /* Desktop layout: gorgeous side-by-side split screen! */
+        /* Desktop layout: Large vertical stack! */
         <div style={{
           width: '100%',
           height: '100%',
-          maxWidth: '1200px',
+          maxWidth: '850px',
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           padding: '20px',
-          boxSizing: 'border-box',
-          gap: '24px',
-          alignItems: 'stretch',
-          justifyContent: 'center'
+          boxSizing: 'border-box'
         }}>
-          {/* Left Side: Game Board (Flex panel taking up 58% of container) */}
           <div style={{ 
-            flex: '1 1 58%', 
-            height: '100%', 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            position: 'relative',
-            minWidth: 0,
-            minHeight: 0
-          }}>
-            {mazeNode}
-          </div>
-          
-          {/* Right Side: Command Deck (Takes up 42% of container) */}
-          <div style={{ 
-            flex: '1 1 42%', 
-            height: '100%', 
+            flex: '1 1 0',
+            minHeight: 0,
+            width: '100%', 
+            maxWidth: '850px', 
             display: 'flex', 
             flexDirection: 'column', 
-            justifyContent: 'space-between',
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(12px)',
-            padding: '24px',
-            borderRadius: '24px',
-            border: '4px solid white',
-            boxShadow: '0 12px 36px rgba(0,0,0,0.1)',
-            boxSizing: 'border-box',
-            minWidth: 0,
-            minHeight: 0,
-            gap: '16px'
+            alignItems: 'center', 
+            padding: '20px',
+            boxSizing: 'border-box'
           }}>
             {headerNode}
+            {mazeNode}
             {queueNode}
             {directionsNode}
             {runNode}
