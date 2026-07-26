@@ -416,7 +416,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     return { normal: 0, freeze: 0, super: 0, atomic: 0, torch: 0, shield: 0 };
   });
   const [activeBombType, setActiveBombType] = useState(null);
-  const [activeExplosion, setActiveExplosion] = useState(null);
+  const [activeExplosions, setActiveExplosions] = useState([]);
   const [activeAtomicExplosion, setActiveAtomicExplosion] = useState(null);
   const [showShop, setShowShop] = useState(false);
   const [shopTarget, setShopTarget] = useState(null);
@@ -1378,18 +1378,19 @@ export default function CodingMazeGame({ lang, onBack }) {
                   
                   setEnemyHealths(prev => prev.map(() => 0));
                   setDestroyedObstacles(currentLevel.obstacles.map(o => ({ r: o.r, c: o.c })));
-                } else {
+                } else if (usedBomb !== 'torch') {
                   setIsShaking(true);
                   setTimeout(() => setIsShaking(false), 300);
                   
                   const explId = Date.now();
-                  setActiveExplosion({ r, c, type: usedBomb === 'torch' ? 'normal' : usedBomb, id: explId });
+                  const newExpl = { r, c, type: usedBomb, id: explId };
+                  setActiveExplosions(prev => [...prev, newExpl]);
                   setTimeout(() => {
-                    setActiveExplosion(prev => prev && prev.id === explId ? null : prev);
+                    setActiveExplosions(prev => prev.filter(e => e.id !== explId));
                   }, 500);
                 }
                 
-                if (containerRef.current) {
+                if (containerRef.current && usedBomb !== 'torch') {
                   const rect = containerRef.current.getBoundingClientRect();
                   const cellW = rect.width / currentLevel.size;
                   const cellH = rect.height / currentLevel.size;
@@ -1415,14 +1416,14 @@ export default function CodingMazeGame({ lang, onBack }) {
                     }
                   } else {
                     confetti({
-                      particleCount: usedBomb === 'torch' ? 50 : 80,
-                      spread: usedBomb === 'torch' ? 80 : 100,
+                      particleCount: 80,
+                      spread: 100,
                       startVelocity: 30,
                       origin: {
                         x: absX / window.innerWidth,
                         y: absY / window.innerHeight
                       },
-                      colors: usedBomb === 'torch' ? ['#f97316', '#fdba74', '#ef4444', '#f59e0b'] : (usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b']),
+                      colors: usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
                       ticks: 100,
                       gravity: 1.2
                     });
@@ -1433,21 +1434,118 @@ export default function CodingMazeGame({ lang, onBack }) {
                 
                 if (usedBomb !== 'atomic') {
                   if (usedBomb === 'torch') {
-                    setBurningFires(prev => [...prev, { r, c }]);
-                    if (isObstacle) {
-                      setDestroyedObstacles(prev => [...prev, { r, c }]);
+                    // Fire Torch Spreading Logic: BFS to find all connected obstacles
+                    const isObstacleAt = (cr, cc) => {
+                      const isObs = currentLevel.obstacles.some(o => o.r === cr && o.c === cc);
+                      const isDest = destroyedObstacles.some(o => o.r === cr && o.c === cc);
+                      return isObs && !isDest;
+                    };
+
+                    let seedNodes = [];
+                    if (isObstacleAt(r, c)) {
+                      seedNodes.push({ r, c });
+                    } else {
+                      const nbrs = [
+                        { r: r - 1, c }, { r: r + 1, c },
+                        { r, c: c - 1 }, { r, c: c + 1 }
+                      ];
+                      nbrs.forEach(n => {
+                        if (n.r >= 0 && n.r < currentLevel.size && n.c >= 0 && n.c < currentLevel.size && isObstacleAt(n.r, n.c)) {
+                          seedNodes.push(n);
+                        }
+                      });
                     }
+
+                    const visited = new Set();
+                    const waves = [];
+                    let queue = [];
+
+                    seedNodes.forEach(s => {
+                      const k = `${s.r},${s.c}`;
+                      if (!visited.has(k)) {
+                        visited.add(k);
+                        queue.push({ r: s.r, c: s.c, dist: 0 });
+                      }
+                    });
+
+                    while (queue.length > 0) {
+                      const curr = queue.shift();
+                      if (!waves[curr.dist]) waves[curr.dist] = [];
+                      waves[curr.dist].push({ r: curr.r, c: curr.c });
+
+                      const nbrs = [
+                        { r: curr.r - 1, c: curr.c },
+                        { r: curr.r + 1, c: curr.c },
+                        { r: curr.r, c: curr.c - 1 },
+                        { r: curr.r, c: curr.c + 1 }
+                      ];
+
+                      nbrs.forEach(n => {
+                        if (n.r >= 0 && n.r < currentLevel.size && n.c >= 0 && n.c < currentLevel.size) {
+                          const k = `${n.r},${n.c}`;
+                          if (!visited.has(k) && isObstacleAt(n.r, n.c)) {
+                            visited.add(k);
+                            queue.push({ r: n.r, c: n.c, dist: curr.dist + 1 });
+                          }
+                        }
+                      });
+                    }
+
+                    // Ignite starting cell
+                    setBurningFires(prev => [...prev, { r, c }]);
                     if (isEnemy) {
                       setEnemyHealths(prev => {
                         const next = [...prev];
                         next[enemyIdx] = Math.max(0, next[enemyIdx] - 1);
                         if (next[enemyIdx] <= 0) {
-                          // Clean up position instantly
                           const epCopy = [...enemyPositions];
                           epCopy[enemyIdx] = null;
                           setEnemyPositions(epCopy);
                         }
                         return next;
+                      });
+                    }
+
+                    if (waves.length === 0) {
+                      const explId = Date.now();
+                      setActiveExplosions(prev => [...prev, { r, c, type: 'normal', id: explId }]);
+                      setTimeout(() => setActiveExplosions(prev => prev.filter(e => e.id !== explId)), 600);
+                    } else {
+                      // Trigger dynamic spreading waves!
+                      waves.forEach((waveCells, waveIdx) => {
+                        setTimeout(() => {
+                          audioSynth.playBomb();
+                          setIsShaking(true);
+                          setTimeout(() => setIsShaking(false), 180);
+
+                          setDestroyedObstacles(prev => [...prev, ...waveCells]);
+                          setBurningFires(prev => [...prev, ...waveCells]);
+
+                          const waveExpls = waveCells.map(cell => ({ r: cell.r, c: cell.c, type: 'normal', id: Date.now() + Math.random() }));
+                          setActiveExplosions(prev => [...prev, ...waveExpls]);
+                          setTimeout(() => {
+                            setActiveExplosions(prev => prev.filter(item => !waveExpls.some(e => e.id === item.id)));
+                          }, 600);
+
+                          if (containerRef.current) {
+                            const rect = containerRef.current.getBoundingClientRect();
+                            const cellW = rect.width / currentLevel.size;
+                            const cellH = rect.height / currentLevel.size;
+                            waveCells.forEach(cell => {
+                              const absX = rect.left + cell.c * cellW + cellW / 2;
+                              const absY = rect.top + cell.r * cellH + cellH / 2;
+                              confetti({
+                                particleCount: 35,
+                                spread: 75,
+                                startVelocity: 25,
+                                origin: { x: absX / window.innerWidth, y: absY / window.innerHeight },
+                                colors: ['#f97316', '#fdba74', '#ef4444', '#f59e0b'],
+                                ticks: 80,
+                                gravity: 1.2
+                              });
+                            });
+                          }
+                        }, waveIdx * 140);
                       });
                     }
                   } else {
@@ -1488,9 +1586,10 @@ export default function CodingMazeGame({ lang, onBack }) {
           }}>
             {content}
             {plannedArrowNode}
-            {activeExplosion && activeExplosion.r === r && activeExplosion.c === c && (
+            {activeExplosions.filter(e => e.r === r && e.c === c).map(e => (
               <img 
-                src={`${import.meta.env.BASE_URL}expl_${activeExplosion.type}.png`} 
+                key={e.id}
+                src={`${import.meta.env.BASE_URL}expl_${e.type}.png`} 
                 alt="explosion"
                 style={{
                   position: 'absolute', top: '50%', left: '50%',
@@ -1498,10 +1597,10 @@ export default function CodingMazeGame({ lang, onBack }) {
                   objectFit: 'contain',
                   pointerEvents: 'none',
                   animation: 'magicExplosion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                  color: activeExplosion.type === 'freeze' ? '#93c5fd' : activeExplosion.type === 'super' ? '#fde047' : '#fca5a5'
+                  color: e.type === 'freeze' ? '#93c5fd' : (e.type === 'super' ? '#fde047' : '#fca5a5')
                 }} 
               />
-            )}
+            ))}
           </div>
         );
       }
@@ -2571,7 +2670,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               <button onClick={() => triggerMathQuiz('torch', torchNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #f97316', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff7ed' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🔥 <span style={{color: '#ea580c'}}>{lang === 'en' ? `Torch x${torchAward}` : `火把 x${torchAward}`}</span></div>
-                  <div style={{ fontSize: '0.8rem', color: '#c2410c', background: '#ffedd5', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Burn Obstacle & Set Fire' : '功能: 烧毁障碍并留火'}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#c2410c', background: '#ffedd5', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Burn All Connected Obstacles & Set Fire' : '功能: 连毁所有相连障碍并留火'}</div>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#ea580c' }}>{lang === 'en' ? `${torchNeeded} Questions` : `需连答 ${torchNeeded} 题`}</div>
               </button>
