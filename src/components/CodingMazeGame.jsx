@@ -463,19 +463,19 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [isParentGateShaking, setIsParentGateShaking] = useState(false);
   const [mathMin, setMathMin] = useState(() => {
     const saved = localStorage.getItem('codingMazeMathMin');
-    return saved ? parseInt(saved, 10) : 10;
+    return saved ? parseInt(saved, 10) : 20;
   });
   const [mathMax, setMathMax] = useState(() => {
     const saved = localStorage.getItem('codingMazeMathMax');
-    return saved ? parseInt(saved, 10) : 20;
+    return saved ? parseInt(saved, 10) : 50;
   });
   const [atomicMin, setAtomicMin] = useState(() => {
     const saved = localStorage.getItem('codingMazeAtomicMin');
-    return saved ? parseInt(saved, 10) : 15;
+    return saved ? parseInt(saved, 10) : 20;
   });
   const [atomicMax, setAtomicMax] = useState(() => {
     const saved = localStorage.getItem('codingMazeAtomicMax');
-    return saved ? parseInt(saved, 10) : 30;
+    return saved ? parseInt(saved, 10) : 50;
   });
   const [customMinInput, setCustomMinInput] = useState(mathMin);
   const [customMaxInput, setCustomMaxInput] = useState(mathMax);
@@ -2768,7 +2768,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="10"
+                placeholder="20"
               />
               <span style={{ fontSize: '1.2rem', color: '#64748b', fontWeight: 'bold' }}>-</span>
               <input 
@@ -2779,7 +2779,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="20"
+                placeholder="50"
               />
             </div>
 
@@ -2796,7 +2796,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #a855f7', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="15"
+                placeholder="20"
               />
               <span style={{ fontSize: '1.2rem', color: '#a855f7', fontWeight: 'bold' }}>-</span>
               <input 
@@ -2807,7 +2807,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #a855f7', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="30"
+                placeholder="50"
               />
             </div>
 
