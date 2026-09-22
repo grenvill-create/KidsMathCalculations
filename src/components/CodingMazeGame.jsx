@@ -79,7 +79,7 @@ const RAW_LEVELS = [
   // 24
   {theme:"cat",size:8,start:{r:2,c:0},target:{r:5,c:7},obstacles:[{r:7,c:6},{r:5,c:1},{r:3,c:4},{r:7,c:1},{r:1,c:0},{r:0,c:6},{r:2,c:6},{r:2,c:2},{r:1,c:0},{r:1,c:3},{r:1,c:7},{r:5,c:1},{r:5,c:0},{r:2,c:6},{r:6,c:2},{r:1,c:4},{r:1,c:3}]},
   // 25
-  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ type: 'tiger', start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }, { type: 'skeleton', start: {r: 1, c: 2}, commands: ['RIGHT', 'LEFT'] }]},
+  {theme:"monkey",size:8,start:{r:7,c:0},target:{r:4,c:7},obstacles:[{r:6,c:1},{r:2,c:5},{r:0,c:2},{r:3,c:0},{r:2,c:1},{r:1,c:5},{r:0,c:1},{r:6,c:2},{r:6,c:5},{r:1,c:7},{r:5,c:4},{r:3,c:0},{r:1,c:0},{r:1,c:0},{r:2,c:7},{r:7,c:5},{r:6,c:1},{r:2,c:5}], enemies: [{ type: 'tiger', start: {r: 3, c: 4}, commands: ['UP', 'UP', 'DOWN', 'DOWN'] }]},
   // 26
   {theme:"bear",size:9,start:{r:4,c:0},target:{r:5,c:8},obstacles:[{r:6,c:0},{r:2,c:1},{r:3,c:1},{r:4,c:6},{r:2,c:1},{r:4,c:8},{r:6,c:6},{r:6,c:1},{r:4,c:5},{r:1,c:8},{r:8,c:7},{r:4,c:5},{r:4,c:7},{r:0,c:7},{r:7,c:4},{r:2,c:8},{r:2,c:0},{r:3,c:2},{r:1,c:2},{r:2,c:8},{r:0,c:6},{r:7,c:7}]},
   // 27
@@ -89,7 +89,7 @@ const RAW_LEVELS = [
   // 29
   {theme:"frog",size:9,start:{r:3,c:0},target:{r:3,c:8},obstacles:[{r:1,c:5},{r:8,c:7},{r:4,c:4},{r:0,c:3},{r:5,c:4},{r:6,c:0},{r:7,c:8},{r:8,c:3},{r:0,c:5},{r:6,c:8},{r:2,c:6},{r:0,c:8},{r:6,c:2},{r:5,c:7},{r:2,c:0},{r:7,c:4},{r:7,c:8},{r:4,c:0},{r:5,c:2},{r:8,c:7},{r:7,c:1},{r:0,c:4},{r:6,c:5},{r:5,c:8},{r:4,c:3},{r:4,c:6}]},
   // 30
-  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'dinosaur', start: {r:6, c:1}, commands: ['NONE'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }, { type: 'skeleton', start: {r: 4, c: 4}, commands: ['LEFT', 'RIGHT'] }] },
+  { theme: 'fox', size: 10, start: {r:9, c:0}, target: {r:0, c:9}, obstacles: [{r:8,c:0},{r:8,c:1},{r:8,c:2},{r:7,c:4},{r:6,c:4},{r:5,c:4},{r:5,c:5},{r:5,c:6},{r:4,c:8},{r:3,c:8},{r:2,c:8},{r:1,c:8},{r:9,c:3},{r:9,c:4},{r:9,c:5},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:2},{r:4,c:2},{r:0,c:5},{r:1,c:5}], enemies: [{ type: 'dinosaur', start: {r:6, c:1}, commands: ['NONE'] }, { type: 'tiger', start: {r:2, c:6}, commands: ['LEFT', 'RIGHT'] }] },
   // 31
   { theme: 'frog', size: 10, start: {r:0, c:0}, target: {r:9, c:9}, obstacles: [{r:0,c:2},{r:1,c:2},{r:2,c:2},{r:3,c:2},{r:4,c:2},{r:5,c:2},{r:9,c:7},{r:8,c:7},{r:7,c:7},{r:6,c:7},{r:5,c:7},{r:4,c:5},{r:5,c:5},{r:6,c:5}], enemies: [{ type: 'tiger', start: {r:3, c:4}, commands: ['LEFT', 'RIGHT'] }, { type: 'snake', start: {r:7, c:3}, commands: ['UP', 'DOWN'] }] },
   // 32
@@ -156,7 +156,7 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         let eType = idx >= 4 ? 'tiger' : 'snake'; // 从第5关起出现老虎
         if (idx >= 29) {
           // 第30关起陆续出现新怪物
-          const pool = ['tiger', 'ghost', 'skeleton'];
+          const pool = ['tiger', 'ghost'];
           if (idx >= 32) pool.push('witch');
           if (idx >= 35) pool.push('zombie');
           if (idx >= 38) pool.push('magma');
@@ -222,7 +222,7 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         let eType = 'tiger';
         if (idx >= 29) {
           // 第30关起陆续出现新怪物
-          const pool = ['tiger', 'spider', 'elephant', 'rhino', 'ghost', 'skeleton'];
+          const pool = ['tiger', 'spider', 'elephant', 'rhino', 'ghost'];
           if (idx >= 32) pool.push('witch');
           if (idx >= 35) pool.push('zombie');
           if (idx >= 38) pool.push('magma');
@@ -239,31 +239,6 @@ const LEVELS = RAW_LEVELS.map((lvl, idx) => {
         const commandsList = eType === 'magma' ? ['NONE'] : ['UP', 'DOWN', 'LEFT', 'RIGHT'];
         newLvl.enemies.push({ type: eType, start: extraEnemyPos, commands: commandsList });
       }
-    }
-  }
-
-  // 确保每一关都包含至少一个骷髅士兵
-  if (!newLvl.enemies) newLvl.enemies = [];
-  const hasSkeleton = newLvl.enemies.some(e => e.type === 'skeleton');
-  if (!hasSkeleton) {
-    let skeletonPos = null;
-    for (let r = 0; r < newLvl.size; r++) {
-      for (let c = 0; c < newLvl.size; c++) {
-        if ((r === newLvl.start.r && c === newLvl.start.c) || (r === newLvl.target.r && c === newLvl.target.c)) continue;
-        if (newLvl.obstacles.some(o => o.r === r && o.c === c)) continue;
-        if (newLvl.enemies.some(e => e.start && e.start.r === r && e.start.c === c)) continue;
-        skeletonPos = { r, c };
-        break;
-      }
-      if (skeletonPos) break;
-    }
-    if (skeletonPos) {
-      const commandsList = idx < 5 ? ['NONE'] : ['LEFT', 'RIGHT'];
-      newLvl.enemies.push({
-        type: 'skeleton',
-        start: skeletonPos,
-        commands: commandsList
-      });
     }
   }
 
@@ -367,6 +342,23 @@ const WeatherOverlay = ({ weather }) => {
 };
 
 export default function CodingMazeGame({ lang, onBack }) {
+  const getEnemyName = (type) => {
+    const mapping = {
+      turtle: lang === 'en' ? 'Turtle' : '小乌龟',
+      spider: lang === 'en' ? 'Spider' : '小蜘蛛',
+      snake: lang === 'en' ? 'Snake' : '贪吃蛇',
+      ghost: lang === 'en' ? 'Ghost' : '幽灵',
+      zombie: lang === 'en' ? 'Zombie' : '僵尸',
+      witch: lang === 'en' ? 'Witch' : '女巫',
+      tiger: lang === 'en' ? 'Tiger' : '猛虎',
+      rhino: lang === 'en' ? 'Rhino' : '犀牛',
+      elephant: lang === 'en' ? 'Elephant' : '大象',
+      dinosaur: lang === 'en' ? 'Dinosaur' : '恐龙',
+      magma: lang === 'en' ? 'Magma Golem' : '岩浆怪'
+    };
+    return mapping[type] || type;
+  };
+
   const [levelIdx, setLevelIdx] = useState(() => {
     const saved = localStorage.getItem('codingMazeLevel');
     if (saved) {
@@ -383,7 +375,6 @@ export default function CodingMazeGame({ lang, onBack }) {
   }, [levelIdx]);
 
   const currentLevel = LEVELS[levelIdx] || LEVELS[0];
-  const tTheme = THEMES[currentLevel.theme] || THEMES.fox;
   const [commands, setCommands] = useState([]);
   const [pos, setPos] = useState({ ...currentLevel.start });
   const [isPlaying, setIsPlaying] = useState(false);
@@ -416,7 +407,7 @@ export default function CodingMazeGame({ lang, onBack }) {
     return { normal: 0, freeze: 0, super: 0, atomic: 0, torch: 0, shield: 0 };
   });
   const [activeBombType, setActiveBombType] = useState(null);
-  const [activeExplosions, setActiveExplosions] = useState([]);
+  const [activeExplosion, setActiveExplosion] = useState(null);
   const [activeAtomicExplosion, setActiveAtomicExplosion] = useState(null);
   const [showShop, setShowShop] = useState(false);
   const [shopTarget, setShopTarget] = useState(null);
@@ -431,9 +422,6 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [destroyedObstacles, setDestroyedObstacles] = useState([]);
   const [enemyHealths, setEnemyHealths] = useState([]);
   const [enemyPositions, setEnemyPositions] = useState([]);
-  const [isSkeletonBattle, setIsSkeletonBattle] = useState(false);
-  const [skeletonMistakes, setSkeletonMistakes] = useState(0);
-  const [skeletonQuestionIdx, setSkeletonQuestionIdx] = useState(0);
   
   const [showMathQuiz, setShowMathQuiz] = useState(false);
   const [mathProblem, setMathProblem] = useState(null);
@@ -463,19 +451,19 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [isParentGateShaking, setIsParentGateShaking] = useState(false);
   const [mathMin, setMathMin] = useState(() => {
     const saved = localStorage.getItem('codingMazeMathMin');
-    return saved ? parseInt(saved, 10) : 20;
+    return saved ? parseInt(saved, 10) : 10;
   });
   const [mathMax, setMathMax] = useState(() => {
     const saved = localStorage.getItem('codingMazeMathMax');
-    return saved ? parseInt(saved, 10) : 50;
+    return saved ? parseInt(saved, 10) : 20;
   });
   const [atomicMin, setAtomicMin] = useState(() => {
     const saved = localStorage.getItem('codingMazeAtomicMin');
-    return saved ? parseInt(saved, 10) : 20;
+    return saved ? parseInt(saved, 10) : 15;
   });
   const [atomicMax, setAtomicMax] = useState(() => {
     const saved = localStorage.getItem('codingMazeAtomicMax');
-    return saved ? parseInt(saved, 10) : 50;
+    return saved ? parseInt(saved, 10) : 30;
   });
   const [customMinInput, setCustomMinInput] = useState(mathMin);
   const [customMaxInput, setCustomMaxInput] = useState(mathMax);
@@ -552,6 +540,61 @@ export default function CodingMazeGame({ lang, onBack }) {
   const [inputShieldInv, setInputShieldInv] = useState(0);
   const [inputLevelIdx, setInputLevelIdx] = useState(levelIdx);
 
+  // Combat states
+  const [enemyMin, setEnemyMin] = useState(() => {
+    const saved = localStorage.getItem('codingMazeEnemyMin');
+    return saved ? parseInt(saved, 10) : 10;
+  });
+  const [enemyMax, setEnemyMax] = useState(() => {
+    const saved = localStorage.getItem('codingMazeEnemyMax');
+    return saved ? parseInt(saved, 10) : 50;
+  });
+  const [enemyQuizCountMap, setEnemyQuizCountMap] = useState(() => {
+    const saved = localStorage.getItem('codingMazeEnemyQuizCountMap');
+    return saved ? JSON.parse(saved) : {
+      turtle: 1,
+      spider: 1,
+      snake: 2,
+      ghost: 2,
+      zombie: 3,
+      witch: 3,
+      tiger: 3,
+      rhino: 3,
+      elephant: 4,
+      dinosaur: 4,
+      magma: 5
+    };
+  });
+
+  const [inputEnemyMin, setInputEnemyMin] = useState(enemyMin);
+  const [inputEnemyMax, setInputEnemyMax] = useState(enemyMax);
+  const [inputEnemyQuizCountMap, setInputEnemyQuizCountMap] = useState({
+    turtle: 1,
+    spider: 1,
+    snake: 2,
+    ghost: 2,
+    zombie: 3,
+    witch: 3,
+    tiger: 3,
+    rhino: 3,
+    elephant: 4,
+    dinosaur: 4,
+    magma: 5
+  });
+
+  // Combat runtime states
+  const [battleActive, setBattleActive] = useState(false);
+  const [showVSOverlay, setShowVSOverlay] = useState(false);
+  const [battleEnemyDef, setBattleEnemyDef] = useState(null);
+  const [battleEnemyIdx, setBattleEnemyIdx] = useState(-1);
+  const [battleTotalQuestions, setBattleTotalQuestions] = useState(0);
+  const [battleCurrentIndex, setBattleCurrentIndex] = useState(0);
+  const [battleProblem, setBattleProblem] = useState(null);
+  const [battleInput, setBattleInput] = useState('');
+  const [battleStatus, setBattleStatus] = useState('');
+  const [battleResolve, setBattleResolve] = useState(null);
+  const [isBattleShaking, setIsBattleShaking] = useState(false);
+
   const [isMobile, setIsMobile] = useState(false);
   const resetTimeoutRef = useRef(null);
   const containerRef = useRef(null);
@@ -617,6 +660,10 @@ export default function CodingMazeGame({ lang, onBack }) {
     setCustomMaxInput(mathMax);
     setCustomAtomicMinInput(atomicMin);
     setCustomAtomicMaxInput(atomicMax);
+    
+    setInputEnemyMin(enemyMin);
+    setInputEnemyMax(enemyMax);
+    setInputEnemyQuizCountMap({ ...enemyQuizCountMap });
     
     setInputNormalNeeded(normalNeeded);
     setInputFreezeNeeded(freezeNeeded);
@@ -711,7 +758,6 @@ export default function CodingMazeGame({ lang, onBack }) {
       if (e.type === 'dinosaur') return 4;
       if (e.type === 'elephant' || e.type === 'magma') return 3;
       if (e.type === 'tiger' || e.type === 'rhino' || e.type === 'witch' || e.type === 'zombie') return 2;
-      if (e.type === 'skeleton') return 1;
       return 1;
     }) : []);
     setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map(e => ({...e.start})) : []);
@@ -756,9 +802,7 @@ export default function CodingMazeGame({ lang, onBack }) {
       if (webStuckPrompt) {
         webStuckPrompt.resolve(true);
         setWebStuckPrompt(null);
-        if (!isSkeletonBattle) {
-          setShowMathQuiz(false);
-        }
+        setShowMathQuiz(false);
         return;
       }
 
@@ -786,24 +830,40 @@ export default function CodingMazeGame({ lang, onBack }) {
       setTimeout(() => setIsMathShaking(false), 500);
       
       if (webStuckPrompt) {
-        if (isSkeletonBattle) {
-          setSkeletonMistakes(prev => {
-            const next = prev + 1;
-            if (next >= 2) {
-              webStuckPrompt.resolve(false);
-              setWebStuckPrompt(null);
-              setShowMathQuiz(false);
-            } else {
-              setStatusMsg(lang === 'en' ? '❌ Wrong! One chance left.' : '❌ 答错了！还有最后一次机会。');
-            }
-            return next;
-          });
-        } else {
-          webStuckPrompt.resolve(false);
-          setWebStuckPrompt(null);
-          setShowMathQuiz(false);
-        }
+        webStuckPrompt.resolve(false);
+        setWebStuckPrompt(null);
+        setShowMathQuiz(false);
       }
+    }
+  };
+
+  const handleBattleSubmit = (e) => {
+    e.preventDefault();
+    const userAnswer = parseInt(battleInput, 10);
+    if (isNaN(userAnswer)) return;
+
+    if (userAnswer === battleProblem.ans) {
+      audioSynth.playCorrect();
+      const nextIndex = battleCurrentIndex + 1;
+      if (nextIndex >= battleTotalQuestions) {
+        // Battle won!
+        if (battleResolve) {
+          battleResolve.resolve(true);
+        }
+      } else {
+        // Next question
+        setBattleCurrentIndex(nextIndex);
+        setBattleInput('');
+        setBattleStatus(lang === 'en' ? 'Great! Next attack!' : '打得漂亮！下一击！');
+        const q = mathGenerator.generateQuestion(4, { minNumber: enemyMin, maxNumber: enemyMax, operations: ['add', 'sub'], lang: lang });
+        setBattleProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
+      }
+    } else {
+      audioSynth.playIncorrect();
+      setIsBattleShaking(true);
+      setBattleInput('');
+      setBattleStatus(lang === 'en' ? 'Defended! Try again!' : '被怪物挡住了，加油再算一次！');
+      setTimeout(() => setIsBattleShaking(false), 500);
     }
   };
 
@@ -903,22 +963,6 @@ export default function CodingMazeGame({ lang, onBack }) {
             anyElephantMoved = true;
           }
 
-          if (enemyDef.type === 'skeleton') {
-            let er = ep.r, ec = ep.c;
-            const chaseSteps = levelIdx < 5 ? 1 : 2;
-            for (let s = 0; s < chaseSteps; s++) {
-              let dr = nextR - er;
-              let dc = nextC - ec;
-              if (dr === 0 && dc === 0) break;
-              if (Math.abs(dr) >= Math.abs(dc)) {
-                er += dr > 0 ? 1 : -1;
-              } else {
-                ec += dc > 0 ? 1 : -1;
-              }
-            }
-            return { r: er, c: ec };
-          }
-
           const eCmd = enemyDef.commands[i % enemyDef.commands.length];
           let er = ep.r, ec = ep.c;
           let steps = enemyDef.type === 'rhino' ? 2 : 1;
@@ -974,12 +1018,6 @@ export default function CodingMazeGame({ lang, onBack }) {
         if (enemyDef.type === 'dinosaur') {
           return (nextR === ep.r || nextR === ep.r + 1) && (nextC === ep.c || nextC === ep.c + 1);
         }
-        if (enemyDef.type === 'skeleton') {
-          const oldEp = enemyPositions[idx];
-          const landed = ep.r === nextR && ep.c === nextC;
-          const swapped = oldEp && (ep.r === currentPos.r && ep.c === currentPos.c) && (oldEp.r === nextR && oldEp.c === nextC);
-          return landed || swapped;
-        }
         return ep.r === nextR && ep.c === nextC;
       });
       const hitEnemy = hitEnemyIdx !== -1;
@@ -996,109 +1034,62 @@ export default function CodingMazeGame({ lang, onBack }) {
         return false;
       }) || isCellOnFire(nextR, nextC);
 
-      if (hitEnemy || hitFire) {
-        const hitEnemyDef = hitEnemy ? currentLevel.enemies?.[hitEnemyIdx] : null;
-        if (hitEnemyDef && hitEnemyDef.type === 'skeleton') {
-          if (hasShield) {
-            setHasShield(false);
-            setStatusMsg(lang === 'en' ? '🛡️ Shield blocked skeleton battle!' : '🛡️ 护盾挡住了骷髅士兵！');
-            audioSynth.playCorrect();
+      if (hitEnemy) {
+        if (hasShield) {
+          setHasShield(false);
+          setStatusMsg(lang === 'en' ? '🛡️ Shield blocked enemy hit!' : '🛡️ 护盾抵挡了一次怪兽袭击！');
+          audioSynth.playCorrect();
+        } else {
+          // Trigger Battle!
+          const enemyDef = currentLevel.enemies[hitEnemyIdx];
+          const countNeeded = enemyQuizCountMap[enemyDef.type] || 2;
+          
+          setBattleEnemyDef(enemyDef);
+          setBattleEnemyIdx(hitEnemyIdx);
+          setBattleTotalQuestions(countNeeded);
+          setBattleCurrentIndex(0);
+          
+          // Generate first question
+          const q = mathGenerator.generateQuestion(4, { minNumber: enemyMin, maxNumber: enemyMax, operations: ['add', 'sub'], lang: lang });
+          setBattleProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
+          setBattleInput('');
+          setBattleStatus('');
+
+          // Play battle transition audio and animation
+          audioSynth.playBattleStart();
+          setShowVSOverlay(true);
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          setShowVSOverlay(false);
+          setBattleActive(true);
+          
+          // Pause execution and wait for promise
+          const won = await new Promise(resolve => {
+            setBattleResolve({ resolve });
+          });
+          
+          setBattleActive(false);
+          
+          if (won) {
+            // Defeat enemy!
             setEnemyHealths(prev => {
               const next = [...prev];
-              next[hitEnemyIdx] = 0;
-              currentEnemyPositions[hitEnemyIdx] = null;
-              setEnemyPositions([...currentEnemyPositions]);
+              next[hitEnemyIdx] = 0; // set HP to 0
               return next;
             });
-          } else {
-            audioSynth.playIncorrect();
-            setStatusMsg(lang === 'en' ? '⚠️ Skeleton battle begins!' : '⚠️ 遭遇骷髅士兵，决斗开始！');
+            // Also clear it from currentEnemyPositions so it doesn't collide again
+            currentEnemyPositions[hitEnemyIdx] = null;
+            setEnemyPositions([...currentEnemyPositions]);
             
-            setIsSkeletonBattle(true);
-            setSkeletonMistakes(0);
-            setSkeletonQuestionIdx(0);
-            
-            let wonBattle = true;
-            for (let qIdx = 0; qIdx < 2; qIdx++) {
-              setSkeletonQuestionIdx(qIdx);
-              setStatusMsg(lang === 'en' 
-                ? `Skeleton Battle! Solve question ${qIdx + 1}/2` 
-                : `💀 骷髅决战！请解答第 ${qIdx + 1}/2 题`);
-              
-              const q = mathGenerator.generateQuestion(4, { minNumber: mathMin, maxNumber: mathMax, operations: ['add', 'sub'], lang: lang });
-              setMathProblem({ a: q.num1, b: q.num2, op: q.symbol, ans: q.answer });
-              setMathInput('');
-              setShowMathQuiz(true);
-              
-              const solved = await new Promise(resolve => {
-                setWebStuckPrompt({ resolve });
-              });
-              
-              if (!solved) {
-                wonBattle = false;
-                break;
-              }
-              
-              if (qIdx < 1) {
-                await new Promise(res => setTimeout(res, 100));
-              }
-            }
-            
-            setShowMathQuiz(false);
-            setIsSkeletonBattle(false);
-            
-            if (!wonBattle) {
-              audioSynth.playIncorrect();
-              setStatusMsg(lang === 'en' ? 'Defeated by the skeleton!' : '决斗失败，被骷髅兵击败！');
-              setIsPlaying(false);
-              setExecutingIdx(-1);
-              setIsShaking(true);
-              setCaughtBy('skeleton');
-              
-              resetTimeoutRef.current = setTimeout(() => {
-                setIsShaking(false);
-                setPos({ ...currentLevel.start });
-                setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
-                setSpiderWebs([]);
-              }, 500);
-              return;
-            } else {
-              audioSynth.playCorrect();
-              setStatusMsg(lang === 'en' ? '🎉 Defeated the skeleton!' : '🎉 成功战胜骷髅兵，它化为尘土！');
-              
-              setEnemyHealths(prev => {
-                const next = [...prev];
-                next[hitEnemyIdx] = 0;
-                currentEnemyPositions[hitEnemyIdx] = null;
-                setEnemyPositions([...currentEnemyPositions]);
-                return next;
-              });
-            }
-          }
-        } else {
-          if (hasShield) {
-            setHasShield(false);
-            setStatusMsg(hitFire 
-              ? (lang === 'en' ? '🛡️ Shield blocked fire damage!' : '🛡️ 护盾抵挡了一次火焰伤害！')
-              : (lang === 'en' ? '🛡️ Shield blocked enemy hit!' : '🛡️ 护盾抵挡了一次怪兽袭击！'));
+            setStatusMsg(lang === 'en' ? `Defeated the ${enemyDef.type}! Code execution continues.` : `成功击败了${getEnemyName(enemyDef.type)}！程序继续执行。`);
             audioSynth.playCorrect();
           } else {
+            // Defeat failed, trigger reset
             audioSynth.playIncorrect();
-            setStatusMsg(hitFire 
-              ? (lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。')
-              : (lang === 'en' ? 'Oops! Caught by an enemy.' : '哎呀，被敌人抓住了。'));
+            setStatusMsg(lang === 'en' ? 'Battle failed!' : '战斗失败！');
             setIsPlaying(false);
             setExecutingIdx(-1);
             setIsShaking(true);
-            
-            let caughtType = 'snake';
-            if (hitEnemy) {
-              caughtType = currentLevel.enemies?.[hitEnemyIdx]?.type || 'snake';
-            } else if (hitFire) {
-              caughtType = 'dinosaur';
-            }
-            setCaughtBy(caughtType);
-            
+            setCaughtBy(enemyDef.type);
             resetTimeoutRef.current = setTimeout(() => {
               setIsShaking(false);
               setPos({ ...currentLevel.start });
@@ -1107,6 +1098,27 @@ export default function CodingMazeGame({ lang, onBack }) {
             }, 500);
             return;
           }
+        }
+      } else if (hitFire) {
+        if (hasShield) {
+          setHasShield(false);
+          setStatusMsg(lang === 'en' ? '🛡️ Shield blocked fire damage!' : '🛡️ 护盾抵挡了一次火焰伤害！');
+          audioSynth.playCorrect();
+        } else {
+          // Normal fire hit fails
+          audioSynth.playIncorrect();
+          setStatusMsg(lang === 'en' ? 'Oops! Burned by fire.' : '哎呀，被恐龙的火烧到了。');
+          setIsPlaying(false);
+          setExecutingIdx(-1);
+          setIsShaking(true);
+          setCaughtBy('dinosaur');
+          resetTimeoutRef.current = setTimeout(() => {
+            setIsShaking(false);
+            setPos({ ...currentLevel.start });
+            setEnemyPositions(currentLevel.enemies ? currentLevel.enemies.map((e, i) => enemyHealths[i] <= 0 ? null : ({...e.start})) : []);
+            setSpiderWebs([]);
+          }, 500);
+          return;
         }
       }
       
@@ -1203,9 +1215,27 @@ export default function CodingMazeGame({ lang, onBack }) {
       localStorage.removeItem('codingMazeLevel');
       localStorage.removeItem('codingMazeMaxUnlockedLevel');
       localStorage.removeItem('codingMazeInventory');
+      localStorage.removeItem('codingMazeEnemyMin');
+      localStorage.removeItem('codingMazeEnemyMax');
+      localStorage.removeItem('codingMazeEnemyQuizCountMap');
       setLevelIdx(0);
       setMaxUnlockedLevel(0);
       setInventory({ normal: 0, freeze: 0, super: 0, atomic: 0, torch: 0, shield: 0 });
+      setEnemyMin(10);
+      setEnemyMax(50);
+      setEnemyQuizCountMap({
+        turtle: 1,
+        spider: 1,
+        snake: 2,
+        ghost: 2,
+        zombie: 3,
+        witch: 3,
+        tiger: 3,
+        rhino: 3,
+        elephant: 4,
+        dinosaur: 4,
+        magma: 5
+      });
       setActiveBombType(null);
       setActiveAtomicExplosion(null);
       setDestroyedObstacles([]);
@@ -1296,7 +1326,7 @@ export default function CodingMazeGame({ lang, onBack }) {
         } else if ((isObstacle && isDestroyed) || isEnemyDestroyed) {
           content = null;
         } else if (isOnFire) {
-          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize * 0.82}px`, lineHeight: 1 }}>🔥</span>;
+          content = <span style={{ animation: 'fireWobble 0.6s infinite alternate', display: 'inline-block', fontSize: `${cellSize * 0.5}px` }}>🔥</span>;
           bg = '#ffedd5';
           borderColor = '#f97316';
           shadowColor = '#fdba74';
@@ -1331,22 +1361,18 @@ export default function CodingMazeGame({ lang, onBack }) {
 
         row.push(
           <div key={`${r}-${c}`} style={{
-            width: `${cellSize}px`,
-            height: `${cellSize}px`,
-            flexShrink: 0,
+            flex: 1,
+            height: '100%',
             backgroundColor: bg,
-            borderRadius: isMobile ? '6px' : '10px',
+            borderRadius: isMobile ? '6px' : '12px',
             border: `${isMobile ? 1 : 2}px solid ${borderColor}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: `${cellSize * 0.82}px`,
-            lineHeight: 1,
-            overflow: 'hidden',
+            fontSize: `${cellSize * 0.6}px`,
             boxShadow: `0 ${isMobile ? 2 : 4}px 0 ${shadowColor}`,
             position: 'relative',
             cursor: canBomb ? 'crosshair' : (isEnemy && activeBombType === null ? 'pointer' : 'default'),
             outline: canBomb ? '2px solid red' : 'none',
-            outlineOffset: '-2px',
-            boxSizing: 'border-box'
+            outlineOffset: '-2px'
           }} onClick={() => {
             if (canBomb && !isPendingBomb) {
               const usedBomb = activeBombType;
@@ -1378,19 +1404,18 @@ export default function CodingMazeGame({ lang, onBack }) {
                   
                   setEnemyHealths(prev => prev.map(() => 0));
                   setDestroyedObstacles(currentLevel.obstacles.map(o => ({ r: o.r, c: o.c })));
-                } else if (usedBomb !== 'torch') {
+                } else {
                   setIsShaking(true);
                   setTimeout(() => setIsShaking(false), 300);
                   
                   const explId = Date.now();
-                  const newExpl = { r, c, type: usedBomb, id: explId };
-                  setActiveExplosions(prev => [...prev, newExpl]);
+                  setActiveExplosion({ r, c, type: usedBomb === 'torch' ? 'normal' : usedBomb, id: explId });
                   setTimeout(() => {
-                    setActiveExplosions(prev => prev.filter(e => e.id !== explId));
+                    setActiveExplosion(prev => prev && prev.id === explId ? null : prev);
                   }, 500);
                 }
                 
-                if (containerRef.current && usedBomb !== 'torch') {
+                if (containerRef.current) {
                   const rect = containerRef.current.getBoundingClientRect();
                   const cellW = rect.width / currentLevel.size;
                   const cellH = rect.height / currentLevel.size;
@@ -1416,14 +1441,14 @@ export default function CodingMazeGame({ lang, onBack }) {
                     }
                   } else {
                     confetti({
-                      particleCount: 80,
-                      spread: 100,
+                      particleCount: usedBomb === 'torch' ? 50 : 80,
+                      spread: usedBomb === 'torch' ? 80 : 100,
                       startVelocity: 30,
                       origin: {
                         x: absX / window.innerWidth,
                         y: absY / window.innerHeight
                       },
-                      colors: usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b'],
+                      colors: usedBomb === 'torch' ? ['#f97316', '#fdba74', '#ef4444', '#f59e0b'] : (usedBomb === 'freeze' ? ['#60a5fa', '#93c5fd', '#bfdbfe', '#ffffff'] : ['#ef4444', '#f97316', '#eab308', '#27272a', '#64748b']),
                       ticks: 100,
                       gravity: 1.2
                     });
@@ -1434,118 +1459,21 @@ export default function CodingMazeGame({ lang, onBack }) {
                 
                 if (usedBomb !== 'atomic') {
                   if (usedBomb === 'torch') {
-                    // Fire Torch Spreading Logic: BFS to find all connected obstacles
-                    const isObstacleAt = (cr, cc) => {
-                      const isObs = currentLevel.obstacles.some(o => o.r === cr && o.c === cc);
-                      const isDest = destroyedObstacles.some(o => o.r === cr && o.c === cc);
-                      return isObs && !isDest;
-                    };
-
-                    let seedNodes = [];
-                    if (isObstacleAt(r, c)) {
-                      seedNodes.push({ r, c });
-                    } else {
-                      const nbrs = [
-                        { r: r - 1, c }, { r: r + 1, c },
-                        { r, c: c - 1 }, { r, c: c + 1 }
-                      ];
-                      nbrs.forEach(n => {
-                        if (n.r >= 0 && n.r < currentLevel.size && n.c >= 0 && n.c < currentLevel.size && isObstacleAt(n.r, n.c)) {
-                          seedNodes.push(n);
-                        }
-                      });
-                    }
-
-                    const visited = new Set();
-                    const waves = [];
-                    let queue = [];
-
-                    seedNodes.forEach(s => {
-                      const k = `${s.r},${s.c}`;
-                      if (!visited.has(k)) {
-                        visited.add(k);
-                        queue.push({ r: s.r, c: s.c, dist: 0 });
-                      }
-                    });
-
-                    while (queue.length > 0) {
-                      const curr = queue.shift();
-                      if (!waves[curr.dist]) waves[curr.dist] = [];
-                      waves[curr.dist].push({ r: curr.r, c: curr.c });
-
-                      const nbrs = [
-                        { r: curr.r - 1, c: curr.c },
-                        { r: curr.r + 1, c: curr.c },
-                        { r: curr.r, c: curr.c - 1 },
-                        { r: curr.r, c: curr.c + 1 }
-                      ];
-
-                      nbrs.forEach(n => {
-                        if (n.r >= 0 && n.r < currentLevel.size && n.c >= 0 && n.c < currentLevel.size) {
-                          const k = `${n.r},${n.c}`;
-                          if (!visited.has(k) && isObstacleAt(n.r, n.c)) {
-                            visited.add(k);
-                            queue.push({ r: n.r, c: n.c, dist: curr.dist + 1 });
-                          }
-                        }
-                      });
-                    }
-
-                    // Ignite starting cell
                     setBurningFires(prev => [...prev, { r, c }]);
+                    if (isObstacle) {
+                      setDestroyedObstacles(prev => [...prev, { r, c }]);
+                    }
                     if (isEnemy) {
                       setEnemyHealths(prev => {
                         const next = [...prev];
                         next[enemyIdx] = Math.max(0, next[enemyIdx] - 1);
                         if (next[enemyIdx] <= 0) {
+                          // Clean up position instantly
                           const epCopy = [...enemyPositions];
                           epCopy[enemyIdx] = null;
                           setEnemyPositions(epCopy);
                         }
                         return next;
-                      });
-                    }
-
-                    if (waves.length === 0) {
-                      const explId = Date.now();
-                      setActiveExplosions(prev => [...prev, { r, c, type: 'normal', id: explId }]);
-                      setTimeout(() => setActiveExplosions(prev => prev.filter(e => e.id !== explId)), 600);
-                    } else {
-                      // Trigger dynamic spreading waves!
-                      waves.forEach((waveCells, waveIdx) => {
-                        setTimeout(() => {
-                          audioSynth.playBomb();
-                          setIsShaking(true);
-                          setTimeout(() => setIsShaking(false), 180);
-
-                          setDestroyedObstacles(prev => [...prev, ...waveCells]);
-                          setBurningFires(prev => [...prev, ...waveCells]);
-
-                          const waveExpls = waveCells.map(cell => ({ r: cell.r, c: cell.c, type: 'normal', id: Date.now() + Math.random() }));
-                          setActiveExplosions(prev => [...prev, ...waveExpls]);
-                          setTimeout(() => {
-                            setActiveExplosions(prev => prev.filter(item => !waveExpls.some(e => e.id === item.id)));
-                          }, 600);
-
-                          if (containerRef.current) {
-                            const rect = containerRef.current.getBoundingClientRect();
-                            const cellW = rect.width / currentLevel.size;
-                            const cellH = rect.height / currentLevel.size;
-                            waveCells.forEach(cell => {
-                              const absX = rect.left + cell.c * cellW + cellW / 2;
-                              const absY = rect.top + cell.r * cellH + cellH / 2;
-                              confetti({
-                                particleCount: 35,
-                                spread: 75,
-                                startVelocity: 25,
-                                origin: { x: absX / window.innerWidth, y: absY / window.innerHeight },
-                                colors: ['#f97316', '#fdba74', '#ef4444', '#f59e0b'],
-                                ticks: 80,
-                                gravity: 1.2
-                              });
-                            });
-                          }
-                        }, waveIdx * 140);
                       });
                     }
                   } else {
@@ -1578,7 +1506,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               }, 500);
             } else if (isEnemy && activeBombType === null) {
               const eType = currentLevel.enemies?.[enemyIdx]?.type || 'snake';
-              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma', 'skeleton'].includes(eType)) {
+              if (['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType)) {
                 audioSynth.playClick();
                 setPreviewImage(`${import.meta.env.BASE_URL}${eType}_3d.png`);
               }
@@ -1586,10 +1514,9 @@ export default function CodingMazeGame({ lang, onBack }) {
           }}>
             {content}
             {plannedArrowNode}
-            {activeExplosions.filter(e => e.r === r && e.c === c).map(e => (
+            {activeExplosion && activeExplosion.r === r && activeExplosion.c === c && (
               <img 
-                key={e.id}
-                src={`${import.meta.env.BASE_URL}expl_${e.type}.png`} 
+                src={`${import.meta.env.BASE_URL}expl_${activeExplosion.type}.png`} 
                 alt="explosion"
                 style={{
                   position: 'absolute', top: '50%', left: '50%',
@@ -1597,29 +1524,26 @@ export default function CodingMazeGame({ lang, onBack }) {
                   objectFit: 'contain',
                   pointerEvents: 'none',
                   animation: 'magicExplosion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                  color: e.type === 'freeze' ? '#93c5fd' : (e.type === 'super' ? '#fde047' : '#fca5a5')
+                  color: activeExplosion.type === 'freeze' ? '#93c5fd' : activeExplosion.type === 'super' ? '#fde047' : '#fca5a5'
                 }} 
               />
-            ))}
+            )}
           </div>
         );
       }
       grid.push(
-        <div key={r} style={{ display: 'flex', gap: `${gridGap}px`, height: `${cellSize}px`, flexShrink: 0 }}>
+        <div key={r} style={{ display: 'flex', gap: `${gridGap}px`, flex: 1 }}>
           {row}
         </div>
       );
     }
-    const totalGridSize = 2 * gridPadding + size * cellSize + (size - 1) * gridGap;
     return (
       <div className="maze-grid-container" key={levelIdx} style={{
         animation: activeAtomicExplosion 
           ? 'gridAtomicShake 1.8s ease-in-out' 
           : 'bounceInDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         position: 'absolute',
-        top: 0, left: 0,
-        width: `${totalGridSize}px`,
-        height: `${totalGridSize}px`,
+        top: 0, left: 0, right: 0, bottom: 0,
         display: 'flex',
         flexDirection: 'column',
         gap: `${gridGap}px`,
@@ -1739,13 +1663,6 @@ export default function CodingMazeGame({ lang, onBack }) {
               50% { transform: translate(0, 0) rotate(0deg); }
               75% { transform: translate(1px, -1px) rotate(4deg); }
             }
-            @keyframes skeletonRattle {
-              0%, 100% { transform: translate(0, 0) rotate(0deg); }
-              20% { transform: translate(-1.5px, 0.5px) rotate(-2deg); }
-              40% { transform: translate(1.5px, -0.5px) rotate(2deg); }
-              60% { transform: translate(-1.5px, -0.5px) rotate(-1deg); }
-              80% { transform: translate(1.5px, 0.5px) rotate(1deg); }
-            }
             @keyframes magmaBubble {
               0%, 100% { transform: scale(1) skewX(0deg); filter: drop-shadow(0 2px 4px #dc2626) brightness(1); }
               50% { transform: scale(1.05, 0.95) skewX(1deg); filter: drop-shadow(0 4px 8px #f97316) brightness(1.25); }
@@ -1794,19 +1711,6 @@ export default function CodingMazeGame({ lang, onBack }) {
               65% { transform: scale(1) translate(-2px, 2px) rotate(0deg); }
               75% { transform: scale(1) translate(1px, -1px) rotate(0deg); }
             }
-            @keyframes skeletonCycle1 {
-              0%, 33.32% { opacity: 1; visibility: visible; }
-              33.33%, 100% { opacity: 0; visibility: hidden; }
-            }
-            @keyframes skeletonCycle2 {
-              0%, 33.32% { opacity: 0; visibility: hidden; }
-              33.33%, 66.65% { opacity: 1; visibility: visible; }
-              66.66%, 100% { opacity: 0; visibility: hidden; }
-            }
-            @keyframes skeletonCycle3 {
-              0%, 66.65% { opacity: 0; visibility: hidden; }
-              66.66%, 100% { opacity: 1; visibility: visible; }
-            }
           `}
         </style>
         
@@ -1843,7 +1747,7 @@ export default function CodingMazeGame({ lang, onBack }) {
           width: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           height: `calc((100% - ${2 * gridPadding}px - ${(size - 1) * gridGap}px) / ${size})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: `${cellSize * 0.82}px`,
+          fontSize: `${cellSize * 0.7}px`,
           transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
           animation: webStruggle ? 'webStruggle 0.3s infinite' : (isShaking ? 'heroShake 0.4s' : (isSolved ? 'victorySpin 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' : (isJumping ? 'heroJump 0.5s infinite' : (isWalking ? 'wobbleWalk 0.4s infinite' : 'none')))),
           zIndex: 10,
@@ -1890,7 +1794,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               zIndex: 9,
               pointerEvents: 'none'
             }}>
-              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma', 'skeleton'].includes(eType) ? (
+              {['tiger', 'elephant', 'spider', 'rhino', 'turtle', 'snake', 'dinosaur', 'ghost', 'witch', 'zombie', 'magma'].includes(eType) ? (
                 <div style={{ 
                   position: 'relative', 
                   width: '100%', 
@@ -1900,52 +1804,23 @@ export default function CodingMazeGame({ lang, onBack }) {
                   justifyContent: 'center',
                   opacity: eType === 'ghost' ? 0.75 : 1
                 }}>
-                  {eType === 'skeleton' ? (
-                    <>
-                      <img src={`${import.meta.env.BASE_URL}skeleton_frame1.png`} style={{
-                        position: 'absolute',
-                        width: '95%',
-                        height: '95%',
-                        objectFit: 'contain',
-                        animation: 'skeletonCycle1 0.75s steps(1) infinite',
-                        filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
-                      }} />
-                      <img src={`${import.meta.env.BASE_URL}skeleton_frame2.png`} style={{
-                        position: 'absolute',
-                        width: '95%',
-                        height: '95%',
-                        objectFit: 'contain',
-                        animation: 'skeletonCycle2 0.75s steps(1) infinite',
-                        filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
-                      }} />
-                      <img src={`${import.meta.env.BASE_URL}skeleton_frame3.png`} style={{
-                        position: 'absolute',
-                        width: '95%',
-                        height: '95%',
-                        objectFit: 'contain',
-                        animation: 'skeletonCycle3 0.75s steps(1) infinite',
-                        filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
-                      }} />
-                    </>
-                  ) : (
-                    <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
-                      width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
-                      height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
-                      objectFit: 'contain',
-                      animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
-                                 (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
-                                  eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
-                                  eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
-                                  eType === 'snake' ? 'hoverWobble 1s infinite' :
-                                  eType === 'dinosaur' ? 'dinoBreathing 1.8s infinite alternate' :
-                                  eType === 'ghost' ? 'ghostFloat 2s infinite ease-in-out' :
-                                  eType === 'witch' ? 'witchHover 1.5s infinite ease-in-out' :
-                                  eType === 'zombie' ? 'zombieLimp 1.2s infinite' :
-                                  eType === 'magma' ? 'magmaBubble 1.4s infinite alternate' :
-                                  'idleBreathing 1.5s infinite alternate'),
-                      filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
-                    }} />
-                  )}
+                  <img src={`${import.meta.env.BASE_URL}${eType}_3d.png`} style={{
+                    width: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
+                    height: eType === 'elephant' ? '120%' : eType === 'rhino' ? '110%' : eType === 'turtle' ? '85%' : '95%', 
+                    objectFit: 'contain',
+                    animation: isPlaying ? 'wobbleWalk 0.4s infinite' : 
+                               (eType === 'rhino' ? 'shakeAngry 0.8s infinite' : 
+                                eType === 'turtle' ? 'hoverWobble 2s infinite ease-in-out' :
+                                eType === 'spider' ? 'hoverWobble 1.2s infinite ease-in-out' :
+                                eType === 'snake' ? 'hoverWobble 1s infinite' :
+                                eType === 'dinosaur' ? 'dinoBreathing 1.8s infinite alternate' :
+                                eType === 'ghost' ? 'ghostFloat 2s infinite ease-in-out' :
+                                eType === 'witch' ? 'witchHover 1.5s infinite ease-in-out' :
+                                eType === 'zombie' ? 'zombieLimp 1.2s infinite' :
+                                eType === 'magma' ? 'magmaBubble 1.4s infinite alternate' :
+                                'idleBreathing 1.5s infinite alternate'),
+                    filter: `drop-shadow(0 ${isMobile ? 3 : 5}px ${isMobile ? 3 : 5}px rgba(0,0,0,0.3))`
+                  }} />
                   {isDinosaur && (
                     <div style={{
                       position: 'absolute',
@@ -2057,254 +1932,6 @@ export default function CodingMazeGame({ lang, onBack }) {
   };
 
 
-  const headerNode = (
-    <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px', flexShrink: 0 }}>
-      <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
-        <button className="bouncy-button secondary" onClick={onBack} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
-          <ArrowLeft size={isMobile ? 18 : 22} />
-        </button>
-        <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
-          <RotateCcw size={isMobile ? 18 : 22} />
-        </button>
-        <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowMonsterMenu(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Monster Guide' : '怪物图鉴'}>
-          👾
-        </button>
-        <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowLevelMap(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Select Level' : '选择关卡'}>
-          🗺️
-        </button>
-      </div>
-      <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : 'clamp(1rem, 3vw, 1.4rem)', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
-        {lang === 'en' ? (isMobile ? `${levelIdx + 1}/${LEVELS.length}` : `Maze (${levelIdx + 1}/${LEVELS.length})`) : (isMobile ? `第${levelIdx + 1}关` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`)}
-      </h2>
-      <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
-        <button className="bouncy-button secondary" onClick={triggerSettings} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Settings' : '设置'}>
-          <Settings size={isMobile ? 18 : 22} />
-        </button>
-        <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="缩小">
-          <ZoomOut size={isMobile ? 18 : 22} />
-        </button>
-        <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="放大">
-          <ZoomIn size={isMobile ? 18 : 22} />
-        </button>
-        <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
-          <RefreshCw size={isMobile ? 18 : 22} />
-        </button>
-      </div>
-    </div>
-  );
-
-  const mazeNode = (
-    <div 
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        flex: '1 1 auto',
-        minHeight: 0,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: isMobile ? '3px' : '0px',
-        perspective: '1000px'
-      }}
-    >
-      <div ref={containerRef} style={{
-         height: '100%',
-         maxWidth: '100%',
-         aspectRatio: '1 / 1',
-         position: 'relative',
-         transform: `scale(${zoomScale}) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
-         transformOrigin: 'center center',
-         transition: tilt.rx === 0 && tilt.ry === 0 ? 'transform 0.5s ease-out' : 'transform 0.1s ease-out',
-         transformStyle: 'preserve-3d',
-         boxSizing: 'border-box'
-      }}>
-        {renderGrid()}
-      </div>
-    </div>
-  );
-
-  const queueNode = (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', flex: 1, minHeight: 0 }}>
-      {/* Status */}
-      <div style={{ height: isMobile ? '16px' : '22px', fontSize: isMobile ? '0.8rem' : '0.95rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '2px' : '6px', textAlign: 'center' }}>
-        {statusMsg}
-      </div>
-
-      {/* Commands strip */}
-      <div style={{ 
-        width: '100%', 
-        flex: 1,
-        minHeight: `${cmdBtnSize + 8}px`, 
-        overflowY: 'auto',
-        border: '2px solid #cbd5e1', 
-        borderRadius: '10px', 
-        display: 'flex', 
-        flexWrap: 'wrap', 
-        alignContent: 'flex-start',
-        gap: isMobile ? '3px' : '6px', 
-        padding: isMobile ? '3px' : '6px', 
-        marginBottom: isMobile ? '4px' : '12px',
-        backgroundColor: '#f8fafc', 
-        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)',
-        boxSizing: 'border-box'
-      }}>
-        {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: isMobile ? '0.75rem' : '0.9rem', lineHeight: `${cmdBtnSize}px` }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
-        {commands.map((cmd, idx) => (
-          <div key={idx} onClick={() => removeCommand(idx)} style={{
-            width: `${cmdBtnSize}px`, 
-            height: `${cmdBtnSize}px`, 
-            background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white',
-            borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: isPlaying || isSolved ? 'default' : 'pointer', 
-            boxShadow: `0 ${isMobile ? 2 : 3}px 0 #1e40af`,
-            position: 'relative',
-            animation: idx === executingIdx ? 'glowPulse 0.5s infinite' : 'none',
-            zIndex: idx === executingIdx ? 10 : 1,
-            flexShrink: 0
-          }}>
-            {getCmdIcon(cmd)}
-            
-            {/* Step badge */}
-            <div style={{ 
-              position: 'absolute', 
-              top: -3, left: -3, 
-              background: '#10b981', color: 'white', 
-              fontSize: '0.55rem', fontWeight: 'bold', 
-              width: '14px', height: '14px', 
-              borderRadius: '50%', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.2)' 
-            }}>
-              {idx + 1}
-            </div>
-
-            {!isPlaying && !isSolved && (
-              <div style={{ 
-                position: 'absolute', top: -3, right: -3, 
-                background: '#ef4444', borderRadius: '50%', 
-                padding: '1px', color: 'white', 
-                boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                lineHeight: 0
-              }}>
-                <X size={8} strokeWidth={3} />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const directionsNode = (
-    <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', marginBottom: isMobile ? '4px' : '12px', width: '100%', justifyContent: 'center' }}>
-      {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
-        <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
-          style={{
-            width: `${dirBtnSize}px`, 
-            height: `${dirBtnSize}px`,
-            borderRadius: '12px',
-            background: isPlaying || isSolved ? '#cbd5e1' : 'linear-gradient(135deg, #fcd34d, #f59e0b)',
-            border: 'none', color: isPlaying || isSolved ? '#94a3b8' : 'white',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: isPlaying || isSolved ? 'none' : `0 ${isMobile ? 2 : 4}px 0 #d97706`,
-            cursor: isPlaying || isSolved ? 'default' : 'pointer',
-            transition: 'all 0.1s'
-          }}
-          onMouseDown={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.boxShadow = '0 0 0 #d97706'; } }}
-          onMouseUp={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 ${isMobile ? 2 : 4}px 0 #d97706`; } }}
-          onMouseLeave={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 ${isMobile ? 2 : 4}px 0 #d97706`; } }}
-        >
-          {getCmdIcon(cmd)}
-        </button>
-      ))}
-    </div>
-  );
-
-  const runNode = (
-    <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', width: '100%', justifyContent: 'center', alignItems: 'stretch' }}>
-      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-start' }}>
-        <button 
-           className="bouncy-button secondary" 
-           onClick={() => { if (!isPlaying && !isSolved) setShowShop(true); }}
-           style={{ 
-              padding: isMobile ? '6px 10px' : '8px 12px', 
-              fontSize: isMobile ? '0.8rem' : '0.95rem',
-              background: '#bfdbfe', border: '2px solid #3b82f6', color: '#1e40af',
-              borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px',
-              boxShadow: `0 ${isMobile ? 2 : 4}px 0 #60a5fa`
-           }}
-        >
-          🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
-        </button>
-        
-        {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0 || inventory.torch > 0 || inventory.shield > 0) && (
-          <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
-            {inventory.normal > 0 && (
-              <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                💣 x{inventory.normal}
-                <span style={{ fontSize: '0.75rem', color: activeBombType === 'normal' ? '#b91c1c' : '#ef4444', fontWeight: 'bold' }}>-1❤️</span>
-              </button>
-            )}
-            {inventory.freeze > 0 && (
-              <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                ❄️ x{inventory.freeze}
-                <span style={{ fontSize: '0.75rem', color: activeBombType === 'freeze' ? '#1d4ed8' : '#3b82f6', fontWeight: 'bold' }}>-2❤️</span>
-              </button>
-            )}
-            {inventory.super > 0 && (
-              <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                🌟 x{inventory.super}
-                <span style={{ fontSize: '0.75rem', color: activeBombType === 'super' ? '#a16207' : '#eab308', fontWeight: 'bold' }}>-3❤️</span>
-              </button>
-            )}
-            {inventory.atomic > 0 && (
-              <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'atomic' ? null : 'atomic')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'atomic' ? '#a855f7' : '#cbd5e1'}`, background: activeBombType === 'atomic' ? '#f3e8ff' : 'white', animation: activeBombType === 'atomic' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt="atomic" /> x{inventory.atomic}
-                <span style={{ fontSize: '0.75rem', color: activeBombType === 'atomic' ? '#7e22ce' : '#a855f7', fontWeight: 'bold' }}>-ALL❤️</span>
-              </button>
-            )}
-            {inventory.torch > 0 && (
-              <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'torch' ? null : 'torch')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'torch' ? '#f97316' : '#cbd5e1'}`, background: activeBombType === 'torch' ? '#fed7aa' : 'white', animation: activeBombType === 'torch' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                🔥 x{inventory.torch}
-                <span style={{ fontSize: '0.75rem', color: activeBombType === 'torch' ? '#c2410c' : '#f97316', fontWeight: 'bold' }}>烧毁</span>
-              </button>
-            )}
-            {inventory.shield > 0 && (
-              <button className="bouncy-button secondary" onClick={() => {
-                if (isPlaying || isSolved) return;
-                if (hasShield) {
-                  setStatusMsg(lang === 'en' ? 'Shield is already active!' : '护盾已处于激活状态！');
-                  return;
-                }
-                audioSynth.playCorrect();
-                setHasShield(true);
-                const newInv = { ...inventory, shield: (inventory.shield || 0) - 1 };
-                setInventory(newInv);
-                localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
-                setStatusMsg(lang === 'en' ? '🛡️ Shield activated!' : '🛡️ 守护护盾已开启！');
-              }} style={{ padding: '4px 8px', borderRadius: '8px', border: '2px solid #cbd5e1', background: 'white', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                🛡️ x{inventory.shield}
-                <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 'bold' }}>防护</span>
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {isSolved ? (
-        <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
-          {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
-        </button>
-      ) : (
-        <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
-          <Play size={isMobile ? 14 : 18} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
-        </button>
-      )}
-    </div>
-  );
-
   return (
     <div className="screen-wrapper fade-in" style={{
       padding: isMobile ? '4px' : '16px',
@@ -2323,298 +1950,270 @@ export default function CodingMazeGame({ lang, onBack }) {
     }}>
       <WeatherOverlay weather={currentWeather} />
       
-      {isMobile ? (
-        /* Mobile layout: EXACT original vertical stack */
-        <div style={{
+      {/* Transparent card holding all controls */}
+      <div style={{
+        width: '100%',
+        height: '100%',
+        maxWidth: '600px',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: isMobile ? '8px' : '20px',
+        boxSizing: 'border-box'
+      }}>
+      <div style={{ 
+        flex: '1 1 0',
+        minHeight: 0,
+        width: '100%', 
+        maxWidth: '600px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        padding: isMobile ? '6px 8px' : '20px',
+        boxSizing: 'border-box'
+      }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '3px' : '12px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
+            <button className="bouncy-button secondary" onClick={onBack} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+              <ArrowLeft size={isMobile ? 18 : 22} />
+            </button>
+            <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
+              <RotateCcw size={isMobile ? 18 : 22} />
+            </button>
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowMonsterMenu(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Monster Guide' : '怪物图鉴'}>
+              👾
+            </button>
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowLevelMap(true); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: isMobile ? '16px' : '20px' }} title={lang === 'en' ? 'Select Level' : '选择关卡'}>
+              🗺️
+            </button>
+          </div>
+          <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: isMobile ? '1.1rem' : 'clamp(1rem, 3vw, 1.4rem)', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
+            {lang === 'en' ? (isMobile ? `${levelIdx + 1}/${LEVELS.length}` : `Maze (${levelIdx + 1}/${LEVELS.length})`) : (isMobile ? `第${levelIdx + 1}关` : `编程迷宫 (${levelIdx + 1}/${LEVELS.length})`)}
+          </h2>
+          <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', alignItems: 'center' }}>
+            <button className="bouncy-button secondary" onClick={triggerSettings} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Settings' : '设置'}>
+              <Settings size={isMobile ? 18 : 22} />
+            </button>
+            <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="缩小">
+              <ZoomOut size={isMobile ? 18 : 22} />
+            </button>
+            <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="放大">
+              <ZoomIn size={isMobile ? 18 : 22} />
+            </button>
+            <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ width: isMobile ? '32px' : '44px', height: isMobile ? '32px' : '44px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+              <RefreshCw size={isMobile ? 18 : 22} />
+            </button>
+          </div>
+        </div>
+
+        {/* Maze Container (Flex area that takes remaining vertical space) */}
+        <div 
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+          flex: '1 1 auto',
+          minHeight: 0,
           width: '100%',
-          height: '100%',
-          maxWidth: '600px',
           display: 'flex',
-          flexDirection: 'column',
-          padding: '8px',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: isMobile ? '3px' : '10px',
+          perspective: '1000px'
+        }}>
+          {/* Inner container forced to be a square, sizing itself purely by CSS constraints */}
+          <div ref={containerRef} style={{
+             height: '100%',
+             maxWidth: '100%',
+             aspectRatio: '1 / 1',
+             position: 'relative',
+             transform: `scale(${zoomScale}) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+             transformOrigin: 'center center',
+             transition: tilt.rx === 0 && tilt.ry === 0 ? 'transform 0.5s ease-out' : 'transform 0.1s ease-out',
+             transformStyle: 'preserve-3d'
+          }}>
+            {renderGrid()}
+          </div>
+        </div>
+
+        {/* Status */}
+        <div style={{ flexShrink: 0, height: isMobile ? '16px' : '22px', fontSize: isMobile ? '0.8rem' : '0.95rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: isMobile ? '2px' : '6px' }}>
+          {statusMsg}
+        </div>
+
+        {/* Commands strip */}
+        <div style={{ 
+          width: '100%', 
+          flexShrink: 0,
+          minHeight: `${cmdBtnSize + 8}px`, 
+          maxHeight: `${cmdBtnSize * 2 + 16}px`,
+          overflowY: 'auto',
+          border: '2px solid #cbd5e1', 
+          borderRadius: '10px', 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          alignContent: 'flex-start',
+          gap: isMobile ? '3px' : '6px', 
+          padding: isMobile ? '3px' : '6px', 
+          marginBottom: isMobile ? '4px' : '12px',
+          backgroundColor: '#f8fafc', 
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)',
           boxSizing: 'border-box'
         }}>
-          <div style={{ 
-            flex: '1 1 0',
-            minHeight: 0,
-            width: '100%', 
-            maxWidth: '600px', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            padding: '6px 8px',
-            boxSizing: 'border-box'
-          }}>
-            {/* Header */}
-            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px', flexShrink: 0 }}>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                <button className="bouncy-button secondary" onClick={onBack} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
-                  <ArrowLeft size={18} />
-                </button>
-                <button className="bouncy-button secondary" onClick={resetAllProgress} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Reset Progress' : '重置所有进度'}>
-                  <RotateCcw size={18} />
-                </button>
-                <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowMonsterMenu(true); }} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '16px' }} title={lang === 'en' ? 'Monster Guide' : '怪物图鉴'}>
-                  👾
-                </button>
-                <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); setShowLevelMap(true); }} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '16px' }} title={lang === 'en' ? 'Select Level' : '选择关卡'}>
-                  🗺️
-                </button>
-              </div>
-              <h2 style={{ color: '#c0487a', margin: '0 5px', fontSize: '1.1rem', textAlign: 'center', flex: 1, lineHeight: '1.2' }}>
-                {lang === 'en' ? `${levelIdx + 1}/${LEVELS.length}` : `第${levelIdx + 1}关`}
-              </h2>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                <button className="bouncy-button secondary" onClick={triggerSettings} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title={lang === 'en' ? 'Settings' : '设置'}>
-                  <Settings size={18} />
-                </button>
-                <button className="bouncy-button secondary" onClick={handleZoomOut} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="缩小">
-                  <ZoomOut size={18} />
-                </button>
-                <button className="bouncy-button secondary" onClick={handleZoomIn} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} title="放大">
-                  <ZoomIn size={18} />
-                </button>
-                <button className="bouncy-button secondary" onClick={() => { audioSynth.playClick(); resetLevel(); }} style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
-                  <RefreshCw size={18} />
-                </button>
-              </div>
-            </div>
-
-            {/* Maze Container */}
-            <div 
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              style={{
-              flex: '1 1 auto',
-              minHeight: 0,
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginBottom: '3px',
-              perspective: '1000px'
+          {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: isMobile ? '0.75rem' : '0.9rem', lineHeight: `${cmdBtnSize}px` }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
+          {commands.map((cmd, idx) => (
+            <div key={idx} onClick={() => removeCommand(idx)} style={{
+              width: `${cmdBtnSize}px`, 
+              height: `${cmdBtnSize}px`, 
+              background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white',
+              borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: isPlaying || isSolved ? 'default' : 'pointer', 
+              boxShadow: `0 ${isMobile ? 2 : 3}px 0 #1e40af`,
+              position: 'relative',
+              animation: idx === executingIdx ? 'glowPulse 0.5s infinite' : 'none',
+              zIndex: idx === executingIdx ? 10 : 1,
+              flexShrink: 0
             }}>
-              <div ref={containerRef} style={{
-                 height: '100%',
-                 maxWidth: '100%',
-                 aspectRatio: '1 / 1',
-                 position: 'relative',
-                 transform: `scale(${zoomScale}) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
-                 transformOrigin: 'center center',
-                 transition: tilt.rx === 0 && tilt.ry === 0 ? 'transform 0.5s ease-out' : 'transform 0.1s ease-out',
-                 transformStyle: 'preserve-3d'
+              {getCmdIcon(cmd)}
+              
+              {/* Step badge */}
+              <div style={{ 
+                position: 'absolute', 
+                top: -3, left: -3, 
+                background: '#10b981', color: 'white', 
+                fontSize: '0.55rem', fontWeight: 'bold', 
+                width: '14px', height: '14px', 
+                borderRadius: '50%', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.2)' 
               }}>
-                {renderGrid()}
+                {idx + 1}
               </div>
-            </div>
 
-            {/* Status */}
-            <div style={{ flexShrink: 0, height: '16px', fontSize: '0.8rem', fontWeight: 'bold', color: isSolved ? '#16a34a' : '#c0487a', marginBottom: '2px' }}>
-              {statusMsg}
-            </div>
-
-            {/* Commands strip */}
-            <div style={{ 
-              width: '100%', 
-              flexShrink: 0,
-              minHeight: `${cmdBtnSize + 8}px`, 
-              maxHeight: `${cmdBtnSize * 2 + 16}px`,
-              overflowY: 'auto',
-              border: '2px solid #cbd5e1', 
-              borderRadius: '10px', 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              alignContent: 'flex-start',
-              gap: '3px', 
-              padding: '3px', 
-              marginBottom: '4px',
-              backgroundColor: '#f8fafc', 
-              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)',
-              boxSizing: 'border-box'
-            }}>
-              {commands.length === 0 && <div style={{ color: '#94a3b8', width: '100%', textAlign: 'center', fontWeight: 'bold', fontSize: '0.75rem', lineHeight: `${cmdBtnSize}px` }}>{lang === 'en' ? 'Add commands below' : '在下方添加指令'}</div>}
-              {commands.map((cmd, idx) => (
-                <div key={idx} onClick={() => removeCommand(idx)} style={{
-                  width: `${cmdBtnSize}px`, 
-                  height: `${cmdBtnSize}px`, 
-                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white',
-                  borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: isPlaying || isSolved ? 'default' : 'pointer', 
-                  boxShadow: `0 2px 0 #1e40af`,
-                  position: 'relative',
-                  animation: idx === executingIdx ? 'glowPulse 0.5s infinite' : 'none',
-                  zIndex: idx === executingIdx ? 10 : 1,
-                  flexShrink: 0
+              {!isPlaying && !isSolved && (
+                <div style={{ 
+                  position: 'absolute', top: -3, right: -3, 
+                  background: '#ef4444', borderRadius: '50%', 
+                  padding: '1px', color: 'white', 
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  lineHeight: 0
                 }}>
-                  {getCmdIcon(cmd)}
-                  
-                  {/* Step badge */}
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: -3, left: -3, 
-                    background: '#10b981', color: 'white', 
-                    fontSize: '0.55rem', fontWeight: 'bold', 
-                    width: '14px', height: '14px', 
-                    borderRadius: '50%', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.2)' 
-                  }}>
-                    {idx + 1}
-                  </div>
-
-                  {!isPlaying && !isSolved && (
-                    <div style={{ 
-                      position: 'absolute', top: -3, right: -3, 
-                      background: '#ef4444', borderRadius: '50%', 
-                      padding: '1px', color: 'white', 
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                      lineHeight: 0
-                    }}>
-                      <X size={8} strokeWidth={3} />
-                    </div>
-                  )}
+                  <X size={8} strokeWidth={3} />
                 </div>
-              ))}
-            </div>
-
-            {/* Direction buttons */}
-            <div style={{ display: 'flex', flexShrink: 0, gap: '6px', marginBottom: '4px' }}>
-              {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
-                <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
-                  style={{
-                    width: `${dirBtnSize}px`, 
-                    height: `${dirBtnSize}px`,
-                    borderRadius: '12px',
-                    background: isPlaying || isSolved ? '#cbd5e1' : 'linear-gradient(135deg, #fcd34d, #f59e0b)',
-                    border: 'none', color: isPlaying || isSolved ? '#94a3b8' : 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: isPlaying || isSolved ? 'none' : `0 2px 0 #d97706`,
-                    cursor: isPlaying || isSolved ? 'default' : 'pointer',
-                    transition: 'all 0.1s'
-                  }}
-                  onMouseDown={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.boxShadow = '0 0 0 #d97706'; } }}
-                  onMouseUp={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 2px 0 #d97706`; } }}
-                  onMouseLeave={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 2px 0 #d97706`; } }}
-                >
-                  {getCmdIcon(cmd)}
-                </button>
-              ))}
-            </div>
-
-            {/* Controls and Run area */}
-            <div style={{ display: 'flex', flexShrink: 0, gap: '6px', width: '100%', justifyContent: 'center', alignItems: 'stretch' }}>
-              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-start' }}>
-                <button 
-                   className="bouncy-button secondary" 
-                   onClick={() => { if (!isPlaying && !isSolved) setShowShop(true); }}
-                   style={{ 
-                      padding: '6px 10px', 
-                      fontSize: '0.8rem',
-                      background: '#bfdbfe', border: '2px solid #3b82f6', color: '#1e40af',
-                      borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px',
-                      boxShadow: `0 2px 0 #60a5fa`
-                   }}
-                >
-                  🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
-                </button>
-                
-                {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0 || inventory.torch > 0 || inventory.shield > 0) && (
-                  <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
-                    {inventory.normal > 0 && (
-                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        💣 x{inventory.normal}
-                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'normal' ? '#b91c1c' : '#ef4444', fontWeight: 'bold' }}>-1❤️</span>
-                      </button>
-                    )}
-                    {inventory.freeze > 0 && (
-                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        ❄️ x{inventory.freeze}
-                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'freeze' ? '#1d4ed8' : '#3b82f6', fontWeight: 'bold' }}>-2❤️</span>
-                      </button>
-                    )}
-                    {inventory.super > 0 && (
-                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        🌟 x{inventory.super}
-                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'super' ? '#a16207' : '#eab308', fontWeight: 'bold' }}>-3❤️</span>
-                      </button>
-                    )}
-                    {inventory.atomic > 0 && (
-                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'atomic' ? null : 'atomic')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'atomic' ? '#a855f7' : '#cbd5e1'}`, background: activeBombType === 'atomic' ? '#f3e8ff' : 'white', animation: activeBombType === 'atomic' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt="atomic" /> x{inventory.atomic}
-                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'atomic' ? '#7e22ce' : '#a855f7', fontWeight: 'bold' }}>-ALL❤️</span>
-                      </button>
-                    )}
-                    {inventory.torch > 0 && (
-                      <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'torch' ? null : 'torch')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'torch' ? '#f97316' : '#cbd5e1'}`, background: activeBombType === 'torch' ? '#fed7aa' : 'white', animation: activeBombType === 'torch' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        🔥 x{inventory.torch}
-                        <span style={{ fontSize: '0.75rem', color: activeBombType === 'torch' ? '#c2410c' : '#f97316', fontWeight: 'bold' }}>烧毁</span>
-                      </button>
-                    )}
-                    {inventory.shield > 0 && (
-                      <button className="bouncy-button secondary" onClick={() => {
-                        if (isPlaying || isSolved) return;
-                        if (hasShield) {
-                          setStatusMsg(lang === 'en' ? 'Shield is already active!' : '护盾已处于激活状态！');
-                          return;
-                        }
-                        audioSynth.playCorrect();
-                        setHasShield(true);
-                        const newInv = { ...inventory, shield: (inventory.shield || 0) - 1 };
-                        setInventory(newInv);
-                        localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
-                        setStatusMsg(lang === 'en' ? '🛡️ Shield activated!' : '🛡️ 守护护盾已开启！');
-                      }} style={{ padding: '4px 8px', borderRadius: '8px', border: '2px solid #cbd5e1', background: 'white', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        🛡️ x{inventory.shield}
-                        <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 'bold' }}>防护</span>
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {isSolved ? (
-                <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: '6px 14px', fontSize: '0.9rem' }}>
-                  {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
-                </button>
-              ) : (
-                <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: '6px 14px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
-                  <Play size={14} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
-                </button>
               )}
             </div>
-          </div>
+          ))}
         </div>
-      ) : (
-        /* Desktop layout: Large vertical stack! */
-        <div style={{
-          width: '100%',
-          height: '100%',
-          maxWidth: '850px',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '20px',
-          boxSizing: 'border-box'
-        }}>
-          <div style={{ 
-            flex: '1 1 0',
-            minHeight: 0,
-            width: '100%', 
-            maxWidth: '850px', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            padding: '20px',
-            boxSizing: 'border-box'
-          }}>
-            {headerNode}
-            {mazeNode}
-            {queueNode}
-            {directionsNode}
-            {runNode}
-          </div>
+
+        {/* Direction buttons */}
+        <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', marginBottom: isMobile ? '4px' : '12px' }}>
+          {['UP', 'DOWN', 'LEFT', 'RIGHT'].map(cmd => (
+            <button key={cmd} onClick={() => addCommand(cmd)} disabled={isPlaying || isSolved}
+              style={{
+                width: `${dirBtnSize}px`, 
+                height: `${dirBtnSize}px`,
+                borderRadius: '12px',
+                background: isPlaying || isSolved ? '#cbd5e1' : 'linear-gradient(135deg, #fcd34d, #f59e0b)',
+                border: 'none', color: isPlaying || isSolved ? '#94a3b8' : 'white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: isPlaying || isSolved ? 'none' : `0 ${isMobile ? 2 : 4}px 0 #d97706`,
+                cursor: isPlaying || isSolved ? 'default' : 'pointer',
+                transition: 'all 0.1s'
+              }}
+              onMouseDown={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.boxShadow = '0 0 0 #d97706'; } }}
+              onMouseUp={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 ${isMobile ? 2 : 4}px 0 #d97706`; } }}
+              onMouseLeave={e => { if(!isPlaying && !isSolved) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 ${isMobile ? 2 : 4}px 0 #d97706`; } }}
+            >
+              {getCmdIcon(cmd)}
+            </button>
+          ))}
         </div>
-      )}
-      
+
+        {/* Controls and Run area */}
+        <div style={{ display: 'flex', flexShrink: 0, gap: isMobile ? '6px' : '12px', width: '100%', justifyContent: 'center', alignItems: 'stretch' }}>
+          
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-start' }}>
+            <button 
+               className="bouncy-button secondary" 
+               onClick={() => { if (!isPlaying && !isSolved) setShowShop(true); }}
+               style={{ 
+                  padding: isMobile ? '6px 10px' : '8px 12px', 
+                  fontSize: isMobile ? '0.8rem' : '0.95rem',
+                  background: '#bfdbfe', border: '2px solid #3b82f6', color: '#1e40af',
+                  borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px',
+                  boxShadow: `0 ${isMobile ? 2 : 4}px 0 #60a5fa`
+               }}
+            >
+              🛒 <span style={{fontWeight:'bold'}}>{lang === 'en' ? 'Shop' : '道具补给'}</span>
+            </button>
+            
+            {(inventory.normal > 0 || inventory.freeze > 0 || inventory.super > 0 || inventory.atomic > 0 || inventory.torch > 0 || inventory.shield > 0) && (
+              <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
+                {inventory.normal > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'normal' ? null : 'normal')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'normal' ? '#ef4444' : '#cbd5e1'}`, background: activeBombType === 'normal' ? '#fca5a5' : 'white', animation: activeBombType === 'normal' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    💣 x{inventory.normal}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'normal' ? '#b91c1c' : '#ef4444', fontWeight: 'bold' }}>-1❤️</span>
+                  </button>
+                )}
+                {inventory.freeze > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'freeze' ? null : 'freeze')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'freeze' ? '#3b82f6' : '#cbd5e1'}`, background: activeBombType === 'freeze' ? '#93c5fd' : 'white', animation: activeBombType === 'freeze' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    ❄️ x{inventory.freeze}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'freeze' ? '#1d4ed8' : '#3b82f6', fontWeight: 'bold' }}>-2❤️</span>
+                  </button>
+                )}
+                {inventory.super > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'super' ? null : 'super')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'super' ? '#eab308' : '#cbd5e1'}`, background: activeBombType === 'super' ? '#fde047' : 'white', animation: activeBombType === 'super' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    🌟 x{inventory.super}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'super' ? '#a16207' : '#eab308', fontWeight: 'bold' }}>-3❤️</span>
+                  </button>
+                )}
+                {inventory.atomic > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'atomic' ? null : 'atomic')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'atomic' ? '#a855f7' : '#cbd5e1'}`, background: activeBombType === 'atomic' ? '#f3e8ff' : 'white', animation: activeBombType === 'atomic' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <img src={`${import.meta.env.BASE_URL}atomic_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt="atomic" /> x{inventory.atomic}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'atomic' ? '#7e22ce' : '#a855f7', fontWeight: 'bold' }}>-ALL❤️</span>
+                  </button>
+                )}
+                {inventory.torch > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => !isPlaying && !isSolved && setActiveBombType(activeBombType === 'torch' ? null : 'torch')} style={{ padding: '4px 8px', borderRadius: '8px', border: `2px solid ${activeBombType === 'torch' ? '#f97316' : '#cbd5e1'}`, background: activeBombType === 'torch' ? '#fed7aa' : 'white', animation: activeBombType === 'torch' ? 'bombPulse 1.5s infinite' : 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    🔥 x{inventory.torch}
+                    <span style={{ fontSize: '0.75rem', color: activeBombType === 'torch' ? '#c2410c' : '#f97316', fontWeight: 'bold' }}>烧毁</span>
+                  </button>
+                )}
+                {inventory.shield > 0 && (
+                  <button className="bouncy-button secondary" onClick={() => {
+                    if (isPlaying || isSolved) return;
+                    if (hasShield) {
+                      setStatusMsg(lang === 'en' ? 'Shield is already active!' : '护盾已处于激活状态！');
+                      return;
+                    }
+                    audioSynth.playCorrect();
+                    setHasShield(true);
+                    const newInv = { ...inventory, shield: (inventory.shield || 0) - 1 };
+                    setInventory(newInv);
+                    localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
+                    setStatusMsg(lang === 'en' ? '🛡️ Shield activated!' : '🛡️ 守护护盾已开启！');
+                  }} style={{ padding: '4px 8px', borderRadius: '8px', border: '2px solid #cbd5e1', background: 'white', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    🛡️ x{inventory.shield}
+                    <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 'bold' }}>防护</span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {isSolved ? (
+            <button className="bouncy-button primary" onClick={nextLevel} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem' }}>
+              {lang === 'en' ? 'Next Maze ➔' : '下一关 ➔'}
+            </button>
+          ) : (
+            <button className="bouncy-button primary" onClick={executeCommands} disabled={isPlaying || commands.length === 0} style={{ flexShrink: 0, padding: isMobile ? '6px 14px' : '10px 22px', fontSize: isMobile ? '0.9rem' : '1.15rem', display: 'flex', alignItems: 'center', gap: '6px', background: isPlaying ? '#94a3b8' : '' }}>
+              <Play size={isMobile ? 14 : 18} fill="white" /> {lang === 'en' ? 'Run Code' : '运行程序'}
+            </button>
+          )}
+        </div>
+
+      </div>
+      </div>
 
       {/* Shop Modal */}
       {showShop && (
@@ -2670,7 +2269,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               <button onClick={() => triggerMathQuiz('torch', torchNeeded)} className="bouncy-button secondary" style={{ padding: '12px', borderRadius: '12px', border: '2px solid #f97316', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff7ed' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>🔥 <span style={{color: '#ea580c'}}>{lang === 'en' ? `Torch x${torchAward}` : `火把 x${torchAward}`}</span></div>
-                  <div style={{ fontSize: '0.8rem', color: '#c2410c', background: '#ffedd5', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Burn All Connected Obstacles & Set Fire' : '功能: 连毁所有相连障碍并留火'}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#c2410c', background: '#ffedd5', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold' }}>{lang === 'en' ? 'Burn Obstacle & Set Fire' : '功能: 烧毁障碍并留火'}</div>
                 </div>
                 <div style={{ fontSize: '0.85rem', color: '#ea580c' }}>{lang === 'en' ? `${torchNeeded} Questions` : `需连答 ${torchNeeded} 题`}</div>
               </button>
@@ -2707,86 +2306,8 @@ export default function CodingMazeGame({ lang, onBack }) {
             border: '4px solid #60a5fa'
           }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e40af', fontSize: '1.4rem' }}>
-              {isSkeletonBattle 
-                ? (lang === 'en' ? '💀 Skeleton Battle 💀' : '💀 决战骷髅兵 💀')
-                : (lang === 'en' ? 'Math Challenge' : '算术挑战')}
+              {lang === 'en' ? 'Math Challenge' : '算术挑战'}
             </h3>
-            {isSkeletonBattle && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: 'linear-gradient(135deg, #1e1b4b 0%, #311042 100%)',
-                padding: '12px',
-                borderRadius: '16px',
-                border: '3px solid #7c3aed',
-                boxShadow: '0 8px 16px rgba(124, 58, 237, 0.3)',
-                marginBottom: '15px',
-                color: 'white',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                {/* Hero Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                  <div style={{ 
-                    fontSize: '2.5rem', 
-                    animation: isMathShaking ? 'heroShake 0.4s' : 'idleBreathing 1.5s infinite alternate' 
-                  }}>{tTheme.hero}</div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#4ade80', marginTop: '4px' }}>
-                    {lang === 'en' ? 'Hero' : '小勇士'}
-                  </div>
-                  {/* Hero HP */}
-                  <div style={{ display: 'flex', gap: '3px', marginTop: '4px' }}>
-                    {Array.from({ length: 2 }).map((_, i) => (
-                      <span key={i} style={{ 
-                        fontSize: '14px',
-                        opacity: i < (2 - skeletonMistakes) ? 1 : 0.25,
-                        transition: 'opacity 0.3s'
-                      }}>❤️</span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* VS Badge */}
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  padding: '0 10px'
-                }}>
-                  <span style={{ 
-                    fontSize: '1.2rem', 
-                    fontWeight: '900', 
-                    color: '#f43f5e', 
-                    textShadow: '0 0 10px #f43f5e',
-                    animation: 'targetPulse 1s infinite'
-                  }}>VS</span>
-                </div>
-
-                {/* Skeleton Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                  <div style={{ width: '50px', height: '50px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <img src={`${import.meta.env.BASE_URL}skeleton_frame1.png`} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'contain', animation: 'skeletonCycle1 0.75s steps(1) infinite' }} />
-                    <img src={`${import.meta.env.BASE_URL}skeleton_frame2.png`} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'contain', animation: 'skeletonCycle2 0.75s steps(1) infinite' }} />
-                    <img src={`${import.meta.env.BASE_URL}skeleton_frame3.png`} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'contain', animation: 'skeletonCycle3 0.75s steps(1) infinite' }} />
-                  </div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#f43f5e', marginTop: '4px' }}>
-                    {lang === 'en' ? 'Skeleton' : '骷髅兵'}
-                  </div>
-                  {/* Skeleton HP */}
-                  <div style={{ display: 'flex', gap: '3px', marginTop: '4px' }}>
-                    {Array.from({ length: 2 }).map((_, i) => (
-                      <span key={i} style={{ 
-                        fontSize: '14px', 
-                        opacity: i < (2 - skeletonQuestionIdx) ? 1 : 0.25,
-                        transition: 'opacity 0.3s'
-                      }}>💀</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
             {shopTarget ? (
               <p style={{ margin: '0 0 20px 0', color: '#1e40af', fontSize: '1rem', fontWeight: 'bold', background: '#e0f2fe', padding: '6px 12px', borderRadius: '20px', display: 'inline-block' }}>
                 {lang === 'en' 
@@ -2795,9 +2316,7 @@ export default function CodingMazeGame({ lang, onBack }) {
               </p>
             ) : (
               <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '1rem', fontWeight: 'bold' }}>
-                {isSkeletonBattle 
-                  ? (lang === 'en' ? 'Defeat the skeleton with correct math!' : '用正确的心算击败骷髅！')
-                  : (lang === 'en' ? 'Solve the problem to escape!' : '答对题目即可脱身！')}
+                {lang === 'en' ? 'Solve the problem to escape!' : '答对题目即可脱身！'}
               </p>
             )}
             
@@ -2823,18 +2342,247 @@ export default function CodingMazeGame({ lang, onBack }) {
               </button>
             </form>
             
-             {!isSkeletonBattle && (
-               <button 
-                 onClick={() => { audioSynth.playClick(); setShowMathQuiz(false); }}
-                 style={{
-                   marginTop: '15px', background: 'none', border: 'none', color: '#94a3b8',
-                   textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem',
-                   padding: '10px'
-                 }}
-               >
-                 {lang === 'en' ? 'Cancel' : '放弃挑战'}
-               </button>
-             )}
+            <button 
+              onClick={() => { audioSynth.playClick(); setShowMathQuiz(false); }}
+              style={{
+                marginTop: '15px', background: 'none', border: 'none', color: '#94a3b8',
+                textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem',
+                padding: '10px'
+              }}
+            >
+              {lang === 'en' ? 'Cancel' : '放弃挑战'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* VS Battle Entry Transition Overlay */}
+      {showVSOverlay && battleEnemyDef && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'linear-gradient(135deg, rgba(220,38,38,0.95) 0%, rgba(30,27,75,0.98) 100%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          zIndex: 4000, overflow: 'hidden'
+        }}>
+          <style>{`
+            @keyframes vsSlideLeft {
+              0% { transform: translateX(-150px) rotate(-15deg); opacity: 0; }
+              70% { transform: translateX(10px) rotate(5deg); opacity: 1; }
+              100% { transform: translateX(0) rotate(0deg); opacity: 1; }
+            }
+            @keyframes vsSlideRight {
+              0% { transform: translateX(150px) rotate(15deg); opacity: 0; }
+              70% { transform: translateX(-10px) rotate(-5deg); opacity: 1; }
+              100% { transform: translateX(0) rotate(0deg); opacity: 1; }
+            }
+            @keyframes vsPop {
+              0% { transform: scale(0); opacity: 0; }
+              60% { transform: scale(1.2); opacity: 1; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            @keyframes vsWarningStripes {
+              0% { background-position: 0 0; }
+              100% { background-position: 40px 0; }
+            }
+            .vs-warning-bg {
+              background-image: linear-gradient(45deg, rgba(0,0,0,0.3) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.3) 75%, transparent 75%, transparent);
+              background-size: 40px 40px;
+              animation: vsWarningStripes 1s linear infinite;
+            }
+            .vs-card-left {
+              animation: vsSlideLeft 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.2) both;
+            }
+            .vs-card-right {
+              animation: vsSlideRight 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.2) both;
+            }
+            .vs-logo {
+              animation: vsPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+            }
+          `}</style>
+          
+          {/* Flashing Warning background pattern */}
+          <div className="vs-warning-bg" style={{
+            position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none'
+          }} />
+
+          {/* VS Title banner */}
+          <div style={{
+            color: '#fef08a', fontSize: isMobile ? '1.8rem' : '2.6rem',
+            fontWeight: '900', letterSpacing: '4px', textShadow: '0 0 20px rgba(250,204,21,0.6)',
+            marginBottom: isMobile ? '30px' : '50px',
+            animation: 'vsPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both',
+            fontFamily: 'Fredoka, sans-serif', textTransform: 'uppercase',
+            zIndex: 10
+          }}>
+            ⚠️ {lang === 'en' ? 'BATTLE START!' : '对决开始！'} ⚠️
+          </div>
+
+          {/* Cards container */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyItems: 'center',
+            gap: isMobile ? '10px' : '40px', width: '90%', maxWidth: '700px',
+            position: 'relative', zIndex: 10
+          }}>
+            {/* Player Card */}
+            <div className="vs-card-left" style={{
+              flex: 1, background: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(5px)', borderRadius: '24px',
+              border: '3px solid #3b82f6', padding: isMobile ? '15px' : '25px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              boxShadow: '0 15px 30px rgba(59,130,246,0.3)'
+            }}>
+              <div style={{
+                fontSize: isMobile ? '3rem' : '4.5rem',
+                filter: 'drop-shadow(0 8px 12px rgba(59,130,246,0.5))',
+                animation: 'idleBreathing 1.5s infinite alternate'
+              }}>
+                🤖
+              </div>
+              <div style={{
+                color: 'white', fontWeight: '800',
+                fontSize: isMobile ? '1.1rem' : '1.5rem', marginTop: '12px'
+              }}>
+                {lang === 'en' ? 'Hero' : '小勇士'}
+              </div>
+              <div style={{
+                color: '#93c5fd', fontSize: '0.85rem', fontWeight: 'bold', marginTop: '4px'
+              }}>
+                HP: ❤️❤️❤️
+              </div>
+            </div>
+
+            {/* VS text bubble */}
+            <div className="vs-logo" style={{
+              fontSize: isMobile ? '3.5rem' : '5rem',
+              fontWeight: '900', color: '#ef4444',
+              textShadow: '0 0 15px rgba(239,68,68,0.7), 0 0 30px rgba(239,68,68,0.5)',
+              fontStyle: 'italic', zIndex: 10
+            }}>
+              VS
+            </div>
+
+            {/* Enemy Card */}
+            <div className="vs-card-right" style={{
+              flex: 1, background: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(5px)', borderRadius: '24px',
+              border: '3px solid #ef4444', padding: isMobile ? '15px' : '25px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              boxShadow: '0 15px 30px rgba(239,68,68,0.3)'
+            }}>
+              <img 
+                src={`${import.meta.env.BASE_URL}${battleEnemyDef.type}_3d.png`} 
+                style={{
+                  width: isMobile ? '70px' : '100px',
+                  height: isMobile ? '70px' : '100px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 8px 12px rgba(239,68,68,0.5))',
+                  animation: 'hoverWobble 1.2s infinite'
+                }} 
+                alt="enemy"
+              />
+              <div style={{
+                color: 'white', fontWeight: '800',
+                fontSize: isMobile ? '1.1rem' : '1.5rem', marginTop: '12px'
+              }}>
+                {getEnemyName(battleEnemyDef.type)}
+              </div>
+              <div style={{
+                color: '#fca5a5', fontSize: '0.85rem', fontWeight: 'bold', marginTop: '4px',
+                display: 'flex', gap: '2px'
+              }}>
+                HP: {Array.from({ length: enemyQuizCountMap[battleEnemyDef.type] || 2 }).map((_, hi) => '❤️')}
+              </div>
+            </div>
+          </div>
+          
+          <div style={{
+            marginTop: '40px', color: 'rgba(255,255,255,0.7)',
+            fontSize: isMobile ? '0.9rem' : '1.1rem', fontWeight: 'bold',
+            letterSpacing: '1px', textTransform: 'uppercase',
+            animation: 'pulse 1s infinite alternate',
+            zIndex: 10
+          }}>
+            {lang === 'en' ? 'Get ready to solve math problems!' : '准备口算对决，击败怪兽！'}
+          </div>
+        </div>
+      )}
+
+      {/* Enemy Combat Quiz Modal */}
+      {battleActive && battleProblem && battleEnemyDef && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1050, margin: 0, padding: 0
+        }}>
+          <div className={isBattleShaking ? 'shake-animation' : 'bounce-in'} style={{
+            background: 'white', padding: isMobile ? '20px' : '30px', borderRadius: '24px',
+            textAlign: 'center', width: '85%', maxWidth: '350px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+            border: '4px solid #f97316'
+          }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#c2410c', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              ⚔️ {lang === 'en' ? 'Combat Battle!' : '遭遇怪兽！'}
+            </h3>
+            
+            <div style={{ background: '#fff7ed', padding: '12px', borderRadius: '16px', border: '1px solid #ffedd5', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <img 
+                src={`${import.meta.env.BASE_URL}${battleEnemyDef.type}_3d.png`} 
+                style={{ width: '80px', height: '80px', objectFit: 'contain' }} 
+                alt="enemy" 
+              />
+              <span style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#7c2d12', marginTop: '6px' }}>
+                {getEnemyName(battleEnemyDef.type)}
+              </span>
+              <span style={{ fontSize: '0.85rem', color: '#9a3412', marginTop: '4px', fontWeight: '500', background: '#ffedd5', padding: '3px 10px', borderRadius: '12px' }}>
+                {lang === 'en' 
+                  ? `Question ${battleCurrentIndex + 1} of ${battleTotalQuestions}` 
+                  : `第 ${battleCurrentIndex + 1} 题，共 ${battleTotalQuestions} 题`}
+              </span>
+            </div>
+
+            {battleStatus && (
+              <p style={{ margin: '0 0 12px 0', color: '#ea580c', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                {battleStatus}
+              </p>
+            )}
+
+            <div style={{ fontSize: '2.8rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', letterSpacing: '3px' }}>
+              {battleProblem.a} {battleProblem.op} {battleProblem.b} = ?
+            </div>
+
+            <form onSubmit={handleBattleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <input 
+                type="number" 
+                value={battleInput}
+                onChange={(e) => setBattleInput(e.target.value)}
+                autoFocus
+                style={{
+                  fontSize: '2rem', padding: '10px', textAlign: 'center',
+                  borderRadius: '12px', border: '3px solid #cbd5e1', outline: 'none',
+                  color: '#0f172a', fontWeight: 'bold'
+                }}
+                placeholder="?"
+              />
+              <button type="submit" className="bouncy-button primary" style={{ padding: '14px', fontSize: '1.2rem', borderRadius: '12px', background: '#ea580c', border: 'none', color: 'white', cursor: 'pointer' }}>
+                {lang === 'en' ? 'Attack!' : '发起攻击！'}
+              </button>
+            </form>
+
+            <button 
+              onClick={() => {
+                audioSynth.playClick();
+                if (battleResolve) {
+                  battleResolve.resolve(false);
+                }
+              }}
+              style={{
+                marginTop: '15px', background: 'none', border: 'none', color: '#94a3b8',
+                textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem',
+                padding: '10px'
+              }}
+            >
+              {lang === 'en' ? 'Give Up' : '放弃战斗（重置关卡）'}
+            </button>
           </div>
         </div>
       )}
@@ -2867,7 +2615,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="20"
+                placeholder="10"
               />
               <span style={{ fontSize: '1.2rem', color: '#64748b', fontWeight: 'bold' }}>-</span>
               <input 
@@ -2878,7 +2626,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #cbd5e1', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="50"
+                placeholder="20"
               />
             </div>
 
@@ -2895,7 +2643,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #a855f7', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="20"
+                placeholder="15"
               />
               <span style={{ fontSize: '1.2rem', color: '#a855f7', fontWeight: 'bold' }}>-</span>
               <input 
@@ -2906,7 +2654,7 @@ export default function CodingMazeGame({ lang, onBack }) {
                   flex: 1, padding: '10px', fontSize: '1.1rem', borderRadius: '12px',
                   border: '2px solid #a855f7', textAlign: 'center', minWidth: 0
                 }}
-                placeholder="50"
+                placeholder="30"
               />
             </div>
 
@@ -3032,6 +2780,56 @@ export default function CodingMazeGame({ lang, onBack }) {
               </div>
             </div>
 
+            {/* Enemy Quiz Config Section */}
+            <p style={{ fontSize: '0.95rem', color: '#7c2d12', marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+              {lang === 'en' ? 'Enemy Combat Math Settings:' : '怪物对决答题配置：'}
+            </p>
+            
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#7c2d12' }}>
+                {lang === 'en' ? 'Question Range:' : '算术题数值范围:'}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input 
+                  type="number" 
+                  value={inputEnemyMin} 
+                  onChange={e => setInputEnemyMin(Math.max(1, parseInt(e.target.value) || 1))} 
+                  style={{ width: '60px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} 
+                />
+                <span>~</span>
+                <input 
+                  type="number" 
+                  value={inputEnemyMax} 
+                  onChange={e => setInputEnemyMax(Math.max(1, parseInt(e.target.value) || 1))} 
+                  style={{ width: '60px', padding: '6px', textAlign: 'center', borderRadius: '8px', border: '1px solid #cbd5e1' }} 
+                />
+              </div>
+            </div>
+
+            <span style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '8px', display: 'block' }}>
+              {lang === 'en' ? 'Number of questions to defeat each enemy:' : '击败各类怪物所需答对题数：'}
+            </span>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', maxHeight: '180px', overflowY: 'auto', padding: '6px', background: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5', marginBottom: '15px' }}>
+              {Object.keys(inputEnemyQuizCountMap).map((enemyType) => (
+                <div key={`set-q-${enemyType}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', padding: '6px 8px', borderRadius: '8px', border: '1px solid #fed7aa' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }}>
+                    <img src={`${import.meta.env.BASE_URL}${enemyType}_3d.png`} style={{ width: '18px', height: '18px', objectFit: 'contain' }} alt={enemyType} />
+                    <span style={{ fontWeight: '500' }}>{getEnemyName(enemyType)}:</span>
+                  </div>
+                  <input 
+                    type="number" 
+                    value={inputEnemyQuizCountMap[enemyType] || 1} 
+                    onChange={e => {
+                      const val = Math.max(1, parseInt(e.target.value) || 1);
+                      setInputEnemyQuizCountMap(prev => ({ ...prev, [enemyType]: val }));
+                    }} 
+                    style={{ width: '40px', padding: '4px', textAlign: 'center', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                  />
+                </div>
+              ))}
+            </div>
+
             {/* Direct Level Selection for Parents */}
             <p style={{ fontSize: '0.95rem', color: '#dc2626', marginTop: '15px', marginBottom: '10px', fontWeight: 'bold', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
               {lang === 'en' ? 'Set Current Level (Parent Override):' : '设置当前关卡（强行跳关）：'}
@@ -3095,6 +2893,18 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setCustomAtomicMinInput(aMin);
                   setCustomAtomicMaxInput(aMax);
 
+                  let eMin = parseInt(inputEnemyMin);
+                  let eMax = parseInt(inputEnemyMax);
+                  if (isNaN(eMin) || eMin < 1) eMin = 1;
+                  if (isNaN(eMax) || eMax < eMin) eMax = eMin + 5;
+                  if (eMax > 1000) eMax = 1000;
+                  setEnemyMin(eMin);
+                  setEnemyMax(eMax);
+                  setInputEnemyMin(eMin);
+                  setInputEnemyMax(eMax);
+
+                  setEnemyQuizCountMap({ ...inputEnemyQuizCountMap });
+
                   // Save props configuration
                   setNormalNeeded(inputNormalNeeded);
                   setFreezeNeeded(inputFreezeNeeded);
@@ -3128,23 +2938,27 @@ export default function CodingMazeGame({ lang, onBack }) {
                   setMaxUnlockedLevel(newMax);
                   localStorage.setItem('codingMazeMaxUnlockedLevel', newMax.toString());
 
-                  localStorage.setItem('codingMazeMathMin', vMin);
-                  localStorage.setItem('codingMazeMathMax', vMax);
-                  localStorage.setItem('codingMazeAtomicMin', aMin);
-                  localStorage.setItem('codingMazeAtomicMax', aMax);
-                  localStorage.setItem('codingMazeNormalNeeded', inputNormalNeeded);
-                  localStorage.setItem('codingMazeFreezeNeeded', inputFreezeNeeded);
-                  localStorage.setItem('codingMazeSuperNeeded', inputSuperNeeded);
-                  localStorage.setItem('codingMazeAtomicNeeded', inputAtomicNeeded);
-                  localStorage.setItem('codingMazeTorchNeeded', inputTorchNeeded);
-                  localStorage.setItem('codingMazeShieldNeeded', inputShieldNeeded);
+                  localStorage.setItem('codingMazeMathMin', vMin.toString());
+                  localStorage.setItem('codingMazeMathMax', vMax.toString());
+                  localStorage.setItem('codingMazeAtomicMin', aMin.toString());
+                  localStorage.setItem('codingMazeAtomicMax', aMax.toString());
+                  localStorage.setItem('codingMazeEnemyMin', eMin.toString());
+                  localStorage.setItem('codingMazeEnemyMax', eMax.toString());
+                  localStorage.setItem('codingMazeEnemyQuizCountMap', JSON.stringify(inputEnemyQuizCountMap));
                   
-                  localStorage.setItem('codingMazeNormalAward', inputNormalAward);
-                  localStorage.setItem('codingMazeFreezeAward', inputFreezeAward);
-                  localStorage.setItem('codingMazeSuperAward', inputSuperAward);
-                  localStorage.setItem('codingMazeAtomicAward', inputAtomicAward);
-                  localStorage.setItem('codingMazeTorchAward', inputTorchAward);
-                  localStorage.setItem('codingMazeShieldAward', inputShieldAward);
+                  localStorage.setItem('codingMazeNormalNeeded', inputNormalNeeded.toString());
+                  localStorage.setItem('codingMazeFreezeNeeded', inputFreezeNeeded.toString());
+                  localStorage.setItem('codingMazeSuperNeeded', inputSuperNeeded.toString());
+                  localStorage.setItem('codingMazeAtomicNeeded', inputAtomicNeeded.toString());
+                  localStorage.setItem('codingMazeTorchNeeded', inputTorchNeeded.toString());
+                  localStorage.setItem('codingMazeShieldNeeded', inputShieldNeeded.toString());
+                  
+                  localStorage.setItem('codingMazeNormalAward', inputNormalAward.toString());
+                  localStorage.setItem('codingMazeFreezeAward', inputFreezeAward.toString());
+                  localStorage.setItem('codingMazeSuperAward', inputSuperAward.toString());
+                  localStorage.setItem('codingMazeAtomicAward', inputAtomicAward.toString());
+                  localStorage.setItem('codingMazeTorchAward', inputTorchAward.toString());
+                  localStorage.setItem('codingMazeShieldAward', inputShieldAward.toString());
                   localStorage.setItem('codingMazeInventory', JSON.stringify(newInv));
 
                   setShowSettings(false);
@@ -3321,7 +3135,6 @@ export default function CodingMazeGame({ lang, onBack }) {
               { type: 'elephant', emoji: '🐘', name: lang==='en'?'Elephant':'大象',  hp: 3, color: '#475569', glow: '#94a3b8', anim: 'idleBreathing 1.5s infinite alternate', desc: lang==='en'?'Huge and heavy':'巨大沉重' },
               { type: 'magma',    emoji: '🌋', name: lang==='en'?'Magma':'岩浆怪',  hp: 3, color: '#dc2626', glow: '#f97316', anim: 'magmaBubble 1.4s infinite alternate', desc: lang==='en'?'Burns nearby tiles':'周围格子着火🔥' },
               { type: 'dinosaur', emoji: '🦕', name: lang==='en'?'Dinosaur':'恐龙',  hp: 4, color: '#b91c1c', glow: '#ef4444', anim: 'dinoBreathing 1.8s infinite alternate', desc: lang==='en'?'2x2 BOSS! Spits fire':'2x2大boss! 喷火🔥' },
-              { type: 'skeleton', emoji: '💀', name: lang==='en'?'Skeleton':'骷髅士兵',hp: 1, color: '#6b7280', glow: '#9ca3af', anim: 'skeletonRattle 0.5s infinite', desc: lang==='en'?'A frightening skeleton warrior':'手持邪恶铁刃的恐怖骷髅兵' },
             ].map((m, idx) => (
               <div key={m.type} style={{
                 background: `linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)`,

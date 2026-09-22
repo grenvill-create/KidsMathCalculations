@@ -49,6 +49,7 @@ import MathLinkGame from './components/MathLinkGame';
 import SubPopGame from './components/SubPopGame';
 import WaterJugGame from './components/WaterJugGame';
 import MemoryMatchGame from './components/MemoryMatchGame';
+import Base10AdditionGame from './components/Base10AdditionGame';
 import philosophyImg from './assets/philosophy.jpg';
 
 // Reusable category card for the welcome screen game sections
@@ -585,6 +586,7 @@ export default function App() {
             { label: gameState.lang === 'en' ? 'Sub Pop' : '减法消消乐', emoji: '➖', screen: 'subpop', bg: 'linear-gradient(135deg, #60a5fa, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
             { label: gameState.lang === 'en' ? 'Equation Link' : '算式连连看', emoji: '🔗', screen: 'mathLink', bg: 'linear-gradient(135deg, #a78bfa, #6366f1)', shadow: 'rgba(99,102,241,0.35)' },
             { label: gameState.lang === 'en' ? 'Memory Match' : '记忆翻牌', emoji: '🎴', screen: 'memoryMatch', bg: 'linear-gradient(135deg, #a78bfa, #8b5cf6)', shadow: 'rgba(139,92,246,0.35)' },
+            { label: gameState.lang === 'en' ? 'Block Add' : '积木加法', emoji: '🧱', screen: 'base10Add', bg: 'linear-gradient(135deg, #60a5fa, #3b82f6)', shadow: 'rgba(59,130,246,0.35)' },
           ]} onScreen={(s) => { audioSynth.playClick(); setScreen(s); }} />
 
           {/* ── Section: 图形与空间 ── */}
@@ -1109,6 +1111,7 @@ export default function App() {
       {screen === 'subpop'         && <SubPopGame lang={gameState.lang} onBack={goHomeFromGame} />}
       {screen === 'waterJug'       && <WaterJugGame lang={gameState.lang} onBack={goHomeFromGame} />}
       {screen === 'memoryMatch'    && <MemoryMatchGame lang={gameState.lang} range={{min: gameState.minNumber, max: gameState.maxNumber}} ops={gameState.operations} onBack={goHomeFromGame} />}
+      {screen === 'base10Add'      && <Base10AdditionGame lang={gameState.lang} onBack={goHomeFromGame} />}
       {/* --- EDUCATION PHILOSOPHY MODAL --- */}
       {showPhilosophy && (
         <div className="fade-in" style={{

@@ -245,6 +245,45 @@ export const audioSynth = {
     } catch(e) {}
   },
 
+  // Tension-building synth arpeggio for battle entrance
+  playBattleStart() {
+    if (isMuted) return;
+    try {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      
+      // Tension synth sweep
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(261.63, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.65);
+      
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.7);
+      
+      // Heavy boom impact
+      const kick = ctx.createOscillator();
+      const kickGain = ctx.createGain();
+      kick.type = 'triangle';
+      kick.frequency.setValueAtTime(150, now);
+      kick.frequency.exponentialRampToValueAtTime(40, now + 0.4);
+      
+      kickGain.gain.setValueAtTime(0.35, now);
+      kickGain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+      
+      kick.connect(kickGain);
+      kickGain.connect(ctx.destination);
+      kick.start(now);
+      kick.stop(now + 0.45);
+    } catch (e) {}
+  },
+
   // Laser armor piercing big boom
   playSuperBomb() {
     if (isMuted) return;
