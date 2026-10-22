@@ -31,6 +31,7 @@ export const translations = {
     gameSeqFill: "数列填空",
     gameMakeTen: "凑十法",
     gameBreakingTen: "破十减法",
+    gameColumnSub: "竖式借位减法",
     gameMultiIntro: "乘法启蒙",
     
     gameShape: "认形状",
@@ -160,6 +161,7 @@ export const translations = {
     gameSeqFill: "Fill Sequence",
     gameMakeTen: "Make Ten",
     gameBreakingTen: "Teens Subtraction",
+    gameColumnSub: "Column Subtraction",
     gameMultiIntro: "Intro Multi",
     
     gameShape: "Shapes",
