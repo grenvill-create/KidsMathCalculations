@@ -2,24 +2,24 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import { audioSynth } from '../utils/audioSynth';
 
-// Generate a valid subtraction with regrouping (100以内退位减法)
-function generateProblem(level) {
+// ── 生成退位减法题目 ──
+function generateProblem(type = 'mixed') {
   let aTens, aOnes, bTens, bOnes;
 
-  if (level === 1) {
-    // Level 1: 两位数减一位数退位 (如 32 - 7, 45 - 8)
+  if (type === 'two_minus_one') {
+    // 两位数减一位数退位 (如 32 - 7, 45 - 8)
     aTens = Math.floor(Math.random() * 5) + 2; // 2..6
     aOnes = Math.floor(Math.random() * 5); // 0..4
     bTens = 0;
     bOnes = Math.floor(Math.random() * (9 - aOnes)) + (aOnes + 1); // aOnes+1..9
-  } else if (level === 2) {
-    // Level 2: 整十数减法 (如 50 - 24, 60 - 8)
+  } else if (type === 'tens_sub') {
+    // 整十数减法 (如 50 - 24, 60 - 8)
     aTens = Math.floor(Math.random() * 5) + 3; // 3..7
     aOnes = 0;
     bTens = Math.random() > 0.4 ? Math.floor(Math.random() * (aTens - 2)) + 1 : 0;
     bOnes = Math.floor(Math.random() * 9) + 1;
   } else {
-    // Level 3: 两位数减两位数退位 (如 52 - 28, 64 - 37)
+    // 两位数减两位数退位 (如 52 - 28, 64 - 37, 73 - 48)
     aTens = Math.floor(Math.random() * 5) + 3; // 3..7
     aOnes = Math.floor(Math.random() * 5); // 0..4
     bTens = Math.floor(Math.random() * (aTens - 1)) + 1; // 1..aTens-1
@@ -45,7 +45,18 @@ function generateProblem(level) {
   };
 }
 
-// 3 nearby choices including the correct one
+// 生成一组循序渐进的5道每日题目（前2道两位数减一位数，第3道整十数，后2道两位数减两位数）
+function generateDaily5() {
+  return [
+    generateProblem('two_minus_one'),
+    generateProblem('two_minus_one'),
+    generateProblem('tens_sub'),
+    generateProblem('two_minus_two'),
+    generateProblem('two_minus_two'),
+  ];
+}
+
+// 选项生成器（包含正确答案和邻近干扰项）
 function makeOptions(correct) {
   const opts = new Set([correct]);
   while (opts.size < 3) {
@@ -53,6 +64,15 @@ function makeOptions(correct) {
     if (v >= 0 && v <= 9) opts.add(v);
   }
   return Array.from(opts).sort((x, y) => x - y);
+}
+
+// 获取今天本地日期字符串 YYYY-MM-DD
+function getTodayDateStr() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // ── 醒目的口诀展示卡（每次做题都显示）──
@@ -74,7 +94,7 @@ const MnemonicBanner = ({ activeHighlight = null }) => {
       alignItems: 'center',
       position: 'relative',
     }}>
-      {/* Badge title */}
+      {/* 徽章标题 */}
       <div style={{
         background: 'linear-gradient(135deg, #a855f7, #9333ea)',
         color: 'white',
@@ -88,7 +108,7 @@ const MnemonicBanner = ({ activeHighlight = null }) => {
         ✨ 退位减法速算秘籍 ✨
       </div>
 
-      {/* Main Mnemonic Formula Text */}
+      {/* 口诀公式 */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -100,7 +120,6 @@ const MnemonicBanner = ({ activeHighlight = null }) => {
         textAlign: 'center',
         lineHeight: 1.4,
       }}>
-        {/* Part 1: 头减头减1=头 */}
         <span style={{
           padding: '3px 8px',
           borderRadius: '10px',
@@ -116,7 +135,6 @@ const MnemonicBanner = ({ activeHighlight = null }) => {
 
         <span style={{ color: '#9333ea', fontSize: '1.2rem', fontWeight: '900' }}>；</span>
 
-        {/* Part 2: 尾+尾（尾的补位数）=尾 */}
         <span style={{
           padding: '3px 8px',
           borderRadius: '10px',
@@ -131,7 +149,7 @@ const MnemonicBanner = ({ activeHighlight = null }) => {
         </span>
       </div>
 
-      {/* Kid-friendly helper annotations */}
+      {/* 注释 */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -154,17 +172,10 @@ const MnemonicBanner = ({ activeHighlight = null }) => {
   );
 };
 
-// ── 竖式借位 Guide (school-style column subtraction with guided teaching) ──
+// ── 分步竖式指导组件 (Step-by-Step Column Guide) ──
 function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
   const { a, b, aTens, aOnes, bTens, bOnes, complement, ansTens, ansOnes, answer } = problem;
   
-  // Step sequence:
-  // 'check'       -> 第①步：看个位够不够减
-  // 'borrow'      -> 第②步：向十位借1，点退位点
-  // 'find_comp'   -> 第③步：找补数（减数尾的补位数是几？）
-  // 'calc_tail'   -> 第④步：算尾（尾+尾的补位数=尾）
-  // 'calc_head'   -> 第⑤步：算头（头减头减1=头）
-  // 'done'        -> 第⑥步：合体完成！
   const [step, setStep] = useState('check');
   const [hint, setHint] = useState('');
 
@@ -176,7 +187,6 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
   const onesDone = step === 'calc_head' || step === 'done';
   const tensDone = step === 'done';
 
-  // Highlight which part of the mnemonic is active
   const activeMnemonic = useMemo(() => {
     if (step === 'find_comp' || step === 'calc_tail') return 'tail';
     if (step === 'borrow' || step === 'calc_head') return 'head';
@@ -190,10 +200,8 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
         : `Column method: ${a} minus ${b}. Look at the ones: can ${aOnes} minus ${bOnes}?`,
       lang
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problem.id]);
+  }, [problem.id, a, b, aOnes, bOnes, zh, lang]);
 
-  // Step 1: Check
   const handleCheck = (enough) => {
     audioSynth.playClick();
     if (!enough) {
@@ -203,7 +211,7 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
       audioSynth.speak(
         zh 
           ? `对！不够减。个位不够减，向十位借 1 当 10！点击十位上的 ${aTens} 点上退位点！` 
-          : `Right! Not enough. Borrow 1 from tens! Tap the ${aTens} to place the borrow dot!`,
+          : `Right! Not enough. Borrow 1 from tens! Tap the ${aTens}!`,
         lang
       );
     } else {
@@ -212,7 +220,6 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
     }
   };
 
-  // Step 2: Borrow
   const handleBorrow = () => {
     if (step !== 'borrow') return;
     audioSynth.playClick();
@@ -220,13 +227,12 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
     setStep('find_comp');
     audioSynth.speak(
       zh 
-        ? `借走 1，十位点上红色的退位点！现在看减数的尾巴是 ${bOnes}，它的补位数（凑十好朋友）是几？` 
-        : `Borrowed 1! Borrow dot added. The subtrahend's tail is ${bOnes}. What is its complement to 10?`,
+        ? `借走 1，十位点上红色的退位点！减数的尾巴是 ${bOnes}，它的补位数（凑十好朋友）是几？` 
+        : `Borrowed 1! The subtrahend's tail is ${bOnes}. What is its complement to 10?`,
       lang
     );
   };
 
-  // Step 3: Find complement
   const handleCompPick = (val) => {
     audioSynth.playClick();
     if (val === complement) {
@@ -236,7 +242,7 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
       audioSynth.speak(
         zh 
           ? `太棒啦！${bOnes} 加 ${val} 等于 10，补位数就是 ${val}！现在用口诀：“尾加尾的补位数等于尾”！` 
-          : `Great! ${bOnes} plus ${val} is 10. Now rule: Tail plus complement!`,
+          : `Great! ${bOnes} plus ${val} is 10. Tail plus complement!`,
         lang
       );
     } else {
@@ -245,7 +251,6 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
     }
   };
 
-  // Step 4: Calculate tail
   const handleOnesPick = (val) => {
     audioSynth.playClick();
     if (val === ansOnes) {
@@ -264,7 +269,6 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
     }
   };
 
-  // Step 5: Calculate head
   const handleTensPick = (val) => {
     audioSynth.playClick();
     if (val === ansTens) {
@@ -285,7 +289,6 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
     }
   };
 
-  // Column styling
   const CELL = 74;
   const onesHL = step === 'check' || step === 'find_comp' || step === 'calc_tail';
   const tensHL = step === 'borrow' || step === 'calc_head';
@@ -310,190 +313,118 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
       display: 'flex', flexDirection: 'column', gap: '14px', alignItems: 'center',
       boxShadow: '0 10px 30px rgba(79, 70, 229, 0.12)'
     }}>
-
-      {/* ── 永远显示的口诀秘籍横幅 ── */}
       <MnemonicBanner activeHighlight={activeMnemonic} />
 
-      {/* ── Notebook-style Column Board (作业本风格竖式) ── */}
+      {/* 竖式作业本 */}
       <div style={{
         background: '#fffef7', borderRadius: '20px', padding: '14px 24px 10px',
         border: '2px solid #e2e8f0', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05)',
         position: 'relative'
       }}>
         <div style={{ display: 'grid', gridTemplateColumns: `44px ${CELL}px ${CELL}px`, rowGap: '2px' }}>
-          
-          {/* Column Header Labels */}
           <div />
-          <div style={{ textAlign: 'center', fontSize: '0.8rem', fontWeight: '800', color: '#4f46e5' }}>
-            🟣 头(十位)
-          </div>
-          <div style={{ textAlign: 'center', fontSize: '0.8rem', fontWeight: '800', color: '#ea580c' }}>
-            🟠 尾(个位)
-          </div>
+          <div style={{ textAlign: 'center', fontSize: '0.8rem', fontWeight: '800', color: '#4f46e5' }}>🟣 头(十位)</div>
+          <div style={{ textAlign: 'center', fontSize: '0.8rem', fontWeight: '800', color: '#ea580c' }}>🟠 尾(个位)</div>
 
-          {/* Row 0: Borrow Mark (退位点) */}
+          {/* 退位点行 */}
           <div style={{ height: '18px' }} />
-          <div style={{
-            display: 'flex', justifyContent: 'center', alignItems: 'center', height: '18px',
-            background: colBg(tensHL, '#e0e7ff'), borderRadius: '10px 10px 0 0'
-          }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '18px', background: colBg(tensHL, '#e0e7ff'), borderRadius: '10px 10px 0 0' }}>
             {borrowed && (
               <div className="bounce-in" style={{
-                width: '12px', height: '12px', borderRadius: '50%',
-                background: '#ef4444', boxShadow: '0 0 8px #ef4444',
-                border: '1.5px solid white'
-              }} title="退位点：十位被借走了1个十" />
+                width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444',
+                boxShadow: '0 0 8px #ef4444', border: '1.5px solid white'
+              }} title="退位点" />
             )}
           </div>
           <div style={{ height: '18px', background: colBg(onesHL, '#ffedd5'), borderRadius: '10px 10px 0 0' }} />
 
-          {/* Row 1: Minuend (被减数) */}
+          {/* 被减数 */}
           <div />
           <div onClick={handleBorrow} style={cell(tensHL, '#e0e7ff', { position: 'relative', cursor: step === 'borrow' ? 'pointer' : 'default' })}>
             <span style={{
               ...digitStyle, padding: '0 8px', borderRadius: '14px',
               outline: step === 'borrow' ? '3px dashed #f59e0b' : 'none',
               animation: step === 'borrow' ? 'bounceSlow 1s infinite' : 'none'
-            }}>
-              {aTens}
-            </span>
+            }}>{aTens}</span>
             {borrowed && (
               <>
-                {/* Slash through borrowed tens */}
                 <div style={{ position: 'absolute', width: '42px', height: '3.5px', background: '#ef4444', transform: 'rotate(-55deg)', borderRadius: '2px' }} />
-                {/* Remainder after borrow */}
-                <span className="bounce-in" style={{
-                  position: 'absolute', top: '-4px', right: '4px',
-                  fontSize: '1.15rem', fontWeight: '900', color: '#ef4444'
-                }}>
-                  {aTens - 1}
-                </span>
+                <span className="bounce-in" style={{ position: 'absolute', top: '-4px', right: '4px', fontSize: '1.15rem', fontWeight: '900', color: '#ef4444' }}>{aTens - 1}</span>
               </>
             )}
           </div>
           <div style={cell(onesHL, '#ffedd5')}>
             {borrowed && (
-              <span className="bounce-in" style={{
-                fontSize: '1.25rem', fontWeight: '900', color: '#ef4444',
-                alignSelf: 'flex-start', marginTop: '6px', marginRight: '2px'
-              }}>
-                1
-              </span>
+              <span className="bounce-in" style={{ fontSize: '1.25rem', fontWeight: '900', color: '#ef4444', alignSelf: 'flex-start', marginTop: '6px', marginRight: '2px' }}>1</span>
             )}
             <span style={digitStyle}>{aOnes}</span>
           </div>
 
-          {/* Row 2: Subtrahend (减数) */}
-          <div style={{ ...digitStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444', height: '62px' }}>
-            −
-          </div>
+          {/* 减数 */}
+          <div style={{ ...digitStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444', height: '62px' }}>−</div>
           <div style={cell(tensHL, '#e0e7ff')}>
             <span style={digitStyle}>{bTens > 0 ? bTens : ''}</span>
           </div>
           <div style={cell(onesHL, '#ffedd5', { position: 'relative' })}>
             <span style={digitStyle}>{bOnes}</span>
-            {/* Tag showing complement of the subtrahend tail */}
             {(step === 'find_comp' || step === 'calc_tail') && (
               <span className="bounce-in" style={{
-                position: 'absolute', right: '-12px', top: '4px',
-                background: '#16a34a', color: 'white', borderRadius: '50px',
-                padding: '1px 6px', fontSize: '0.68rem', fontWeight: '800',
-                boxShadow: '0 2px 5px rgba(22, 163, 74, 0.3)'
+                position: 'absolute', right: '-12px', top: '4px', background: '#16a34a', color: 'white',
+                borderRadius: '50px', padding: '1px 6px', fontSize: '0.68rem', fontWeight: '800'
               }}>
                 补数{complement}
               </span>
             )}
           </div>
 
-          {/* Dividing Line */}
+          {/* 分割线 */}
           <div style={{ gridColumn: '1 / span 3', height: '4px', background: '#1e1b4b', borderRadius: '2px', margin: '2px 0' }} />
 
-          {/* Row 3: Answer (差) */}
+          {/* 结果 */}
           <div />
           <div style={cell(tensHL, '#e0e7ff', { borderRadius: '0 0 10px 10px' })}>
-            {tensDone && (
-              <span className="bounce-in" style={{ ...digitStyle, color: ansTens === 0 ? '#94a3b8' : '#16a34a' }}>
-                {ansTens}
-              </span>
-            )}
+            {tensDone && <span className="bounce-in" style={{ ...digitStyle, color: ansTens === 0 ? '#94a3b8' : '#16a34a' }}>{ansTens}</span>}
           </div>
           <div style={cell(onesHL, '#ffedd5', { borderRadius: '0 0 10px 10px' })}>
-            {onesDone && (
-              <span className="bounce-in" style={{ ...digitStyle, color: '#16a34a' }}>
-                {ansOnes}
-              </span>
-            )}
+            {onesDone && <span className="bounce-in" style={{ ...digitStyle, color: '#16a34a' }}>{ansOnes}</span>}
           </div>
-
         </div>
       </div>
 
-      {/* ── Step-by-Step Educational Interactive Panels ── */}
-
-      {/* STEP 1: 看个位够不够减 */}
+      {/* 步骤交互面板 */}
       {step === 'check' && (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', width: '100%' }}>
-          <div style={{
-            background: '#fff7ed', border: '2px solid #fdba74', borderRadius: '16px',
-            padding: '10px 16px', textAlign: 'center', color: '#9a3412', fontWeight: '800', fontSize: '0.96rem'
-          }}>
+          <div style={{ background: '#fff7ed', border: '2px solid #fdba74', borderRadius: '16px', padding: '10px 16px', textAlign: 'center', color: '#9a3412', fontWeight: '800', fontSize: '0.96rem' }}>
             第①步：看个位尾巴，<b>{aOnes} 减 {bOnes}</b> 够不够减？
           </div>
           <div style={{ display: 'flex', gap: '14px' }}>
-            <button className="bouncy-button secondary" onClick={() => handleCheck(true)} style={{ padding: '10px 22px', borderRadius: '16px' }}>
-              ✅ 够减
-            </button>
-            <button className="bouncy-button primary" onClick={() => handleCheck(false)} style={{
-              padding: '10px 22px', borderRadius: '16px',
-              background: 'linear-gradient(135deg, #f97316, #ea580c)', borderColor: '#fdba74'
-            }}>
+            <button className="bouncy-button secondary" onClick={() => handleCheck(true)} style={{ padding: '10px 22px', borderRadius: '16px' }}>✅ 够减</button>
+            <button className="bouncy-button primary" onClick={() => handleCheck(false)} style={{ padding: '10px 22px', borderRadius: '16px', background: 'linear-gradient(135deg, #f97316, #ea580c)', borderColor: '#fdba74' }}>
               ❌ 不够减（借位）
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 2: 向十位借1 */}
       {step === 'borrow' && (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', width: '100%' }}>
-          <div style={{
-            background: '#eef2ff', border: '2px solid #a5b4fc', borderRadius: '16px',
-            padding: '10px 16px', textAlign: 'center', color: '#3730a3', fontWeight: '800', fontSize: '0.96rem'
-          }}>
-            第②步：不够减，向十位“头”借 1 当 10！<br />
-            👆 请点击十位上的数字 <b style={{ color: '#f59e0b', fontSize: '1.2rem' }}>{aTens}</b>
+          <div style={{ background: '#eef2ff', border: '2px solid #a5b4fc', borderRadius: '16px', padding: '10px 16px', textAlign: 'center', color: '#3730a3', fontWeight: '800', fontSize: '0.96rem' }}>
+            第②步：不够减，向十位“头”借 1 当 10！<br />👆 请点击十位上的数字 <b style={{ color: '#f59e0b', fontSize: '1.2rem' }}>{aTens}</b>
           </div>
-          <button className="bouncy-button primary" onClick={handleBorrow} style={{
-            padding: '11px 24px', borderRadius: '20px',
-            background: 'linear-gradient(135deg, #ef4444, #dc2626)', borderColor: '#fca5a5',
-            fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '6px'
-          }}>
-            <span>🔴</span>
-            <span>借 1 个十，点上退位点！</span>
+          <button className="bouncy-button primary" onClick={handleBorrow} style={{ padding: '11px 24px', borderRadius: '20px', background: 'linear-gradient(135deg, #ef4444, #dc2626)', borderColor: '#fca5a5', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>🔴</span><span>借 1 个十，点上退位点！</span>
           </button>
         </div>
       )}
 
-      {/* STEP 3: 找补位数 (凑十好朋友) */}
       {step === 'find_comp' && (
-        <div className="fade-in" style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-          background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '18px', padding: '12px 16px', width: '100%'
-        }}>
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '18px', padding: '12px 16px', width: '100%' }}>
           <div style={{ fontWeight: '800', color: '#166534', fontSize: '0.96rem', textAlign: 'center', lineHeight: 1.4 }}>
-            第③步：认识<b>“补位数”</b><br />
-            减数的尾巴是 <b style={{ color: '#ea580c' }}>{bOnes}</b>，它和几凑成 10（它的补位数是几）？
+            第③步：认识<b>“补位数”</b><br />减数的尾巴是 <b style={{ color: '#ea580c' }}>{bOnes}</b>，它和几凑成 10（补位数是几）？
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             {compOptions.map(opt => (
-              <button
-                key={opt}
-                className="bouncy-button"
-                onClick={() => handleCompPick(opt)}
-                style={optBtn('#16a34a', '#166534')}
-              >
-                {opt}
-              </button>
+              <button key={opt} className="bouncy-button" onClick={() => handleCompPick(opt)} style={optBtn('#16a34a', '#166534')}>{opt}</button>
             ))}
           </div>
           <div style={{ fontSize: '0.78rem', color: '#15803d', fontWeight: '700' }}>
@@ -502,98 +433,52 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
         </div>
       )}
 
-      {/* STEP 4: 算尾 (尾 + 尾的补位数 = 尾) */}
       {step === 'calc_tail' && (
-        <div className="fade-in" style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-          background: '#fff7ed', border: '2px solid #fb923c', borderRadius: '18px', padding: '12px 16px', width: '100%'
-        }}>
-          <div style={{
-            background: '#ea580c', color: 'white', padding: '2px 12px',
-            borderRadius: '50px', fontSize: '0.8rem', fontWeight: '800'
-          }}>
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', background: '#fff7ed', border: '2px solid #fb923c', borderRadius: '18px', padding: '12px 16px', width: '100%' }}>
+          <div style={{ background: '#ea580c', color: 'white', padding: '2px 12px', borderRadius: '50px', fontSize: '0.8rem', fontWeight: '800' }}>
             口诀：尾 ＋ 尾（尾的补位数）＝ 尾
           </div>
-
           <div style={{ fontWeight: '800', color: '#9a3412', fontSize: '1rem', textAlign: 'center', lineHeight: 1.4 }}>
             原有的尾巴 <b style={{ color: '#ea580c' }}>{aOnes}</b> ＋ 补位数 <b style={{ color: '#16a34a' }}>{complement}</b> ＝ ？<br />
-            <span style={{ fontSize: '1.2rem', color: '#c2410c' }}>
-              {aOnes} ＋ {complement} ＝ [ ? ]
-            </span>
+            <span style={{ fontSize: '1.2rem', color: '#c2410c' }}>{aOnes} ＋ {complement} ＝ [ ? ]</span>
           </div>
-
           <div style={{ display: 'flex', gap: '12px' }}>
             {onesOptions.map(opt => (
-              <button
-                key={opt}
-                className="bouncy-button"
-                onClick={() => handleOnesPick(opt)}
-                style={optBtn('#ea580c', '#c2410c')}
-              >
-                {opt}
-              </button>
+              <button key={opt} className="bouncy-button" onClick={() => handleOnesPick(opt)} style={optBtn('#ea580c', '#c2410c')}>{opt}</button>
             ))}
           </div>
-
           <div style={{ fontSize: '0.78rem', color: '#b45309', textAlign: 'center' }}>
             💡 原理：借来的 10 减去 {bOnes} 剩下 {complement}，再加上原本的 {aOnes}！
           </div>
         </div>
       )}
 
-      {/* STEP 5: 算头 (头减头减1 = 头) */}
       {step === 'calc_head' && (
-        <div className="fade-in" style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-          background: '#eef2ff', border: '2px solid #818cf8', borderRadius: '18px', padding: '12px 16px', width: '100%'
-        }}>
-          <div style={{
-            background: '#4f46e5', color: 'white', padding: '2px 12px',
-            borderRadius: '50px', fontSize: '0.8rem', fontWeight: '800'
-          }}>
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', background: '#eef2ff', border: '2px solid #818cf8', borderRadius: '18px', padding: '12px 16px', width: '100%' }}>
+          <div style={{ background: '#4f46e5', color: 'white', padding: '2px 12px', borderRadius: '50px', fontSize: '0.8rem', fontWeight: '800' }}>
             口诀：头 减 头 减 1 ＝ 头
           </div>
-
           <div style={{ fontWeight: '800', color: '#3730a3', fontSize: '1rem', textAlign: 'center', lineHeight: 1.4 }}>
             原有头 <b>{aTens}</b> − 减数头 <b>{bTens}</b> − 借走的 <b>1</b> ＝ ？<br />
-            <span style={{ fontSize: '1.2rem', color: '#4338ca' }}>
-              {aTens} − {bTens} − 1 ＝ [ ? ]
-            </span>
+            <span style={{ fontSize: '1.2rem', color: '#4338ca' }}>{aTens} − {bTens} − 1 ＝ [ ? ]</span>
           </div>
-
           <div style={{ display: 'flex', gap: '12px' }}>
             {tensOptions.map(opt => (
-              <button
-                key={opt}
-                className="bouncy-button"
-                onClick={() => handleTensPick(opt)}
-                style={optBtn('#4f46e5', '#3730a3')}
-              >
-                {opt}
-              </button>
+              <button key={opt} className="bouncy-button" onClick={() => handleTensPick(opt)} style={optBtn('#4f46e5', '#3730a3')}>{opt}</button>
             ))}
           </div>
-
           <div style={{ fontSize: '0.78rem', color: '#4338ca', textAlign: 'center' }}>
             💡 原理：因为头上点了退位点🔴，借走了一个十，所以十位要多减 1！
           </div>
         </div>
       )}
 
-      {/* STEP 6: 完成合体 */}
       {step === 'done' && (
-        <div className="bounce-in" style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-          background: '#f0fdf4', border: '2.5px solid #22c55e', borderRadius: '18px', padding: '14px', width: '100%'
-        }}>
+        <div className="bounce-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', background: '#f0fdf4', border: '2.5px solid #22c55e', borderRadius: '18px', padding: '14px', width: '100%' }}>
           <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#15803d', textAlign: 'center' }}>
             🌟 {a} − {b} ＝ {answer}
           </div>
-
-          <div style={{
-            display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center',
-            fontSize: '0.85rem', fontWeight: '800'
-          }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', fontSize: '0.85rem', fontWeight: '800' }}>
             <span style={{ background: '#e0e7ff', color: '#4338ca', padding: '3px 10px', borderRadius: '8px' }}>
               头：{aTens} − {bTens} − 1 ＝ {ansTens}
             </span>
@@ -601,44 +486,227 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
               尾：{aOnes} ＋ {complement} ＝ {ansOnes}
             </span>
           </div>
-
-          {ansTens === 0 && (
-            <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-              提示：十位是 0 时，最高位 0 不用写出来哦
-            </div>
-          )}
-
-          <button
-            className="bouncy-button primary"
-            onClick={onNext}
-            style={{
-              background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-              padding: '12px 32px', borderRadius: '24px', fontSize: '1.1rem', marginTop: '4px'
-            }}
-          >
+          <button className="bouncy-button primary" onClick={onNext} style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', padding: '12px 32px', borderRadius: '24px', fontSize: '1.1rem', marginTop: '4px' }}>
             下一题 ➔
           </button>
         </div>
       )}
 
-      {/* Hint Alert */}
       {hint && (
-        <div className="fade-in" style={{
-          color: '#dc2626', fontWeight: '800', fontSize: '0.88rem', textAlign: 'center',
-          background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '6px 12px'
-        }}>
+        <div className="fade-in" style={{ color: '#dc2626', fontWeight: '800', fontSize: '0.88rem', textAlign: 'center', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '6px 12px' }}>
           {hint}
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── 每日5题专属组件 (Daily 5 Questions with Streak & Stamp) ──
+function Daily5Section({ zh, lang, onBack }) {
+  const todayStr = useMemo(() => getTodayDateStr(), []);
+  
+  // 从 LocalStorage 读取今天的打卡状态与题目
+  const [dailyState, setDailyState] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`column_sub_daily_${todayStr}`);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {}
+
+    // 未做过，生成今日专属的5道题
+    return {
+      date: todayStr,
+      questions: generateDaily5(),
+      currentIndex: 0,
+      completedCount: 0,
+      isFinished: false,
+    };
+  });
+
+  // 读取连续打卡天数
+  const [streakDays, setStreakDays] = useState(() => {
+    return parseInt(localStorage.getItem('column_sub_daily_streak_days') || '1', 10);
+  });
+
+  // 当前正在做的题目
+  const currentQ = dailyState.questions[dailyState.currentIndex];
+
+  // 保存进度
+  const saveDailyProgress = useCallback((newState) => {
+    setDailyState(newState);
+    try {
+      localStorage.setItem(`column_sub_daily_${todayStr}`, JSON.stringify(newState));
+    } catch (e) {}
+  }, [todayStr]);
+
+  // 当做完一题
+  const handleDailySolved = () => {
+    const nextIdx = dailyState.currentIndex + 1;
+    const isNowFinished = nextIdx >= 5;
+    
+    if (isNowFinished) {
+      // 达成5题，累计打卡天数
+      const newStreak = streakDays + (dailyState.isFinished ? 0 : 1);
+      setStreakDays(newStreak);
+      try {
+        localStorage.setItem('column_sub_daily_streak_days', String(newStreak));
+      } catch (e) {}
+
+      confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
+      audioSynth.playLevelUp();
+      audioSynth.speak(zh ? '太棒啦！今日 5 道退位减法全部打卡成功！' : 'Congratulations! Daily 5 completed!', lang);
+    }
+
+    saveDailyProgress({
+      ...dailyState,
+      completedCount: Math.min(5, dailyState.completedCount + 1),
+      currentIndex: Math.min(4, nextIdx),
+      isFinished: isNowFinished,
+    });
+  };
+
+  // 再练一组（重新生成5道新题）
+  const handleResetDaily = () => {
+    audioSynth.playClick();
+    const newQuestions = generateDaily5();
+    saveDailyProgress({
+      date: todayStr,
+      questions: newQuestions,
+      currentIndex: 0,
+      completedCount: 0,
+      isFinished: false,
+    });
+  };
+
+  return (
+    <div style={{
+      width: '94%', maxWidth: '540px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)',
+      borderRadius: '24px', border: '2.5px solid #c7d2fe', padding: '16px',
+      display: 'flex', flexDirection: 'column', gap: '14px', alignItems: 'center',
+      boxShadow: '0 10px 30px rgba(79, 70, 229, 0.12)'
+    }}>
+
+      {/* ── 永远显示的口诀秘籍横幅 ── */}
+      <MnemonicBanner />
+
+      {/* ── 今日打卡进度条与状态 ── */}
+      <div style={{
+        width: '100%', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
+        border: '1.5px solid #c7d2fe', borderRadius: '18px', padding: '10px 14px',
+        display: 'flex', flexDirection: 'column', gap: '8px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#3730a3' }}>
+            📅 {todayStr} · 每日 5 题
+          </div>
+          <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '2px' }}>
+            <span>🔥 连续打卡</span>
+            <span style={{ fontSize: '0.95rem' }}>{streakDays}</span>
+            <span>天</span>
+          </div>
+        </div>
+
+        {/* 5个徽章格子 */}
+        <div style={{ display: 'flex', gap: '6px', justifyContent: 'space-between' }}>
+          {[0, 1, 2, 3, 4].map(idx => {
+            const isDone = idx < dailyState.completedCount;
+            const isCurrent = idx === dailyState.currentIndex && !dailyState.isFinished;
+
+            return (
+              <div
+                key={idx}
+                style={{
+                  flex: 1, height: '36px', borderRadius: '12px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: '900', fontSize: '0.9rem',
+                  background: isDone 
+                    ? 'linear-gradient(135deg, #22c55e, #16a34a)' 
+                    : isCurrent 
+                      ? '#4f46e5' 
+                      : '#cbd5e1',
+                  color: 'white',
+                  boxShadow: isCurrent ? '0 0 10px rgba(79, 70, 229, 0.4)' : 'none',
+                  transform: isCurrent ? 'scale(1.06)' : 'scale(1)',
+                  transition: 'all 0.25s ease'
+                }}
+              >
+                {isDone ? '⭐' : `第${idx + 1}题`}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 如果今天5道题全部完成 ── */}
+      {dailyState.isFinished ? (
+        <div className="bounce-in" style={{
+          width: '100%', background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+          border: '2.5px solid #22c55e', borderRadius: '20px', padding: '20px 16px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px'
+        }}>
+          <div style={{ fontSize: '3rem' }}>🏅</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#15803d', textAlign: 'center' }}>
+            🎉 今日打卡大成功！
+          </div>
+          <div style={{ fontSize: '0.9rem', color: '#166534', fontWeight: '700', textAlign: 'center', lineHeight: 1.4 }}>
+            小朋友太棒了！已顺利完成今日 5 道退位减法练习。<br />
+            记牢口诀：<b>“头减头减1，尾加补数”</b>！
+          </div>
+
+          {/* 今日做过的5道题清单回顾 */}
+          <div style={{
+            width: '100%', background: 'white', borderRadius: '14px', padding: '10px 14px',
+            border: '1.5px solid #bbf7d0', display: 'flex', flexDirection: 'column', gap: '6px'
+          }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#15803d' }}>
+              📋 今日练习回顾：
+            </div>
+            {dailyState.questions.map((q, i) => (
+              <div key={q.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', fontWeight: '700', color: '#334155' }}>
+                <span>第 {i + 1} 题：{q.a} − {q.b}</span>
+                <span style={{ color: '#16a34a' }}>＝ {q.answer} ✅</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '6px' }}>
+            <button
+              className="bouncy-button secondary"
+              onClick={handleResetDaily}
+              style={{ flex: 1, padding: '12px', borderRadius: '18px', fontSize: '0.95rem' }}
+            >
+              🔄 再练一组 5 题
+            </button>
+            <button
+              className="bouncy-button primary"
+              onClick={onBack}
+              style={{ flex: 1, padding: '12px', borderRadius: '18px', fontSize: '0.95rem', background: 'linear-gradient(135deg, #22c55e, #16a34a)' }}
+            >
+              🏠 返回主页
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* ── 正在做当前的题目（嵌入完整的竖式借位引导） ── */
+        <ColumnGuide
+          key={currentQ.id}
+          problem={currentQ}
+          zh={zh}
+          lang={lang}
+          onSolved={handleDailySolved}
+          onNext={() => {}}
+        />
       )}
 
     </div>
   );
 }
 
-// ── Main Page Component ──
+// ── 主页面组件 ──
 export default function ColumnSubGame({ lang = 'zh', onBack }) {
   const [level, setLevel] = useState(1);
-  const [gameMode, setGameMode] = useState('guide'); // 'guide' (分步竖式) | 'speed' (口诀速算)
+  const [gameMode, setGameMode] = useState('daily'); // 默认'daily' (每日5题) | 'guide' (自由竖式) | 'speed' (口诀速算)
   const [problem, setProblem] = useState(null);
   const [streak, setStreak] = useState(0);
   const [guideSolved, setGuideSolved] = useState(false);
@@ -650,12 +718,12 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
   const zh = lang === 'zh';
 
   const nextProblem = useCallback(() => {
-    setProblem(generateProblem(level));
+    setProblem(generateProblem('mixed'));
     setGuideSolved(false);
     setSpeedTensInput('');
     setSpeedOnesInput('');
     setSpeedFeedback(null);
-  }, [level]);
+  }, []);
 
   useEffect(() => { nextProblem(); }, [nextProblem]);
 
@@ -677,9 +745,11 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
   if (!problem) return null;
 
   const tabBtn = (active) => ({
-    padding: '6px 14px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+    padding: '7px 12px', borderRadius: '12px', border: 'none', cursor: 'pointer',
     background: active ? '#4f46e5' : 'transparent',
     color: active ? 'white' : '#3730a3', fontWeight: '800', fontSize: '0.82rem',
+    boxShadow: active ? '0 2px 8px rgba(79, 70, 229, 0.3)' : 'none',
+    transition: 'all 0.2s ease',
   });
 
   return (
@@ -700,7 +770,7 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
             📝 {zh ? '竖式退位减法' : 'Column Subtraction'}
           </div>
           <div style={{ fontSize: '0.78rem', color: '#6366f1', fontWeight: '700' }}>
-            {zh ? '速算口诀专练' : 'Mental Math Technique'}
+            {zh ? '每日 5 题 · 口诀专练' : 'Daily 5 Practice'}
           </div>
         </div>
 
@@ -712,35 +782,40 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
         </div>
       </div>
 
-      {/* ── Mode Switcher & Difficulty ── */}
+      {/* ── Mode Switcher (每日5题 / 分步竖式 / 口诀速算) ── */}
       <div style={{ display: 'flex', gap: '8px', width: '94%', maxWidth: '540px', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', background: 'rgba(255,255,255,0.75)', borderRadius: '14px', padding: '3px', border: '1.5px solid #c7d2fe' }}>
+          <button onClick={() => { audioSynth.playClick(); setGameMode('daily'); }} style={tabBtn(gameMode === 'daily')}>
+            {zh ? '📅 每日5题' : 'Daily 5'}
+          </button>
           <button onClick={() => { audioSynth.playClick(); setGameMode('guide'); }} style={tabBtn(gameMode === 'guide')}>
-            {zh ? '📝 分步竖式' : 'Step by Step'}
+            {zh ? '📝 自由竖式' : 'Free Mode'}
           </button>
           <button onClick={() => { audioSynth.playClick(); setGameMode('speed'); }} style={tabBtn(gameMode === 'speed')}>
             {zh ? '⚡ 口诀速算' : 'Speed Quiz'}
           </button>
         </div>
 
-        {/* Level buttons */}
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {[1, 2, 3].map(lvl => (
-            <button
-              key={lvl}
-              onClick={() => { audioSynth.playClick(); setLevel(lvl); }}
-              style={{
-                width: '32px', height: '32px', borderRadius: '10px',
-                border: level === lvl ? '2px solid #4f46e5' : '1px solid #c7d2fe',
-                background: level === lvl ? '#eef2ff' : 'white',
-                color: level === lvl ? '#4f46e5' : '#3730a3',
-                fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer'
-              }}
-            >
-              {lvl}
-            </button>
-          ))}
-        </div>
+        {/* 自由模式下的难度与连击 */}
+        {gameMode !== 'daily' && (
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {[1, 2, 3].map(lvl => (
+              <button
+                key={lvl}
+                onClick={() => { audioSynth.playClick(); setLevel(lvl); }}
+                style={{
+                  width: '32px', height: '32px', borderRadius: '10px',
+                  border: level === lvl ? '2px solid #4f46e5' : '1px solid #c7d2fe',
+                  background: level === lvl ? '#eef2ff' : 'white',
+                  color: level === lvl ? '#4f46e5' : '#3730a3',
+                  fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer'
+                }}
+              >
+                {lvl}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Streak counter */}
         <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '2px' }}>
@@ -748,41 +823,52 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
         </div>
       </div>
 
-      {/* ── Equation Banner ── */}
-      <div style={{
-        width: '94%', maxWidth: '540px', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
-        border: '3px solid #818cf8', borderRadius: '24px', padding: '12px 18px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 6px 20px rgba(99, 102, 241, 0.18)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '2.1rem', fontWeight: '900', color: '#3730a3', fontFamily: 'Fredoka, sans-serif' }}>
-          <span>{problem.a}</span>
-          <span style={{ color: '#ef4444' }}>−</span>
-          <span>{problem.b}</span>
-          <span>=</span>
-          <div style={{
-            minWidth: '70px', height: '48px', padding: '0 12px', background: 'white', borderRadius: '16px',
-            border: '2.5px dashed #6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#16a34a', fontSize: '2rem', fontWeight: '900'
-          }}>
-            {guideSolved || speedFeedback === 'correct' ? problem.answer : '?'}
-          </div>
-        </div>
-      </div>
-
-      {/* ── MODE 1: 分步竖式 ── */}
-      {gameMode === 'guide' && (
-        <ColumnGuide
-          key={problem.id}
-          problem={problem}
+      {/* ── 模式 1：📅 每日5题（今日打卡） ── */}
+      {gameMode === 'daily' && (
+        <Daily5Section
           zh={zh}
           lang={lang}
-          onSolved={() => { setGuideSolved(true); setStreak(s => s + 1); }}
-          onNext={nextProblem}
+          onBack={onBack}
         />
       )}
 
-      {/* ── MODE 2: 口诀速算 ── */}
+      {/* ── 模式 2：📝 自由分步竖式 ── */}
+      {gameMode === 'guide' && (
+        <>
+          {/* Equation Banner */}
+          <div style={{
+            width: '94%', maxWidth: '540px', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
+            border: '3px solid #818cf8', borderRadius: '24px', padding: '12px 18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 6px 20px rgba(99, 102, 241, 0.18)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '2.1rem', fontWeight: '900', color: '#3730a3', fontFamily: 'Fredoka, sans-serif' }}>
+              <span>{problem.a}</span>
+              <span style={{ color: '#ef4444' }}>−</span>
+              <span>{problem.b}</span>
+              <span>=</span>
+              <div style={{
+                minWidth: '70px', height: '48px', padding: '0 12px', background: 'white', borderRadius: '16px',
+                border: '2.5px dashed #6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#16a34a', fontSize: '2rem', fontWeight: '900'
+              }}>
+                {guideSolved ? problem.answer : '?'}
+              </div>
+            </div>
+          </div>
+
+          <ColumnGuide
+            key={problem.id}
+            problem={problem}
+            zh={zh}
+            lang={lang}
+            onSolved={() => { setGuideSolved(true); setStreak(s => s + 1); }}
+            onNext={nextProblem}
+          />
+        </>
+      )}
+
+      {/* ── 模式 3：⚡ 口诀速算 ── */}
       {gameMode === 'speed' && (
         <div style={{
           width: '94%', maxWidth: '540px', background: 'rgba(255, 255, 255, 0.94)', backdropFilter: 'blur(16px)',
@@ -794,7 +880,28 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
           {/* 每次做题都显示口诀秘籍 */}
           <MnemonicBanner />
 
-          {/* Formula Helper Card for current problem */}
+          {/* Equation Banner */}
+          <div style={{
+            width: '100%', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
+            border: '2.5px solid #818cf8', borderRadius: '20px', padding: '10px 14px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '1.9rem', fontWeight: '900', color: '#3730a3', fontFamily: 'Fredoka, sans-serif' }}>
+              <span>{problem.a}</span>
+              <span style={{ color: '#ef4444' }}>−</span>
+              <span>{problem.b}</span>
+              <span>=</span>
+              <div style={{
+                minWidth: '60px', height: '44px', padding: '0 10px', background: 'white', borderRadius: '14px',
+                border: '2px dashed #6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#16a34a', fontSize: '1.8rem', fontWeight: '900'
+              }}>
+                {speedFeedback === 'correct' ? problem.answer : '?'}
+              </div>
+            </div>
+          </div>
+
+          {/* Helper Card for current problem */}
           <div style={{
             width: '100%', background: '#f8fafc', borderRadius: '16px', padding: '10px 14px',
             border: '1.5px solid #e2e8f0', display: 'flex', justifyContent: 'space-around', fontSize: '0.85rem'
