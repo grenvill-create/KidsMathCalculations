@@ -315,6 +315,58 @@ function ColumnGuide({ problem, zh, lang, onSolved, onNext }) {
     }}>
       <MnemonicBanner activeHighlight={activeMnemonic} />
 
+      {/* ── 横式题目显示 (让小朋友一眼看懂横式算式与竖式的对应) ── */}
+      <div style={{
+        width: '100%',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)',
+        border: '2px solid #a5b4fc',
+        borderRadius: '18px',
+        padding: '10px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: '0 3px 10px rgba(99, 102, 241, 0.1)',
+        position: 'relative'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{
+            fontSize: '0.82rem', fontWeight: '800', color: '#4f46e5',
+            background: 'white', padding: '3px 10px', borderRadius: '8px',
+            border: '1.5px solid #c7d2fe', boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+          }}>
+            📖 横式
+          </span>
+        </div>
+
+        <div style={{
+          display: 'flex', alignItems: 'baseline', gap: '8px',
+          fontSize: '2rem', fontWeight: '900', color: '#3730a3',
+          fontFamily: 'Fredoka, sans-serif'
+        }}>
+          <span>{a}</span>
+          <span style={{ color: '#ef4444' }}>−</span>
+          <span>{b}</span>
+          <span style={{ color: '#6366f1' }}>＝</span>
+          <div style={{
+            minWidth: '64px', height: '44px', padding: '0 10px',
+            background: 'white', borderRadius: '12px',
+            border: '2.5px dashed #6366f1', display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+            color: '#16a34a', fontSize: '1.8rem', fontWeight: '900',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)'
+          }}>
+            {tensDone && onesDone ? answer : onesDone ? `?${ansOnes}` : '?'}
+          </div>
+        </div>
+
+        <div style={{
+          fontSize: '0.78rem', color: '#6366f1', fontWeight: '800',
+          background: '#e0e7ff', padding: '3px 8px', borderRadius: '8px'
+        }}>
+          ⬇️ 竖式计算
+        </div>
+      </div>
+
       {/* 竖式作业本 */}
       <div style={{
         background: '#fffef7', borderRadius: '20px', padding: '14px 24px 10px',
@@ -587,9 +639,6 @@ function Daily5Section({ zh, lang, onBack }) {
       boxShadow: '0 10px 30px rgba(79, 70, 229, 0.12)'
     }}>
 
-      {/* ── 永远显示的口诀秘籍横幅 ── */}
-      <MnemonicBanner />
-
       {/* ── 今日打卡进度条与状态 ── */}
       <div style={{
         width: '100%', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
@@ -834,38 +883,14 @@ export default function ColumnSubGame({ lang = 'zh', onBack }) {
 
       {/* ── 模式 2：📝 自由分步竖式 ── */}
       {gameMode === 'guide' && (
-        <>
-          {/* Equation Banner */}
-          <div style={{
-            width: '94%', maxWidth: '540px', background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
-            border: '3px solid #818cf8', borderRadius: '24px', padding: '12px 18px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 6px 20px rgba(99, 102, 241, 0.18)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '2.1rem', fontWeight: '900', color: '#3730a3', fontFamily: 'Fredoka, sans-serif' }}>
-              <span>{problem.a}</span>
-              <span style={{ color: '#ef4444' }}>−</span>
-              <span>{problem.b}</span>
-              <span>=</span>
-              <div style={{
-                minWidth: '70px', height: '48px', padding: '0 12px', background: 'white', borderRadius: '16px',
-                border: '2.5px dashed #6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#16a34a', fontSize: '2rem', fontWeight: '900'
-              }}>
-                {guideSolved ? problem.answer : '?'}
-              </div>
-            </div>
-          </div>
-
-          <ColumnGuide
-            key={problem.id}
-            problem={problem}
-            zh={zh}
-            lang={lang}
-            onSolved={() => { setGuideSolved(true); setStreak(s => s + 1); }}
-            onNext={nextProblem}
-          />
-        </>
+        <ColumnGuide
+          key={problem.id}
+          problem={problem}
+          zh={zh}
+          lang={lang}
+          onSolved={() => { setGuideSolved(true); setStreak(s => s + 1); }}
+          onNext={nextProblem}
+        />
       )}
 
       {/* ── 模式 3：⚡ 口诀速算 ── */}
